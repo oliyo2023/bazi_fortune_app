@@ -8,16 +8,16 @@ import '../modules/result/view.dart';
 part 'app_routes.dart';
 
 class AppPages {
-  static const INITIAL = Routes.HOME;
+  static const initial = Routes.home;
 
   static final routes = [
     GetPage(
-      name: _Paths.HOME,
+      name: _Paths.home,
       page: () => HomePage(),
       binding: HomeBinding(),
     ),
     GetPage(
-      name: _Paths.RESULT,
+      name: _Paths.result,
       page: () => ResultPage(),
       binding: ResultBinding(),
     ),

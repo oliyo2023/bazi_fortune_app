@@ -13,7 +13,7 @@ void main() async {
     GetMaterialApp(
       debugShowCheckedModeBanner: false, // 去掉Debug角标
       title: "Bazi Fortune",
-      initialRoute: AppPages.INITIAL,
+      initialRoute: AppPages.initial,
       getPages: AppPages.routes,
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,

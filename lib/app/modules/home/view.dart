@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'controller.dart';
 
 class HomePage extends GetView<HomeController> {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,13 +15,11 @@ class HomePage extends GetView<HomeController> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFE6E9F8),
-              Color(0xFFFDFBFF),
-            ],
+            colors: [Color(0xFFE6E9F8), Color(0xFFFDFBFF)],
           ),
         ),
-        child: SafeArea( // 使用SafeArea防止内容被刘海屏遮挡
+        child: SafeArea(
+          // 使用SafeArea防止内容被刘海屏遮挡
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
@@ -60,7 +60,7 @@ class HomePage extends GetView<HomeController> {
             color: Colors.black.withAlpha(13),
             blurRadius: 10,
             offset: Offset(0, 5),
-          )
+          ),
         ],
       ),
       child: Row(
@@ -86,8 +86,17 @@ class HomePage extends GetView<HomeController> {
             ),
             child: Row(
               children: [
-                Text('签', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
-                Text('+10易铢', style: TextStyle(color: Colors.orange.shade700, fontSize: 10)),
+                Text(
+                  '签',
+                  style: TextStyle(
+                    color: Colors.orange,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '+10易铢',
+                  style: TextStyle(color: Colors.orange.shade700, fontSize: 10),
+                ),
               ],
             ),
           ),
@@ -102,7 +111,6 @@ class HomePage extends GetView<HomeController> {
     );
   }
 
-
   // 万年历卡片
   Widget _buildAlmanacCard() {
     return Card(
@@ -111,75 +119,119 @@ class HomePage extends GetView<HomeController> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         padding: EdgeInsets.all(16),
-        child: Obx(() => Column( 
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  controller.lunarDate.value,
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.red.shade700),
-                ),
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    image: DecorationImage(
-                      image: NetworkImage('https://via.placeholder.com/48/FFFFFF/000000?text=Weather'),
-                      fit: BoxFit.cover,
+        child: Obx(
+          () => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    controller.lunarDate.value,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red.shade700,
                     ),
                   ),
-                )
-              ],
-            ),
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Text('${controller.yearZodiac.value} ${controller.solarDate.value}', style: TextStyle(color: Colors.grey.shade700)),
-                SizedBox(width: 8),
-                Text(controller.weekDay.value, style: TextStyle(color: Colors.grey.shade700)),
-                SizedBox(width: 8),
-                Text('第${controller.weekOfYear.value}周', style: TextStyle(color: Colors.grey.shade700)),
-                Spacer(),
-                Text(controller.solarTerm.value, style: TextStyle(color: Colors.grey.shade700)),
-              ],
-            ),
-            Divider(height: 24),
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade100,
-                    borderRadius: BorderRadius.circular(4),
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          'https://via.placeholder.com/48/FFFFFF/000000?text=Weather',
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                  child: Text('宜', style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.bold)),
-                ),
-                SizedBox(width: 8),
-                Expanded(child: Text('嫁娶 祭祀 塑绘 开光 出行 解除', overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey.shade800))),
-                 Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-              ],
-            ),
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade100,
-                    borderRadius: BorderRadius.circular(4),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Text(
+                    '${controller.yearZodiac.value} ${controller.solarDate.value}',
+                    style: TextStyle(color: Colors.grey.shade700),
                   ),
-                  child: Text('忌', style: TextStyle(color: Colors.red.shade800, fontWeight: FontWeight.bold)),
-                ),
-                SizedBox(width: 8),
-                Expanded(child: Text('伐木 行丧 作灶 作梁 安葬', overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey.shade800))),
-                 Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-              ],
-            ),
-          ],
-        )),
+                  SizedBox(width: 8),
+                  Text(
+                    controller.weekDay.value,
+                    style: TextStyle(color: Colors.grey.shade700),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    '第${controller.weekOfYear.value}周',
+                    style: TextStyle(color: Colors.grey.shade700),
+                  ),
+                  Spacer(),
+                  Text(
+                    controller.solarTerm.value,
+                    style: TextStyle(color: Colors.grey.shade700),
+                  ),
+                ],
+              ),
+              Divider(height: 24),
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '宜',
+                      style: TextStyle(
+                        color: Colors.green.shade800,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '嫁娶 祭祀 塑绘 开光 出行 解除',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Colors.grey.shade800),
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade100,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '忌',
+                      style: TextStyle(
+                        color: Colors.red.shade800,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '伐木 行丧 作灶 作梁 安葬',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Colors.grey.shade800),
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -203,7 +255,9 @@ class HomePage extends GetView<HomeController> {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: isSelected ? Color(0xFF8A65F0) : Colors.transparent,
+                      color: isSelected
+                          ? Color(0xFF8A65F0)
+                          : Colors.transparent,
                       width: 3,
                     ),
                   ),
@@ -213,8 +267,12 @@ class HomePage extends GetView<HomeController> {
                     chartTypes[index],
                     style: TextStyle(
                       fontSize: isSelected ? 18 : 16,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      color: isSelected ? Color(0xFF8A65F0) : Colors.grey.shade600,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: isSelected
+                          ? Color(0xFF8A65F0)
+                          : Colors.grey.shade600,
                     ),
                   ),
                 ),
@@ -225,7 +283,6 @@ class HomePage extends GetView<HomeController> {
       ),
     );
   }
-
 
   // 排盘输入卡片
   Widget _buildInputCard() {
@@ -242,45 +299,66 @@ class HomePage extends GetView<HomeController> {
               children: [
                 Text('性    别:', style: TextStyle(fontSize: 16)),
                 SizedBox(width: 20),
-                Obx(() => ToggleButtons(
-                  isSelected: [controller.selectedGender.value == 0, controller.selectedGender.value == 1],
-                  onPressed: (index) => controller.selectGender(index),
-                  borderRadius: BorderRadius.circular(20),
-                  selectedColor: Colors.white,
-                  fillColor: Color(0xFF8A65F0),
-                  splashColor: Color(0xFF8A65F0).withAlpha(31),
-                  hoverColor: Color(0xFF8A65F0).withAlpha(10),
-                  renderBorder: false,
-                  children: [
-                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(children: [Icon(Icons.male), SizedBox(width:4), Text('男')]),
-                    ),
-                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(children: [Icon(Icons.female), SizedBox(width:4), Text('女')]),
-                    ),
-                  ],
-                )),
+                Obx(
+                  () => ToggleButtons(
+                    isSelected: [
+                      controller.selectedGender.value == 0,
+                      controller.selectedGender.value == 1,
+                    ],
+                    onPressed: (index) => controller.selectGender(index),
+                    borderRadius: BorderRadius.circular(20),
+                    selectedColor: Colors.white,
+                    fillColor: Color(0xFF8A65F0),
+                    splashColor: Color(0xFF8A65F0).withAlpha(31),
+                    hoverColor: Color(0xFF8A65F0).withAlpha(10),
+                    renderBorder: false,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.male),
+                            SizedBox(width: 4),
+                            Text('男'),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.female),
+                            SizedBox(width: 4),
+                            Text('女'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
             Divider(height: 30),
             // 生辰选择
-             Row(
+            Row(
               children: [
                 Text('生    辰:', style: TextStyle(fontSize: 16)),
                 SizedBox(width: 20),
-                Expanded(child: Text('请选择生辰', style: TextStyle(color: Colors.grey))),
+                Expanded(
+                  child: Text('请选择生辰', style: TextStyle(color: Colors.grey)),
+                ),
                 Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
               ],
             ),
             Divider(height: 30),
             // 出生地区
-             Row(
+            Row(
               children: [
                 Text('出生地区:', style: TextStyle(fontSize: 16)),
                 SizedBox(width: 20),
-                Expanded(child: Text('点击选取', style: TextStyle(color: Colors.grey))),
+                Expanded(
+                  child: Text('点击选取', style: TextStyle(color: Colors.grey)),
+                ),
                 Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
               ],
             ),
@@ -290,19 +368,20 @@ class HomePage extends GetView<HomeController> {
               children: [
                 Text('姓    名:', style: TextStyle(fontSize: 16)),
                 SizedBox(width: 20),
-                Expanded(child: TextField(
-                  decoration: InputDecoration(
-                    hintText: '请输入姓名',
-                    border: InputBorder.none,
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: '请输入姓名',
+                      border: InputBorder.none,
+                    ),
                   ),
-                )),
+                ),
               ],
             ),
             SizedBox(height: 20),
             // 马上排盘按钮
             ElevatedButton(
               onPressed: () {},
-              child: Text('马上排盘', style: TextStyle(fontSize: 18, color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF8A65F0),
                 minimumSize: Size(double.infinity, 50),
@@ -310,13 +389,17 @@ class HomePage extends GetView<HomeController> {
                   borderRadius: BorderRadius.circular(25),
                 ),
               ),
-            )
+              child: Text(
+                '马上排盘',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
-  
+
   // 底部快捷功能区
   Widget _buildQuickActions() {
     return Row(
@@ -330,7 +413,10 @@ class HomePage extends GetView<HomeController> {
     );
   }
 
-  Widget _buildQuickActionButton({required IconData icon, required String label}) {
+  Widget _buildQuickActionButton({
+    required IconData icon,
+    required String label,
+  }) {
     return Column(
       children: [
         Icon(icon, color: Color(0xFF8A65F0), size: 30),
@@ -347,26 +433,11 @@ class HomePage extends GetView<HomeController> {
       selectedItemColor: Color(0xFF8A65F0),
       unselectedItemColor: Colors.grey,
       items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: '首页',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.show_chart),
-          label: '运势',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.people),
-          label: '大师咨询',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.message),
-          label: '消息',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: '我的',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: '首页'),
+        BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: '运势'),
+        BottomNavigationBarItem(icon: Icon(Icons.people), label: '大师咨询'),
+        BottomNavigationBarItem(icon: Icon(Icons.message), label: '消息'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: '我的'),
       ],
       // currentIndex: 0, // 后面用controller控制
       // onTap: (index) {},
