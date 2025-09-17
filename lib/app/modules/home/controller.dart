@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:intl/intl.dart'; // 用来格式化日期
+import 'package:lunar/lunar.dart'; // 农历库
 
 class HomeController extends GetxController {
-  
   // 万年历数据
   final RxString lunarDate = '七月廿三'.obs;
   final RxString solarDate = ''.obs;
@@ -25,13 +25,24 @@ class HomeController extends GetxController {
     final now = DateTime.now();
     solarDate.value = DateFormat('M月d日').format(now);
     weekDay.value = DateFormat('EEEE', 'zh_CN').format(now); // 指定中文 locale
-    
+
     // 计算一年中的第几周
     final firstDayOfYear = DateTime(now.year, 1, 1);
     final dayOfYear = now.difference(firstDayOfYear).inDays;
     weekOfYear.value = (dayOfYear / 7).ceil();
 
-    // TODO: 农历、节气、生肖等需要专门的库来计算，暂时用假数据
+    // 使用lunar库计算农历信息
+    final lunar = Lunar.fromDate(now);
+    lunarDate.value = '${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}';
+    yearZodiac.value = '${lunar.getYearShengXiao()}年';
+
+    // 获取节气信息
+    final jieQi = lunar.getJieQi();
+    if (jieQi.isNotEmpty) {
+      solarTerm.value = jieQi;
+    } else {
+      solarTerm.value = '无节气';
+    }
   }
 
   void selectGender(int index) {

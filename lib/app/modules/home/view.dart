@@ -177,16 +177,17 @@ class HomePage extends GetView<HomeController> {
               Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.green.shade100,
-                      borderRadius: BorderRadius.circular(4),
+                      color: Colors.green.shade500,
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '宜',
                       style: TextStyle(
-                        color: Colors.green.shade800,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -205,16 +206,17 @@ class HomePage extends GetView<HomeController> {
               Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade100,
-                      borderRadius: BorderRadius.circular(4),
+                      color: Colors.red.shade500,
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '忌',
                       style: TextStyle(
-                        color: Colors.red.shade800,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
                     ),
                   ),
