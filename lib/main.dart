@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart'; // 引入咒语
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/core/values/supabase_config.dart';
+import 'app/core/bindings/initial_binding.dart';
 import 'app/routes/app_pages.dart';
 
 void main() async {
@@ -18,16 +19,43 @@ void main() async {
     anonKey: supabaseAnonKey,
   );
   
-  runApp(
-    GetMaterialApp(
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false, // 去掉Debug角标
-      title: "Bazi Fortune",
+      title: "八字算命",
+      initialBinding: InitialBinding(),
       initialRoute: AppPages.initial,
       getPages: AppPages.routes,
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        fontFamily: 'PingFang SC', // 使用中文字体
+        appBarTheme: AppBarTheme(
+          elevation: 0,
+          centerTitle: true,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+        cardTheme: CardThemeData(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       ),
-    ),
-  );
+      locale: Locale('zh', 'CN'), // 设置中文
+      fallbackLocale: Locale('zh', 'CN'),
+    );
+  }
 }

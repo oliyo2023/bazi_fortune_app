@@ -44,7 +44,7 @@ class HomePage extends GetView<HomeController> {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNavBar(),
+
     );
   }
 
@@ -139,12 +139,16 @@ class HomePage extends GetView<HomeController> {
                     height: 48,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      image: DecorationImage(
-                        image: NetworkImage(
-                          'https://via.placeholder.com/48/FFFFFF/000000?text=Weather',
-                        ),
-                        fit: BoxFit.cover,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF8A65F0), Color(0xFF6B46C1)],
                       ),
+                    ),
+                    child: Icon(
+                      Icons.wb_sunny,
+                      size: 24,
+                      color: Colors.white,
                     ),
                   ),
                 ],
@@ -383,7 +387,7 @@ class HomePage extends GetView<HomeController> {
             SizedBox(height: 20),
             // 马上排盘按钮
             ElevatedButton(
-              onPressed: () {},
+              onPressed: controller.goToBaziInput,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF8A65F0),
                 minimumSize: Size(double.infinity, 50),
@@ -428,21 +432,5 @@ class HomePage extends GetView<HomeController> {
     );
   }
 
-  // 底部导航栏
-  Widget _buildBottomNavBar() {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed, // 固定模式
-      selectedItemColor: Color(0xFF8A65F0),
-      unselectedItemColor: Colors.grey,
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: '首页'),
-        BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: '运势'),
-        BottomNavigationBarItem(icon: Icon(Icons.people), label: '大师咨询'),
-        BottomNavigationBarItem(icon: Icon(Icons.message), label: '消息'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: '我的'),
-      ],
-      // currentIndex: 0, // 后面用controller控制
-      // onTap: (index) {},
-    );
-  }
+
 }

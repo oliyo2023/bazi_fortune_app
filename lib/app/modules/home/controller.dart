@@ -52,4 +52,12 @@ class HomeController extends GetxController {
   void selectChartType(int index) {
     selectedChartType.value = index;
   }
+
+  void goToBaziInput() {
+    Get.toNamed('/bazi-input');
+  }
+
+  void goToLogin() {
+    Get.toNamed('/login');
+  }
 }
