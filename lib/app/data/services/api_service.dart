@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_model.dart';
@@ -6,7 +5,7 @@ import '../models/bazi_model.dart';
 
 class ApiService extends GetxService {
   static ApiService get to => Get.find();
-  
+
   final SupabaseClient _supabase = Supabase.instance.client;
   final String _baseUrl = 'http://127.0.0.1:8080/api/v1'; // 后端API地址
 
@@ -17,7 +16,7 @@ class ApiService extends GetxService {
         email: email,
         password: password,
       );
-      
+
       if (response.user != null) {
         // 获取用户详细信息
         final userResponse = await _supabase
@@ -25,7 +24,7 @@ class ApiService extends GetxService {
             .select()
             .eq('id', response.user!.id)
             .single();
-        
+
         return UserModel.fromJson(userResponse);
       }
       return null;
@@ -35,13 +34,17 @@ class ApiService extends GetxService {
     }
   }
 
-  Future<UserModel?> register(String email, String password, String name) async {
+  Future<UserModel?> register(
+    String email,
+    String password,
+    String name,
+  ) async {
     try {
       final response = await _supabase.auth.signUp(
         email: email,
         password: password,
       );
-      
+
       if (response.user != null) {
         // 创建用户资料
         final userProfile = {
@@ -52,7 +55,7 @@ class ApiService extends GetxService {
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         };
-        
+
         await _supabase.from('users').insert(userProfile);
         return UserModel.fromJson(userProfile);
       }
@@ -81,7 +84,7 @@ class ApiService extends GetxService {
             .select()
             .eq('id', user.id)
             .single();
-        
+
         return UserModel.fromJson(userResponse);
       }
       return null;
@@ -119,7 +122,8 @@ class ApiService extends GetxService {
         requestData,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${_supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${_supabase.auth.currentSession?.accessToken}',
         },
       );
 
@@ -142,7 +146,8 @@ class ApiService extends GetxService {
         {'bazi_id': baziId},
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${_supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${_supabase.auth.currentSession?.accessToken}',
         },
       );
 
@@ -169,7 +174,17 @@ class ApiService extends GetxService {
           .eq('user_id', user.id)
           .order('created_at', ascending: false);
 
-      return response.map<BaziModel>((json) => BaziModel.fromJson(json)).toList();
+      return response
+          .map<BaziModel>((json) => BaziModel.fromJson(json))
+          .toList();
+    } on PostgrestException catch (e) {
+      if (e.code == 'PGRST205') {
+        // 表不存在错误
+        print('数据库表 bazi_data 不存在，请运行迁移');
+        throw Exception('数据库准备中，请稍后重试或联系管理员');
+      }
+      print('获取历史记录错误: $e');
+      throw Exception('获取历史记录失败: ${e.toString()}');
     } catch (e) {
       print('获取历史记录错误: $e');
       throw Exception('获取历史记录失败: ${e.toString()}');
@@ -182,7 +197,8 @@ class ApiService extends GetxService {
       final response = await GetConnect().get(
         '$_baseUrl/bazi/detail/$baziId',
         headers: {
-          'Authorization': 'Bearer ${_supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${_supabase.auth.currentSession?.accessToken}',
         },
       );
 

@@ -8,277 +8,484 @@ class ProfilePage extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('我的'),
-        backgroundColor: Color(0xFF8A65F0),
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF8A65F0), Colors.white],
-            stops: [0.0, 0.3],
-          ),
-        ),
-        child: Obx(
-          () => controller.isLoggedIn
-              ? _buildLoggedInView()
-              : _buildLoginPrompt(),
-        ),
-      ),
+      backgroundColor: const Color(0xFFF5F6FA),
+      body: Obx(() {
+        return controller.isLoggedIn ? const _ProfileBody() : _LoginPrompt(onLogin: controller.goToLogin);
+      }),
     );
   }
+}
 
-  Widget _buildLoggedInView() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          SizedBox(height: 20),
-          _buildUserInfo(),
-          SizedBox(height: 20),
-          _buildMenuItems(),
-          SizedBox(height: 20),
-          _buildBaziHistory(),
-        ],
-      ),
-    );
-  }
+class _ProfileBody extends GetView<ProfileController> {
+  const _ProfileBody();
 
-  Widget _buildLoginPrompt() {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.person_outline,
-              size: 80,
-              color: Colors.white.withOpacity(0.8),
-            ),
-            SizedBox(height: 24),
-            Text(
-              '登录后查看更多功能',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              '登录后可以保存八字记录\n查看历史分析结果',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white.withOpacity(0.8),
-              ),
-            ),
-            SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: controller.goToLogin,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Color(0xFF8A65F0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                ),
-                child: Text(
-                  '立即登录',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: _UI.gradientHeader,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUserInfo() {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 30,
-              backgroundColor: Color(0xFF8A65F0),
-              child: Text(
-                controller.userName.isNotEmpty ? controller.userName[0] : 'U',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            SizedBox(width: 16),
-            Expanded(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  _TopNoticeBar(),
+                  SizedBox(height: 12),
+                  _UserCard(),
+                ],
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: _UI.pagePadding,
+              child: const _VipPrivilegeBar(),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+              child: const _FeatureGrid(),
+            ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: const _LuckBanner(),
+            ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
                 children: [
-                  Text(
-                    controller.userName,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  _ArrowTile(
+                    icon: Icons.edit_note_rounded,
+                    title: "意见反馈",
+                    onTap: Get.find<ProfileController>().onFeedbackTap,
                   ),
-                  SizedBox(height: 4),
-                  Text(
-                    controller.userEmail,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade600,
-                    ),
+                  const SizedBox(height: 8),
+                  _ArrowTile(
+                    icon: Icons.headset_mic_rounded,
+                    title: "推广官",
+                    onTap: Get.find<ProfileController>().onPromotionTap,
                   ),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, color: Colors.grey),
-          ],
-        ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 16)),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildMenuItems() {
-    final menuItems = [
-      {'icon': Icons.history, 'title': '排盘记录', 'onTap': () {}},
-      {'icon': Icons.favorite, 'title': '我的收藏', 'onTap': () {}},
-      {'icon': Icons.settings, 'title': '设置', 'onTap': () {}},
-      {'icon': Icons.help, 'title': '帮助与反馈', 'onTap': () {}},
-      {'icon': Icons.info, 'title': '关于我们', 'onTap': () {}},
+class _LoginPrompt extends StatelessWidget {
+  final VoidCallback onLogin;
+  const _LoginPrompt({required this.onLogin});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        const Text('请先登录'),
+        const SizedBox(height: 12),
+        ElevatedButton(onPressed: onLogin, child: const Text('登录')),
+      ]),
+    );
+  }
+}
+
+/// 视觉常量与样式
+class _UI {
+  static const radiusL = 16.0;
+  static const radiusXL = 20.0;
+  static const pagePadding = EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+
+  static const gradientHeader = LinearGradient(
+    colors: [Color(0xFFB0D7FF), Color(0xFFEEDCFF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const gradientUserCard = LinearGradient(
+    colors: [Color(0xFF9BB7FF), Color(0xFFF0D2FF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const gradientVip = LinearGradient(
+    colors: [Color(0xFFFFE3B3), Color(0xFFFFD599)],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  );
+
+  static const shadowSoft = [
+    BoxShadow(
+      color: Color(0x1A000000),
+      blurRadius: 10,
+      offset: Offset(0, 4),
+    )
+  ];
+}
+
+/// 顶部会员提示条
+class _TopNoticeBar extends StatelessWidget {
+  const _TopNoticeBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFF3C8), Color(0xFFD8FFE9)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(_UI.radiusXL),
+        boxShadow: _UI.shadowSoft,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Row(
+        children: [
+          const Icon(Icons.campaign, color: Color(0xFFFF8A00)),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Text(
+              "排盘会员免费查看本人8种运势",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: _UI.shadowSoft,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.settings, color: Color(0xFF222222)),
+              onPressed: () {},
+              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+              padding: EdgeInsets.zero,
+              splashRadius: 22,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+/// 用户信息大卡片（读取控制器数据）
+class _UserCard extends GetView<ProfileController> {
+  const _UserCard();
+
+  Widget _stat(String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            color: Colors.black54,
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final name = controller.userName ?? '用户';
+    final phoneOrEmail = controller.userEmail ?? '未设置联系方式';
+    return Container(
+      decoration: BoxDecoration(
+        gradient: _UI.gradientUserCard,
+        borderRadius: BorderRadius.circular(_UI.radiusXL),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              // 头像占位
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Colors.white,
+                    backgroundImage: AssetImage('assets/images/bagua_overlay.png'),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            gradient: _UI.gradientVip,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(Icons.star_rate_rounded, size: 16, color: Color(0xFFB46A00)),
+                              SizedBox(width: 2),
+                              Text(
+                                "普通用户",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF7A4A00),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              SizedBox(width: 2),
+                              Icon(Icons.subdirectory_arrow_left_rounded, size: 14, color: Color(0xFFB46A00)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      phoneOrEmail,
+                      style: const TextStyle(fontSize: 14, color: Colors.black54, letterSpacing: 0.2),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Obx(() {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _stat(controller.balance.value, "余额"),
+                _stat(controller.yiZhu.value, "易锭"),
+                _stat(controller.favorites.value, "关注收藏"),
+              ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+/// 会员权益横条
+class _VipPrivilegeBar extends StatelessWidget {
+  const _VipPrivilegeBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: _UI.gradientVip,
+        borderRadius: BorderRadius.circular(_UI.radiusL),
+        boxShadow: _UI.shadowSoft,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      child: Row(
+        children: [
+          const Icon(Icons.diamond_rounded, color: Color(0xFFB46A00)),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Text(
+              "查看您的专属特权",
+              style: TextStyle(
+                color: Color(0xFF7A4A00),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF0D6),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0xFFFFD6A1)),
+            ),
+            child: const Text(
+              "开通会员",
+              style: TextStyle(
+                color: Color(0xFFB46A00),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 九宫格功能
+class _FeatureGrid extends GetView<ProfileController> {
+  const _FeatureGrid();
+
+  @override
+  Widget build(BuildContext context) {
+    const tiles = [
+      _FeatureTile(icon: Icons.folder_copy_rounded, label: "咨询订单", color: Color(0xFF27A6FF)),
+      _FeatureTile(icon: Icons.help_center_rounded, label: "问答订单", color: Color(0xFF27C79A)),
+      _FeatureTile(icon: Icons.menu_book_rounded, label: "我的课程", color: Color(0xFFFFB74D)),
+      _FeatureTile(icon: Icons.card_giftcard_rounded, label: "优惠券", color: Color(0xFFFF5C93)),
+      _FeatureTile(icon: Icons.store_mall_directory_rounded, label: "分销客", color: Color(0xFFFFA726)),
+      _FeatureTile(icon: Icons.smart_toy_rounded, label: "AI问答", color: Color(0xFF7C4DFF)),
+      _FeatureTile(icon: Icons.verified_user_rounded, label: "老师入驻", color: Color(0xFF42A5F5)),
+      _FeatureTile(icon: Icons.change_circle_rounded, label: "运势订单", color: Color(0xFFFF5252)),
     ];
 
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Column(
-        children: menuItems.map((item) => _buildMenuItem(
-          icon: item['icon'] as IconData,
-          title: item['title'] as String,
-          onTap: item['onTap'] as VoidCallback,
-        )).toList(),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(_UI.radiusXL),
+        boxShadow: _UI.shadowSoft,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+      child: GridView.count(
+        crossAxisCount: 4,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 8,
+        childAspectRatio: 1,
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        children: tiles.map((t) {
+          return GestureDetector(onTap: () => controller.onGridItemTap(t.label), child: t);
+        }).toList(),
       ),
     );
   }
+}
 
-  Widget _buildMenuItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: Color(0xFF8A65F0)),
-      title: Text(title),
-      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-      onTap: onTap,
+class _FeatureTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  const _FeatureTile({required this.icon, required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: color.withOpacity(.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color, size: 26),
+        ),
+        const SizedBox(height: 8),
+        Text(label, style: const TextStyle(fontSize: 13)),
+      ],
     );
   }
+}
 
-  Widget _buildBaziHistory() {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.auto_awesome, color: Color(0xFF8A65F0)),
-                SizedBox(width: 8),
-                Text(
-                  '最近排盘',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Spacer(),
-                TextButton(
-                  onPressed: controller.loadBaziHistory,
-                  child: Text('刷新'),
-                ),
-              ],
-            ),
-            SizedBox(height: 12),
-            Obx(
-              () => controller.isLoading.value
-                  ? Center(child: CircularProgressIndicator())
-                  : controller.baziHistory.isEmpty
-                      ? Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(20),
-                            child: Text(
-                              '暂无排盘记录',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                        )
-                      : Column(
-                          children: controller.baziHistory
-                              .take(3)
-                              .map((bazi) => _buildBaziHistoryItem(bazi))
-                              .toList(),
-                        ),
-            ),
-            if (controller.baziHistory.length > 3)
-              Center(
-                child: TextButton(
-                  onPressed: () => Get.snackbar('提示', '查看更多功能开发中...'),
-                  child: Text('查看更多'),
+/// 广告横幅（2025流年运势）
+class _LuckBanner extends StatelessWidget {
+  const _LuckBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(_UI.radiusXL),
+      child: AspectRatio(
+        aspectRatio: 3.2,
+        child: Image.asset(
+          'assets/images/year_luck_2025.png',
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) {
+            return Container(
+              color: const Color(0xFFFF6A00),
+              alignment: Alignment.center,
+              child: const Text(
+                "2025 流年运势",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
-            SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: controller.logout,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade400,
-                  foregroundColor: Colors.white,
-                ),
-                child: Text('退出登录'),
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
   }
+}
 
-  Widget _buildBaziHistoryItem(dynamic bazi) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: Color(0xFF8A65F0).withOpacity(0.1),
-        child: Icon(Icons.auto_awesome, color: Color(0xFF8A65F0), size: 20),
+/// 列表条目
+class _ArrowTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback? onTap;
+  const _ArrowTile({required this.icon, required this.title, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(_UI.radiusXL),
       ),
-      title: Text(bazi.fullBazi ?? '八字记录'),
-      subtitle: Text(
-        '${bazi.birthYear}年${bazi.birthMonth}月${bazi.birthDay}日',
-        style: TextStyle(fontSize: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+        leading: Icon(icon, color: const Color(0xFF7C8BA1)),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+        ),
+        trailing: const Icon(Icons.chevron_right_rounded, color: Colors.black26),
+        onTap: onTap,
       ),
-      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-      onTap: () => controller.viewBaziDetail(bazi),
     );
   }
 }

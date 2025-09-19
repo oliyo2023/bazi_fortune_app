@@ -10,7 +10,7 @@ class CustomCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const CustomCard({
-    Key? key,
+    super.key,
     required this.child,
     this.padding,
     this.margin,
@@ -18,7 +18,7 @@ class CustomCard extends StatelessWidget {
     this.color,
     this.borderRadius,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +29,7 @@ class CustomCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: borderRadius ?? BorderRadius.circular(16),
       ),
-      child: Padding(
-        padding: padding ?? EdgeInsets.all(16),
-        child: child,
-      ),
+      child: Padding(padding: padding ?? EdgeInsets.all(16), child: child),
     );
 
     if (onTap != null) {

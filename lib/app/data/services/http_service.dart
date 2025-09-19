@@ -1,27 +1,21 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
-import '../models/user_model.dart';
-import '../models/bazi_model.dart';
 
 class HttpService extends GetxService {
   static HttpService get to => Get.find();
-  
+
   final String _baseUrl = 'http://127.0.0.1:8080/api/v1';
   final Map<String, String> _headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
 
-  String? _token;
-
   void setToken(String token) {
-    _token = token;
     _headers['Authorization'] = 'Bearer $token';
   }
 
   void clearToken() {
-    _token = null;
     _headers.remove('Authorization');
   }
 
@@ -31,10 +25,7 @@ class HttpService extends GetxService {
       final response = await http.post(
         Uri.parse('$_baseUrl/auth/login'),
         headers: _headers,
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
+        body: jsonEncode({'email': email, 'password': password}),
       );
 
       if (response.statusCode == 200) {
@@ -51,16 +42,16 @@ class HttpService extends GetxService {
     }
   }
 
-  Future<Map<String, dynamic>?> register(String name, String email, String password) async {
+  Future<Map<String, dynamic>?> register(
+    String name,
+    String email,
+    String password,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$_baseUrl/auth/register'),
         headers: _headers,
-        body: jsonEncode({
-          'name': name,
-          'email': email,
-          'password': password,
-        }),
+        body: jsonEncode({'name': name, 'email': email, 'password': password}),
       );
 
       if (response.statusCode == 201) {
@@ -114,10 +105,7 @@ class HttpService extends GetxService {
       final response = await http.post(
         Uri.parse('$_baseUrl/ai/analyze'),
         headers: _headers,
-        body: jsonEncode({
-          'bazi_id': baziId,
-          'language': 'zh',
-        }),
+        body: jsonEncode({'bazi_id': baziId, 'language': 'zh'}),
       );
 
       if (response.statusCode == 200) {
