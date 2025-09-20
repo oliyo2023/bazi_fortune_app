@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:intl/intl.dart'; // 用来格式化日期
 import 'package:lunar/lunar.dart'; // 农历库
+import '../../data/services/auth_service.dart';
 
 class HomeController extends GetxController {
   // 万年历数据
@@ -54,7 +55,11 @@ class HomeController extends GetxController {
   }
 
   void goToBaziInput() {
-    Get.toNamed('/bazi-input');
+    if (AuthService.to.isAuthenticated) {
+      Get.toNamed('/bazi-input');
+    } else {
+      Get.toNamed('/login');
+    }
   }
 
   void goToLogin() {

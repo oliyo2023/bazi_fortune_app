@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../models/user_model.dart';
 import 'api_service.dart';
+import '../../core/utils/error_mapper.dart';
 
 class AuthService extends GetxService {
   static AuthService get to => Get.find();
@@ -37,9 +38,13 @@ class AuthService extends GetxService {
         _storage.write('user_id', user.id);
         return true;
       }
+      // 未返回用户，按未知错误提示
+      Get.snackbar('提示', ErrorMapper.hintFromCode('unknown_error'));
       return false;
     } catch (e) {
-      Get.snackbar('登录失败', e.toString());
+      // 统一错误映射，不暴露原始信息
+      final hint = ErrorMapper.hintFromException(e);
+      Get.snackbar('提示', hint);
       return false;
     }
   }
@@ -53,9 +58,10 @@ class AuthService extends GetxService {
         _storage.write('user_id', user.id);
         return true;
       }
+      Get.snackbar('提示', ErrorMapper.hintFromCode('unknown_error'));
       return false;
     } catch (e) {
-      Get.snackbar('注册失败', e.toString());
+      Get.snackbar('提示', ErrorMapper.hintFromException(e));
       return false;
     }
   }
@@ -68,7 +74,7 @@ class AuthService extends GetxService {
       _storage.remove('user_id');
       Get.offAllNamed('/');
     } catch (e) {
-      Get.snackbar('登出失败', e.toString());
+      Get.snackbar('提示', ErrorMapper.hintFromException(e));
     }
   }
 

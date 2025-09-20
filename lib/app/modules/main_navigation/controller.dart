@@ -1,9 +1,15 @@
 import 'package:get/get.dart';
+import '../../data/services/auth_service.dart';
 
 class MainNavigationController extends GetxController {
   final RxInt currentIndex = 0.obs;
   
   void changeTab(int index) {
+    // 未登录点击“我的”时直接跳转登录
+    if (index == 4 && !AuthService.to.isAuthenticated) {
+      Get.toNamed('/login');
+      return;
+    }
     currentIndex.value = index;
   }
   

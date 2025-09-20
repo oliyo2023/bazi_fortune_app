@@ -10,7 +10,18 @@ class ProfilePage extends GetView<ProfileController> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       body: Obx(() {
-        return controller.isLoggedIn ? const _ProfileBody() : _LoginPrompt(onLogin: controller.goToLogin);
+        if (controller.isLoggedIn) {
+          return const _ProfileBody();
+        } else {
+          // 未登录直接跳转到登录页面
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (Get.currentRoute != '/login') {
+              Get.toNamed('/login');
+            }
+          });
+          // 返回空视图避免闪烁
+          return const SizedBox.shrink();
+        }
       }),
     );
   }

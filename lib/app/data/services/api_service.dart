@@ -28,9 +28,14 @@ class ApiService extends GetxService {
         return UserModel.fromJson(userResponse);
       }
       return null;
+    } on AuthException catch (e) {
+      // 保留 SDK 的原始异常（包含 message/statusCode/可能的 code），便于上层做映射
+      print('登录错误(AuthException): $e');
+      rethrow;
     } catch (e) {
-      print('登录错误: $e');
-      throw Exception('登录失败: ${e.toString()}');
+      // 其它错误统一抛出，让上层映射为通用提示
+      print('登录错误(Other): $e');
+      rethrow;
     }
   }
 
@@ -188,6 +193,87 @@ class ApiService extends GetxService {
     } catch (e) {
       print('获取历史记录错误: $e');
       throw Exception('获取历史记录失败: ${e.toString()}');
+    }
+  }
+
+  // 创建排盘记录（先写表，不计算）
+  Future<String> createBaziRecord({
+    required String name,
+    required String gender, // 'male' | 'female'
+    required bool lunarCalendar,
+    required int birthYear,
+    required int birthMonth,
+    required int birthDay,
+    required int birthHour,
+    required int birthMinute,
+    required String location, // 出生地区（文本）
+    String timezone = 'Asia/Shanghai',
+  }) async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) {
+        throw Exception('用户未登录');
+      }
+
+      final record = {
+        'user_id': user.id,
+        'name': name,
+        'gender': gender,
+        'lunar_calendar': lunarCalendar,
+        'birth_year': birthYear,
+        'birth_month': birthMonth,
+        'birth_day': birthDay,
+        'birth_hour': birthHour,
+        'birth_minute': birthMinute,
+        'location': location,
+        'timezone': timezone,
+        'created_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
+        // 结果字段先留空，后续计算完成再更新
+        'year_pillar': null,
+        'month_pillar': null,
+        'day_pillar': null,
+        'hour_pillar': null,
+        'wood_score': 0,
+        'fire_score': 0,
+        'earth_score': 0,
+        'metal_score': 0,
+        'water_score': 0,
+      };
+
+      final inserted = await _supabase.from('bazi_data').insert(record).select().single();
+      return inserted['id'] as String;
+    } on PostgrestException catch (e) {
+      if (e.code == 'PGRST205') {
+        // 表不存在错误
+        throw Exception('数据库准备中，请稍后重试或联系管理员');
+      }
+      throw Exception('创建排盘记录失败: ${e.message}');
+    } catch (e) {
+      throw Exception('创建排盘记录失败: ${e.toString()}');
+    }
+  }
+
+  // 回填计算结果到 bazi_data
+  Future<void> updateBaziResult(String id, BaziModel result) async {
+    try {
+      final data = {
+        'year_pillar': result.yearPillar,
+        'month_pillar': result.monthPillar,
+        'day_pillar': result.dayPillar,
+        'hour_pillar': result.hourPillar,
+        'wood_score': result.woodScore,
+        'fire_score': result.fireScore,
+        'earth_score': result.earthScore,
+        'metal_score': result.metalScore,
+        'water_score': result.waterScore,
+        'updated_at': DateTime.now().toIso8601String(),
+      };
+      await _supabase.from('bazi_data').update(data).eq('id', id);
+    } on PostgrestException catch (e) {
+      throw Exception('更新计算结果失败: ${e.message}');
+    } catch (e) {
+      throw Exception('更新计算结果失败: ${e.toString()}');
     }
   }
 

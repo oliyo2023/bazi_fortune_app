@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:lunar/lunar.dart';
 import '../../data/services/api_service.dart';
 import '../../data/services/auth_service.dart';
-import '../../data/models/bazi_model.dart';
+
+import '../profile/controller.dart';
 
 class BaziInputController extends GetxController {
   final nameController = TextEditingController();
@@ -120,21 +121,37 @@ class BaziInputController extends GetxController {
   }
 
   Future<void> calculateBazi() async {
+    // 1) 基本校验
     if (!canCalculate) {
       Get.snackbar('提示', '请填写完整信息');
       return;
     }
 
+    // 2) 登录校验：未登录先去登录
     if (!AuthService.to.isAuthenticated) {
       Get.snackbar('提示', '请先登录');
       Get.toNamed('/login');
       return;
     }
 
+    // 3) 已登录：先写入排盘记录 → 后端计算 → 回填结果 → 跳转结果页
     isCalculating.value = true;
-
     try {
-      final baziResult = await ApiService.to.calculateBazi(
+      final id = await ApiService.to.createBaziRecord(
+        name: nameController.text.trim(),
+        gender: selectedGender.value == 0 ? 'male' : 'female',
+        lunarCalendar: isLunarCalendar.value,
+        birthYear: selectedDate.value.year,
+        birthMonth: selectedDate.value.month,
+        birthDay: selectedDate.value.day,
+        birthHour: selectedTime.value.hour,
+        birthMinute: selectedTime.value.minute,
+        location: selectedLocation.value,
+        timezone: 'Asia/Shanghai',
+      );
+
+      // 后台计算（调用已有后端计算接口）
+      final result = await ApiService.to.calculateBazi(
         birthYear: selectedDate.value.year,
         birthMonth: selectedDate.value.month,
         birthDay: selectedDate.value.day,
@@ -142,23 +159,34 @@ class BaziInputController extends GetxController {
         birthMinute: selectedTime.value.minute,
         gender: selectedGender.value == 0 ? 'male' : 'female',
         lunarCalendar: isLunarCalendar.value,
+        timezone: 'Asia/Shanghai',
       );
 
-      // 跳转到结果页面
+      // 回填结果
+      await ApiService.to.updateBaziResult(id, result);
+
+      // 刷新“历史记录”页数据（如果控制器已注册则触发刷新）
+      if (Get.isRegistered<ProfileController>()) {
+        try {
+          Get.find<ProfileController>().loadBaziHistory();
+        } catch (_) {}
+      }
+
+      // 跳转结果页
       Get.toNamed('/result', arguments: {
-        'bazi': baziResult,
+        'bazi': result,
         'name': nameController.text.trim(),
       });
 
       Get.snackbar(
-        '计算成功',
-        '八字排盘完成！',
+        '计算完成',
+        '已保存并生成结果',
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
     } catch (e) {
       Get.snackbar(
-        '计算失败',
+        '处理失败',
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,

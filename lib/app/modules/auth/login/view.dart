@@ -13,9 +13,13 @@ class LoginPage extends GetView<LoginController> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF8A65F0),
-              Color(0xFF6B46C1),
+            colors: const [
+              Color(0xFFB08CFF), // pastel purple
+              Color(0xFF7BB3FF), // soft blue
+              Color(0xFF5FD1C6), // teal
+              Color(0xFFA8F0D1), // mint
+              Color(0xFFFFF1A6), // soft yellow
+              Color(0xFFFFC6B3), // peach
             ],
           ),
         ),
@@ -115,7 +119,7 @@ class LoginPage extends GetView<LoginController> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFF8A65F0)),
+                  borderSide: BorderSide(color: Color(0xFF7B61FF)),
                 ),
               ),
             ),
@@ -142,7 +146,7 @@ class LoginPage extends GetView<LoginController> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFF8A65F0)),
+                    borderSide: BorderSide(color: Color(0xFF7B61FF)),
                   ),
                 ),
               ),
@@ -162,7 +166,7 @@ class LoginPage extends GetView<LoginController> {
           onPressed: controller.isLoading.value ? null : controller.login,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
-            foregroundColor: Color(0xFF8A65F0),
+            foregroundColor: Color(0xFF7B61FF),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(25),
             ),
@@ -174,7 +178,7 @@ class LoginPage extends GetView<LoginController> {
                   height: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8A65F0)),
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7B61FF)),
                   ),
                 )
               : Text(

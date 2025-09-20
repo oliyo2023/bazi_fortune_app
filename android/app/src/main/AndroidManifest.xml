@@ -12,9 +12,10 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
     <application
-        android:label="bazi_fortune_app"
+        android:label="流年砚"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:extractNativeLibs="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"
