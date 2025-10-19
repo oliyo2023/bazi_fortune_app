@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>老黄历-易百查</title>
+  <style>
+    /* 基础色盘（与原 Flutter 颜色一致） */
+    :root{
+      --primary:#8A65F0; --success:#43A047; --danger:#E53935; --warn:#FB8C00;
+      --bg:#F7F7FA; --card:#FFFFFF; --border:#E0E0E0; --muted:#616161; --text:#212121;
+      --orange-200:#FFF7E6; --orange-300:#FFB74D; --amber:#FFC107;
+      --purple-50:#EDE7F6; --success-a10:rgba(67,160,71,.10); --danger-a10:rgba(229,57,53,.10);
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+    /* 以 360px 设计宽度居中，保证像素落点一致 */
+    .page{width:100%;min-height:100vh;margin:0;background:var(--bg)}
+    /* 顶部 AppBar */
+    .appbar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #eee;
+      height:48px;display:flex;align-items:center;justify-content:center;font-weight:700}
+    .appbar .back{position:absolute;left:8px;top:0;bottom:0;display:flex;align-items:center}
+    .appbar .back svg{width:18px;height:18px;fill:#333}
+    .appbar .title{font-size:16px}
+    /* 容器边距 */
+    .container{padding:10px 16px 24px}
+    /* 月份头部 */
+    .month-header{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:12px}
+    .month-row{display:flex;align-items:center;gap:8px}
+    .chev{width:22px;height:22px;display:grid;place-items:center;color:#E53935}
+    .month-title{font-size:28px;color:#E53935;font-weight:700}
+    .lunar-line{font-size:14px;color:#555}
+    /* 卡片与阴影 */
+    .card{background:var(--card);border-radius:12px;border:1px solid rgba(0,0,0,.03);
+      box-shadow:0 1px 2px rgba(0,0,0,.03)}
+    /* 宜忌区 + 侧边胶囊 */
+    .stack{position:relative}
+    .yiji{padding:12px 12px 12px 12px}
+    .row{display:flex;gap:10px}
+    .chip{background:var(--success);color:#fff;border-radius:16px;padding:4px 10px;font-weight:700;font-size:14px}
+    .chip.danger{background:var(--danger)}
+    .yiji-text{flex:1;font-size:14px;line-height:1.35}
+    .side-tag{position:absolute;right:8px;top:12px;bottom:12px;width:56px;display:grid;place-items:center;
+      border:1px solid var(--orange-300);background:var(--orange-200);border-radius:8px;
+      color:#FB8C00;font-weight:600;font-size:12px;line-height:1.15;text-align:center;white-space:pre-line}
+    /* 三宫格表格 */
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .cell{padding:10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .cell:nth-child(3n){border-right:0}
+    .cell:last-child,.cell:nth-last-child(2),.cell:nth-last-child(3){border-bottom:0}
+    .cell-title{font-size:12px;color:#666;margin-bottom:6px}
+    /* 竖排丝带标签 */
+    .ribbon-col{position:absolute;top:0;bottom:0;display:flex;align-items:center}
+    .ribbon{writing-mode:vertical-rl;text-orientation:mixed;border-radius:6px;padding:6px 4px;
+      font-size:12px;font-weight:600;text-align:center}
+    .ribbon.left{left:0}
+    .ribbon.right{right:0}
+    .ribbon.orange{border:1px solid #FB8C00;color:#FB8C00;background:rgba(251,140,0,.12)}
+    .ribbon.gray{border:1px solid #BDBDBD;color:#BDBDBD;background:rgba(0,0,0,.02)}
+    /* 时辰条 */
+    .hour-strip{margin-top:12px;padding:12px;display:flex;justify-content:space-between}
+    .hour{display:flex;flex-direction:column;align-items:center;gap:4px}
+    .hour .label{font-size:14px}
+    .hour .badge{width:22px;height:22px;display:grid;place-items:center;border-radius:4px;font-size:12px;font-weight:600}
+    .hour.active .label{color:var(--primary);font-weight:700}
+    .hour.active .badge{background:var(--purple-50);color:var(--primary)}
+    .hour.good .badge{background:var(--success-a10);color:var(--success)}
+    .hour.bad .badge{background:var(--danger-a10);color:var(--danger)}
+    /* 当前时辰卡 */
+    .section{margin-top:12px}
+    .inner-card{padding:12px}
+    .badge-outline{display:inline-block;padding:6px 8px;border-radius:6px;border:1px solid var(--danger);
+      color:var(--danger);background:rgba(229,57,53,.06);font-size:12px}
+    .title-row{display:flex;align-items:center;gap:8px}
+    .muted{color:var(--muted);font-size:12px}
+    hr.line{border:none;border-top:1px solid #eee;margin:12px 0}
+  </style>
+  <script>
+    /* Flutter 可调用：window.renderAlmanac(data) 注入数据 */
+    window.renderAlmanac = function(data){
+      if(!data) return;
+      const setTxt=(id,txt)=>{const el=document.getElementById(id); if(el){el.textContent=txt??''}};
+      setTxt('month-title', data.monthTitle);
+      setTxt('lunar-line',  data.lunarLine);
+      setTxt('yi-list',     data.yi);
+      setTxt('ji-list',     data.ji);
+      setTxt('wx', (data.wuXing||'').replaceAll('\n',' '));
+      setTxt('cs', (data.chongSha||'').replaceAll('\n',' '));
+      setTxt('zs', (data.zhiShen||'').replaceAll('\n',' '));
+      setTxt('shenyi', data.shenYiQu);
+      setTxt('taishen', data.taiShen);
+      setTxt('xiongshen', data.xiongShen);
+      setTxt('bailu', data.baiLu);
+      setTxt('current-title', data.currentHourTitle);
+      setTxt('xishen', data.xiShen);
+      setTxt('hour-yi', data.hourYi);
+      setTxt('hour-ji', data.hourJi);
+      // 时辰激活/吉凶示例：[{label:'子',status:'吉',active:true}, ...]
+      if(Array.isArray(data.hours)){
+        const wrap=document.getElementById('hour-strip'); wrap.innerHTML='';
+        data.hours.forEach(h=>{
+          const div=document.createElement('div');
+          div.className='hour '+(h.active?'active ':'')+((h.status==='吉')?'good':'bad');
+          div.innerHTML = '<div class="label">'+(h.label||'')+'</div><div class="badge">'+(h.status||'')+'</div>';
+          wrap.appendChild(div);
+        });
+      }
+    };
+  </script>
+</head>
+<body>
+  <div class="page">
+    <div class="container">
+      <!-- 月份头部 -->
+      <div class="month-header">
+        <div class="month-row">
+          <div class="chev">
+            <svg viewBox="0 0 24 24"><path fill="#E53935" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          </div>
+          <div class="month-title" id="month-title">七月 廿九</div>
+          <div class="chev">
+            <svg viewBox="0 0 24 24"><path fill="#E53935" d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L12.17 12z"/></svg>
+          </div>
+        </div>
+        <div class="lunar-line" id="lunar-line">乙巳年 七月 廿九日 属蛇 周六</div>
+      </div>
+
+      <!-- 宜忌区 + 侧边胶囊 -->
+      <div class="stack">
+        <div class="card yiji">
+          <div class="row" style="align-items:flex-start;">
+            <span class="chip">宜</span>
+            <div class="yiji-text" id="yi-list">嫁娶 纳采 订盟 祭祀 开光 出行 理发 作灶 出火 拆卸 修造 动土 进人口 入宅 移徙 安床 挂匾 栽种 纳畜 破土 安葬 入殓 除服 成服</div>
+          </div>
+          <div style="height:10px;"></div>
+          <div class="row" style="align-items:flex-start;">
+            <span class="chip danger">忌</span>
+            <div class="yiji-text" id="ji-list">开市 掘井 开渠 造桥 造船</div>
+          </div>
+        </div>
+        <div class="side-tag">吉日
+查询</div>
+      </div>
+
+      <!-- 三宫格 + 丝带 -->
+      <div class="section stack">
+        <div class="card" style="padding:12px">
+          <div class="grid3">
+            <div class="cell">
+              <div class="cell-title">五行</div>
+              <div id="wx">长流水</div>
+            </div>
+            <div class="cell">
+              <div class="cell-title">冲煞</div>
+              <div id="cs">冲狗 煞南</div>
+            </div>
+            <div class="cell">
+              <div class="cell-title">值神</div>
+              <div id="zs">青龙</div>
+            </div>
+          </div>
+
+          <div style="height:8px;"></div>
+
+          <div class="grid3" style="border-radius:8px">
+            <div class="cell">
+              <div class="cell-title" style="color:#FFA000">吉神宜趋</div>
+              <div id="shenyi">天德 月德 相宅 福星</div>
+            </div>
+            <div class="cell">
+              <div class="cell-title">今日胎神</div>
+              <div id="taishen">仓库栖外 正北</div>
+            </div>
+            <div class="cell">
+              <div class="cell-title" style="color:#FFA000">凶神宜忌</div>
+              <div id="xiongshen">五虚 白虎 灾煞</div>
+            </div>
+          </div>
+
+          <div style="height:8px;"></div>
+
+          <div class="card" style="padding:10px">
+            <div class="muted">彭祖百忌</div>
+            <div style="height:6px"></div>
+            <div style="font-size:14px" id="bailu">王不决水 更难提防 辰不哭泣 必主重丧</div>
+          </div>
+        </div>
+
+        <div class="ribbon-col" style="left:0">
+          <div class="ribbon orange">建除十二神</div>
+        </div>
+        <div class="ribbon-col" style="right:0">
+          <div class="ribbon gray">二十八星宿</div>
+        </div>
+      </div>
+
+      <!-- 时辰吉凶 -->
+      <div class="section card hour-strip" id="hour-strip">
+        <div class="hour active good">
+          <div class="label">子</div>
+          <div class="badge">吉</div>
+        </div>
+        <div class="hour good">
+          <div class="label">丑</div>
+          <div class="badge">吉</div>
+        </div>
+        <div class="hour bad">
+          <div class="label">寅</div>
+          <div class="badge">凶</div>
+        </div>
+        <div class="hour good">
+          <div class="label">卯</div>
+          <div class="badge">吉</div>
+        </div>
+        <div class="hour good">
+          <div class="label">辰</div>
+          <div class="badge">吉</div>
+        </div>
+        <div class="hour bad">
+          <div class="label">巳</div>
+          <div class="badge">凶</div>
+        </div>
+      </div>
+
+      <!-- 当前时辰 -->
+      <div class="section card inner-card">
+        <div class="title-row">
+          <span class="badge-outline">凶</span>
+          <div id="current-title" style="font-size:14px">当前时段：丙午凶 11:00-12:59 冲鼠 煞北</div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="muted">喜神：<span id="xishen">西南</span></div>
+        <hr class="line"/>
+        <div class="row" style="align-items:flex-start">
+          <span class="chip">宜</span>
+          <div style="flex:1" id="hour-yi">求嗣 订婚 嫁娶 开市 交易 安床</div>
+        </div>
+        <div style="height:8px"></div>
+        <div class="row" style="align-items:flex-start">
+          <span class="chip danger">忌</span>
+          <div style="flex:1" id="hour-ji">赴任 出行 求财 祭祀 祈福 齐醮 开光</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

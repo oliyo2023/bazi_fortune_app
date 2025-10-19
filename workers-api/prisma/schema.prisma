@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  
+  baziData  BaziData[]
+  orders    Order[]
+  
+  @@map("users")
+}
+
+model BaziData {
+  id         String   @id @default(cuid())
+  userId     String
+  inputData  Json     // 八字输入数据
+  resultData Json     // 八字计算结果
+  analysis   String?  // AI分析结果
+  createdAt  DateTime @default(now())
+  
+  user       User     @relation(fields: [userId], references: [id])
+  
+  @@map("bazi_data")
+}
+
+model Order {
+  id         String      @id @default(cuid())
+  userId     String
+  type       OrderType
+  amount     Decimal
+  status     OrderStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
+  
+  user       User        @relation(fields: [userId], references: [id])
+  
+  @@map("orders")
+}
+
+model Master {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  title       String
+  description String?
+  price       Decimal
+  rating      Decimal?
+  available   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id])
+  
+  @@map("masters")
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  userId    String
+  masterId  String
+  messages  Json
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id])
+  master    Master   @relation(fields: [masterId], references: [id])
+  
+  @@map("chats")
+}
+
+enum Role {
+  USER
+  MASTER
+  ADMIN
+}
+
+enum OrderType {
+  CONSULTATION
+  ANALYSIS
+  MEMBERSHIP
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
