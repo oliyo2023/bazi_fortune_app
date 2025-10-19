@@ -172,6 +172,33 @@ class LoginController extends GetxController {
     }
   }
 
+  // 账号密码登录（兼容旧的loginWithEmail调用）
+  Future<void> loginWithAccountPassword() async {
+    if (!emailFormKey.currentState!.validate()) return;
+
+    isLoading.value = true;
+
+    try {
+      // 这里应该使用phoneController.text作为账号，passwordController.text作为密码
+      final success = await AuthService.to.login(
+        phoneController.text.trim(),
+        passwordController.text,
+      );
+
+      if (success) {
+        Get.offAllNamed('/');
+        Get.snackbar(
+          '登录成功',
+          '欢迎回来！',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   void goToRegister() {
     Get.toNamed('/register');
   }

@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import 'controller.dart';
 import 'reset_password_view.dart';
 
-class AccountLoginPage extends GetView<LoginController> {
-  const AccountLoginPage({super.key});
+class AccountPasswordLoginPage extends GetView<LoginController> {
+  const AccountPasswordLoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +57,8 @@ class AccountLoginPage extends GetView<LoginController> {
                     
                     SizedBox(height: 60.h),
                     
-                    // 注册链接
-                    _buildRegisterLink(),
+                    // 短信登录链接
+                    _buildSmsLoginLink(),
                     
                     SizedBox(height: 16.h),
                     
@@ -322,7 +322,7 @@ class AccountLoginPage extends GetView<LoginController> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Obx(() => GestureDetector(
-        onTap: controller.isLoading.value ? null : controller.loginWithEmail,
+        onTap: controller.isLoading.value ? null : controller.loginWithAccountPassword,
         child: Container(
           height: 54.h,
           decoration: BoxDecoration(
@@ -403,7 +403,7 @@ class AccountLoginPage extends GetView<LoginController> {
     );
   }
 
-  Widget _buildRegisterLink() {
+  Widget _buildSmsLoginLink() {
     return GestureDetector(
       onTap: () => Get.back(),
       child: Center(

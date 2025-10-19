@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'controller.dart';
-import 'account_login_view.dart';
-import 'reset_password_view.dart';
+import 'account_password_login_view.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 初始化屏幕适配
     ScreenUtil.init(context, designSize: Size(375, 812));
 
     return Scaffold(
@@ -20,16 +18,14 @@ class LoginPage extends GetView<LoginController> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFE6E9F8), // 浅蓝紫色
-              Color(0xFFFDFBFF), // 浅白色
+              Color(0xFFE6E9F8),
+              Color(0xFFFDFBFF),
             ],
           ),
         ),
         child: Stack(
           children: [
-            // 背景装饰
             _buildBackground(),
-            // 主要内容
             SafeArea(
               child: SingleChildScrollView(
                 physics: BouncingScrollPhysics(),
@@ -39,18 +35,13 @@ class LoginPage extends GetView<LoginController> {
                     SizedBox(height: 50.h),
                     // Logo和标题
                     _buildHeader(),
-                    SizedBox(height: 45.h),
-                    // 登录方式切换
-                    _buildLoginToggle(),
-                    SizedBox(height: 24.h),
-                    // 登录表单
-                    Obx(() => controller.isPhoneLogin.value
-                      ? _buildPhoneLoginForm()
-                      : _buildEmailLoginForm()),
+                    SizedBox(height: 60.h),
+                    // 登录表单（手机号+验证码）
+                    _buildPhoneLoginForm(),
                     SizedBox(height: 24.h),
                     // 登录按钮
                     _buildLoginButton(),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: 20.h),
                     // 其他操作
                     _buildOtherActions(),
                   ],
@@ -63,7 +54,6 @@ class LoginPage extends GetView<LoginController> {
     );
   }
 
-  // 背景装饰
   Widget _buildBackground() {
     return Stack(
       children: [
@@ -148,125 +138,6 @@ class LoginPage extends GetView<LoginController> {
           ),
         ),
       ],
-    );
-  }
-
-  // 登录方式切换
-  Widget _buildLoginToggle() {
-    return Container(
-      height: 48.h,
-      padding: EdgeInsets.all(4.w),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24.r),
-        color: Color(0xFFF5F5F5),
-        border: Border.all(
-          color: Color(0xFFE0E0E0),
-          width: 1.w,
-        ),
-      ),
-      child: Obx(() => Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: controller.toggleLoginMethod,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(22.r),
-                  color: controller.isPhoneLogin.value
-                    ? Colors.white
-                    : Colors.transparent,
-                  boxShadow: controller.isPhoneLogin.value
-                    ? [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ]
-                    : [],
-                ),
-                child: Center(
-                  child: Text(
-                    '手机验证码',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: controller.isPhoneLogin.value
-                        ? Color(0xFF333333)
-                        : Color(0xFF999999),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: controller.toggleLoginMethod,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(22.r),
-                  color: !controller.isPhoneLogin.value
-                    ? Colors.white
-                    : Colors.transparent,
-                  boxShadow: !controller.isPhoneLogin.value
-                    ? [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ]
-                    : [],
-                ),
-                child: Center(
-                  child: Text(
-                    '邮箱密码',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: !controller.isPhoneLogin.value
-                        ? Color(0xFF333333)
-                        : Color(0xFF999999),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      )),
-    );
-  }
-
-  // 自定义表单容器
-  Widget _buildGlassContainer({
-    required Widget child,
-    double? height,
-    double? width,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16.r),
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16.r),
-          color: Colors.white,
-          border: Border.all(
-            color: Color(0xFFE8E8E8),
-            width: 1.w,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: child,
-      ),
     );
   }
 
@@ -462,142 +333,81 @@ class LoginPage extends GetView<LoginController> {
     );
   }
 
-  // 邮箱登录表单
-  Widget _buildEmailLoginForm() {
-    return _buildGlassContainer(
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Form(
-          key: controller.emailFormKey,
-          child: Column(
-            children: [
-              // 邮箱输入框
-              TextFormField(
-                controller: controller.emailController,
-                keyboardType: TextInputType.emailAddress,
-                validator: controller.validateEmail,
-                style: TextStyle(
-                  color: Color(0xFF333333),
-                  fontSize: 14.sp,
-                ),
-                decoration: InputDecoration(
-                  labelText: '邮箱地址',
-                  labelStyle: TextStyle(
-                    color: Color(0xFF999999),
-                    fontSize: 13.sp,
-                  ),
-                  hintStyle: TextStyle(
-                    color: Color(0xFFCCCCCC),
-                  ),
-                  prefixIcon: Icon(
-                    Icons.email_outlined,
-                    color: Color(0xFFCCCCCC),
-                    size: 20.sp,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 12.h),
-                ),
-              ),
-              SizedBox(height: 16.h),
-              Divider(
-                height: 1.h,
-                color: Color(0xFFE8E8E8),
-              ),
-              SizedBox(height: 16.h),
-              // 密码输入框
-              Obx(
-                () => TextFormField(
-                  controller: controller.passwordController,
-                  obscureText: controller.obscurePassword.value,
-                  validator: controller.validatePassword,
-                  style: TextStyle(
-                    color: Color(0xFF333333),
-                    fontSize: 14.sp,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: '密码',
-                    labelStyle: TextStyle(
-                      color: Color(0xFF999999),
-                      fontSize: 13.sp,
-                    ),
-                    hintStyle: TextStyle(
-                      color: Color(0xFFCCCCCC),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.lock_outlined,
-                      color: Color(0xFFCCCCCC),
-                      size: 20.sp,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        controller.obscurePassword.value
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        color: Color(0xFFCCCCCC),
-                        size: 20.sp,
-                      ),
-                      onPressed: controller.togglePasswordVisibility,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 12.h),
-                  ),
-                ),
-              ),
-            ],
+  // 自定义容器
+  Widget _buildGlassContainer({
+    required Widget child,
+    double? height,
+    double? width,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16.r),
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.r),
+          color: Colors.white,
+          border: Border.all(
+            color: Color(0xFFE8E8E8),
+            width: 1.w,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
+        child: child,
       ),
     );
   }
 
   // 登录按钮
   Widget _buildLoginButton() {
-    return Obx(
-      () => GestureDetector(
-        onTap: controller.isLoading.value ? null : controller.login,
-        child: Container(
-          height: 50.h,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24.r),
-            gradient: controller.isLoading.value
-              ? LinearGradient(
-                  colors: [
-                    Color(0xFF667EEA).withOpacity(0.5),
-                    Color(0xFF764BA2).withOpacity(0.5),
-                  ],
-                )
-              : LinearGradient(
-                  colors: [
-                    Color(0xFF667EEA),
-                    Color(0xFF764BA2),
-                  ],
-                ),
-            boxShadow: [
-              BoxShadow(
-                color: Color(0xFF667EEA).withOpacity(0.3),
-                blurRadius: 12,
-                offset: Offset(0, 4),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      child: Obx(
+        () => GestureDetector(
+          onTap: controller.isLoading.value ? null : controller.loginWithPhone,
+          child: Container(
+            height: 50.h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24.r),
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF667EEA),
+                  Color(0xFF764BA2),
+                ],
               ),
-            ],
-          ),
-          child: Center(
-            child: controller.isLoading.value
-              ? SizedBox(
-                  width: 20.w,
-                  height: 20.h,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.w,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                )
-              : Text(
-                  '登录',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF667EEA).withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
                 ),
+              ],
+            ),
+            child: Center(
+              child: controller.isLoading.value
+                  ? SizedBox(
+                      width: 20.w,
+                      height: 20.h,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.w,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      '登录',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+            ),
           ),
         ),
       ),
@@ -608,25 +418,11 @@ class LoginPage extends GetView<LoginController> {
   Widget _buildOtherActions() {
     return Column(
       children: [
-        // 忘记密码
-        TextButton(
-          onPressed: controller.goToForgotPassword,
-          child: Text(
-            '忘记密码？',
-            style: TextStyle(
-              color: Color(0xFF667EEA),
-              fontSize: 13.sp,
-              decoration: TextDecoration.underline,
-              decorationColor: Color(0xFF667EEA),
-            ),
-          ),
-        ),
-
         SizedBox(height: 20.h),
 
-        // 账号密码登录
-        TextButton(
-          onPressed: () => Get.to(() => AccountLoginPage(), binding: BindingsBuilder(() {
+        // 账号密码登录链接
+        GestureDetector(
+          onTap: () => Get.to(() => AccountPasswordLoginPage(), binding: BindingsBuilder(() {
             Get.put(LoginController());
           })),
           child: Text(
@@ -654,10 +450,10 @@ class LoginPage extends GetView<LoginController> {
                 fontSize: 13.sp,
               ),
             ),
-            TextButton(
-              onPressed: controller.goToRegister,
+            GestureDetector(
+              onTap: controller.goToRegister,
               child: Text(
-                '立即注册',
+                ' 立即注册',
                 style: TextStyle(
                   color: Color(0xFF667EEA),
                   fontWeight: FontWeight.bold,
@@ -669,8 +465,6 @@ class LoginPage extends GetView<LoginController> {
             ),
           ],
         ),
-
-        SizedBox(height: 20.h),
       ],
     );
   }
