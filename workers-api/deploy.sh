@@ -6,15 +6,15 @@ set -e
 
 echo "开始部署八字算命应用到 Cloudflare Workers..."
 
-# 检查是否已登录 Cloudflare
-if ! wrangler whoami &> /dev/null; then
-    echo "请先登录 Cloudflare: wrangler login"
-    exit 1
-fi
-
 # 安装依赖
 echo "安装依赖..."
 npm install
+
+# 检查是否已登录 Cloudflare
+if ! npx wrangler whoami &> /dev/null; then
+    echo "请先登录 Cloudflare: npx wrangler login"
+    exit 1
+fi
 
 # 生成 Prisma 客户端
 echo "生成 Prisma 客户端..."
@@ -30,25 +30,25 @@ npm run build
 
 # 部署到 Cloudflare Workers
 echo "部署到 Cloudflare Workers..."
-wrangler deploy
+npx wrangler deploy
 
 # 设置 KV 命名空间（如果需要）
 if [ "$1" == "--setup-kv" ]; then
     echo "设置 KV 命名空间..."
-    wrangler kv:namespace create "BAZI_CACHE"
-    wrangler kv:namespace create "BAZI_CACHE" --preview
+    npx wrangler kv:namespace create "BAZI_CACHE"
+    npx wrangler kv:namespace create "BAZI_CACHE" --preview
     echo "请将生成的 KV 命名空间 ID 添加到 wrangler.toml 文件中"
 fi
 
 # 设置 D1 数据库（如果需要）
 if [ "$1" == "--setup-d1" ]; then
     echo "设置 D1 数据库..."
-    wrangler d1 create bazi-dev-db
+    npx wrangler d1 create bazi-dev-db
     echo "请将生成的 D1 数据库 ID 添加到 wrangler.toml 文件中"
     
     # 执行数据库迁移
     echo "执行数据库迁移..."
-    wrangler d1 execute bazi-dev-db --file=./prisma/migrations/0_init.sql
+    npx wrangler d1 execute bazi-dev-db --file=./prisma/migrations/0_init.sql
 fi
 
 echo "部署完成！"

@@ -1,7 +1,7 @@
 # 嵌套的Git仓库
 admin-vue/.git/
 fronted/.git/
-
+node_modules/
 # Flutter
 .dart_tool/
 .flutter-plugins
