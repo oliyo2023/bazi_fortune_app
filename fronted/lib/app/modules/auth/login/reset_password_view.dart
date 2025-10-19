@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'controller.dart';
-import 'reset_password_view.dart';
 
-class AccountLoginPage extends GetView<LoginController> {
-  const AccountLoginPage({super.key});
+class ResetPasswordPage extends GetView<LoginController> {
+  const ResetPasswordPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,30 +36,20 @@ class AccountLoginPage extends GetView<LoginController> {
                     
                     SizedBox(height: 120.h),
                     
-                    // 登录表单
-                    _buildLoginForm(),
+                    // 重置密码表单
+                    _buildResetForm(),
                     
                     SizedBox(height: 24.h),
                     
-                    // 忘记密码
-                    _buildForgotPassword(),
-                    
-                    SizedBox(height: 28.h),
-                    
-                    // 登录按钮
-                    _buildLoginButton(),
+                    // 下一步按钮
+                    _buildNextButton(),
                     
                     SizedBox(height: 20.h),
                     
                     // 协议复选框
                     _buildAgreementCheckbox(),
                     
-                    SizedBox(height: 60.h),
-                    
-                    // 注册链接
-                    _buildRegisterLink(),
-                    
-                    SizedBox(height: 16.h),
+                    SizedBox(height: 80.h),
                     
                     // 微信客服
                     _buildWechatService(),
@@ -123,7 +112,7 @@ class AccountLoginPage extends GetView<LoginController> {
           Expanded(
             child: Center(
               child: Text(
-                '账号密码登录',
+                '设置新密码',
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
@@ -138,14 +127,14 @@ class AccountLoginPage extends GetView<LoginController> {
     );
   }
 
-  Widget _buildLoginForm() {
+  Widget _buildResetForm() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Form(
-        key: controller.emailFormKey,
+        key: controller.phoneFormKey,
         child: Column(
           children: [
-            // 账号/手机号输入框
+            // 手机号显示框（只读，已验证）
             Container(
               height: 56.h,
               decoration: BoxDecoration(
@@ -164,14 +153,14 @@ class AccountLoginPage extends GetView<LoginController> {
                 child: Row(
                   children: [
                     // 国家代码
-                    Obx(() => Text(
-                      controller.countryCode.value,
+                    Text(
+                      '+86',
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF333333),
                       ),
-                    )),
+                    ),
                     SizedBox(width: 10.w),
                     // 分隔线
                     Container(
@@ -180,26 +169,16 @@ class AccountLoginPage extends GetView<LoginController> {
                       color: Color(0xFFDDDDDD),
                     ),
                     SizedBox(width: 14.w),
-                    // 手机号输入框
+                    // 手机号显示
                     Expanded(
-                      child: TextFormField(
-                        controller: controller.phoneController,
-                        keyboardType: TextInputType.phone,
-                        validator: controller.validatePhone,
+                      child: Text(
+                        controller.phoneController.text.isEmpty
+                            ? '15009549773'
+                            : controller.phoneController.text,
                         style: TextStyle(
                           color: Color(0xFF333333),
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w400,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: '手机号码',
-                          hintStyle: TextStyle(
-                            color: Color(0xFFD0D0D0),
-                            fontSize: 14.sp,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                          isDense: true,
                         ),
                       ),
                     ),
@@ -208,23 +187,23 @@ class AccountLoginPage extends GetView<LoginController> {
                       valueListenable: controller.phoneController,
                       builder: (context, value, child) {
                         return value.text.isNotEmpty
-                          ? GestureDetector(
-                              onTap: () => controller.phoneController.clear(),
-                              child: Container(
-                                width: 24.w,
-                                height: 24.h,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xFFDDDDDD),
+                            ? GestureDetector(
+                                onTap: () => controller.phoneController.clear(),
+                                child: Container(
+                                  width: 24.w,
+                                  height: 24.h,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFFDDDDDD),
+                                  ),
+                                  child: Icon(
+                                    Icons.clear,
+                                    color: Colors.white,
+                                    size: 14.sp,
+                                  ),
                                 ),
-                                child: Icon(
-                                  Icons.clear,
-                                  color: Colors.white,
-                                  size: 14.sp,
-                                ),
-                              ),
-                            )
-                          : SizedBox.shrink();
+                              )
+                            : SizedBox.shrink();
                       },
                     ),
                   ],
@@ -234,7 +213,7 @@ class AccountLoginPage extends GetView<LoginController> {
 
             SizedBox(height: 14.h),
 
-            // 密码输入框
+            // 新密码输入框
             Container(
               height: 56.h,
               decoration: BoxDecoration(
@@ -252,22 +231,33 @@ class AccountLoginPage extends GetView<LoginController> {
                 padding: EdgeInsets.symmetric(horizontal: 18.w),
                 child: Obx(() => Row(
                   children: [
-                    // 密码输入框
+                    // 新密码输入框
                     Expanded(
                       child: TextFormField(
                         controller: controller.passwordController,
                         obscureText: controller.obscurePassword.value,
-                        validator: controller.validatePassword,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return '请输入新密码';
+                          }
+                          if (value.length < 6 || value.length > 20) {
+                            return '密码长度为6-20位';
+                          }
+                          if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
+                            return '仅支持数字与字母';
+                          }
+                          return null;
+                        },
                         style: TextStyle(
                           color: Color(0xFF333333),
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w400,
                         ),
                         decoration: InputDecoration(
-                          hintText: '请输入密码',
+                          hintText: '请输入6-20位数字与字母组合',
                           hintStyle: TextStyle(
                             color: Color(0xFFD0D0D0),
-                            fontSize: 14.sp,
+                            fontSize: 13.sp,
                           ),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
@@ -296,75 +286,55 @@ class AccountLoginPage extends GetView<LoginController> {
     );
   }
 
-  Widget _buildForgotPassword() {
+  Widget _buildNextButton() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: GestureDetector(
-          onTap: () => Get.to(() => ResetPasswordPage(), binding: BindingsBuilder(() {
-            Get.put(LoginController(), tag: 'reset');
-          })),
-          child: Text(
-            '忘记密码？',
-            style: TextStyle(
-              fontSize: 13.sp,
-              color: Color(0xFF20C0B5),
-              fontWeight: FontWeight.w500,
+      child: Obx(
+        () => GestureDetector(
+          onTap: controller.isLoading.value ? null : _handleResetPassword,
+          child: Container(
+            height: 56.h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28.r),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFA587DC),
+                  Color(0xFF8B6FD9),
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF8B6FD9).withOpacity(0.35),
+                  blurRadius: 16,
+                  offset: Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Center(
+              child: controller.isLoading.value
+                  ? SizedBox(
+                      width: 20.w,
+                      height: 20.h,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.w,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      '下一步',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildLoginButton() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: Obx(() => GestureDetector(
-        onTap: controller.isLoading.value ? null : controller.loginWithEmail,
-        child: Container(
-          height: 54.h,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(27.r),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFA587DC),
-                Color(0xFF8B6FD9),
-              ],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Color(0xFF8B6FD9).withOpacity(0.35),
-                blurRadius: 16,
-                offset: Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Center(
-            child: controller.isLoading.value
-              ? SizedBox(
-                  width: 20.w,
-                  height: 20.h,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.w,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                )
-              : Text(
-                  '立即登录',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-          ),
-        ),
-      )),
     );
   }
 
@@ -403,24 +373,6 @@ class AccountLoginPage extends GetView<LoginController> {
     );
   }
 
-  Widget _buildRegisterLink() {
-    return GestureDetector(
-      onTap: () => Get.back(),
-      child: Center(
-        child: Text(
-          '短信登录注册',
-          style: TextStyle(
-            fontSize: 15.sp,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF8B6FD9),
-            decoration: TextDecoration.underline,
-            decorationColor: Color(0xFF8B6FD9),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildWechatService() {
     return Center(
       child: Text(
@@ -432,5 +384,24 @@ class AccountLoginPage extends GetView<LoginController> {
         textAlign: TextAlign.center,
       ),
     );
+  }
+
+  void _handleResetPassword() {
+    if (controller.phoneFormKey.currentState!.validate()) {
+      controller.isLoading.value = true;
+      
+      // 模拟重置密码
+      Future.delayed(Duration(seconds: 2), () {
+        controller.isLoading.value = false;
+        Get.snackbar(
+          '成功',
+          '密码重置成功，请使用新密码登录',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        // 返回到登录页面
+        Get.offAllNamed('/login');
+      });
+    }
   }
 }

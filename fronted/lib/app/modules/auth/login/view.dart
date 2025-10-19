@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'controller.dart';
 import 'account_login_view.dart';
+import 'reset_password_view.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({super.key});
