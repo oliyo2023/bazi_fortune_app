@@ -431,7 +431,7 @@ class GomokuPage extends GetView<GomokuController> {
   Widget _buildBoard() {
     return Obx(() {
       // 确保Obx内有响应式变量
-      final boardState = controller.board.map((row) => row.map((cell) => cell).toList()).toList();
+      // final boardState = controller.board.map((row) => row.map((cell) => cell).toList()).toList();
       
       return Container(
         padding: const EdgeInsets.all(20),
@@ -528,15 +528,16 @@ class GomokuPage extends GetView<GomokuController> {
     });
   }
 
-  Widget _buildControls() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildSidePanel(),
-        ),
-      ],
-    );
-  }
+  // 未使用的方法，保留以备将来使用
+  // Widget _buildControls() {
+  //   return Row(
+  //     children: [
+  //       Expanded(
+  //         child: _buildSidePanel(),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildSidePanel() {
     return Column(
@@ -837,7 +838,7 @@ class GomokuPage extends GetView<GomokuController> {
         ],
       ),
       child: Obx(() {
-        final boardState = controller.board.map((row) => row.map((cell) => cell).toList()).toList();
+        // final boardState = controller.board.map((row) => row.map((cell) => cell).toList()).toList();
         
         return AspectRatio(
           aspectRatio: 1.0,

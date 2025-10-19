@@ -141,7 +141,7 @@ class _PaymentHistoryWidgetState extends State<PaymentHistoryWidget> {
     if (reason == null || reason.isEmpty) return;
 
     try {
-      final response = await _paymentService.requestRefund(
+      await _paymentService.requestRefund(
         orderId: payment.orderId,
         reason: reason,
       );

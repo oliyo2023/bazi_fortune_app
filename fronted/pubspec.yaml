@@ -22,6 +22,9 @@ dependencies:
   flutter_inappwebview: ^6.0.0
   city_pickers: ^1.2.3
   wasm: ^0.1.0+1
+  # 新增依赖
+  flutter_screenutil: ^5.9.0
+  flutter_otp_text_field: ^1.1.1
 
 dev_dependencies:
   flutter_test:

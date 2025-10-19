@@ -268,20 +268,21 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
       );
     }
 
-    Widget buildZhiWheel() {
-      final zIndex = _hourToZhiIndex(_dt.hour);
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // 年-月-日仍用公历滚轮
-            buildSolarWheels(lunarLabel: false),
-            // 替换最后两列为一个“时辰”—用子丑...展示，并将分钟固定为0
-          ],
-        ),
-      );
-    }
+    // 未使用的方法，保留以备将来使用
+    // Widget buildZhiWheel() {
+    //   final zIndex = _hourToZhiIndex(_dt.hour);
+    //   return Padding(
+    //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+    //     child: Row(
+    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //       children: [
+    //         // 年-月-日仍用公历滚轮
+    //         buildSolarWheels(lunarLabel: false),
+    //         // 替换最后两列为一个"时辰"—用子丑...展示，并将分钟固定为0
+    //       ],
+    //     ),
+    //   );
+    // }
 
     Widget buildFourPillarsWheels() {
       // 简化：年/月/日用公历滚轮，时用12地支；分钟固定0
