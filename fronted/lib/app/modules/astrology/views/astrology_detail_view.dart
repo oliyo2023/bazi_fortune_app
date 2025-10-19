@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../controllers/astrology_controller.dart';
+import '../models/astrology_model.dart';
 
 class AstrologyDetailPage extends GetView<AstrologyController> {
   const AstrologyDetailPage({super.key});
