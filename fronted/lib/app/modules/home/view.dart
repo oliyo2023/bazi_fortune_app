@@ -308,7 +308,7 @@ class HomePage extends GetView<HomeController> {
             // 性别选择（原型：圆形头像 + 文案 两个并排按钮）
             Row(
               children: [
-                Text('gender'.tr + '    :', style: TextStyle(fontSize: 16)),
+                Text('${'gender'.tr}    :', style: TextStyle(fontSize: 16)),
                 SizedBox(width: 20),
                 Obx(() {
                   final sel = controller.selectedGender.value;
@@ -364,7 +364,7 @@ class HomePage extends GetView<HomeController> {
               onTap: () => controller.pickBirthDateTime(context),
               child: Row(
                 children: [
-                  Text('birth_info'.tr + '    :', style: TextStyle(fontSize: 16)),
+                  Text('${'birth_info'.tr}    :', style: TextStyle(fontSize: 16)),
                   SizedBox(width: 20),
                   Expanded(
                     child: Obx(() {
@@ -390,7 +390,7 @@ class HomePage extends GetView<HomeController> {
               onTap: () => controller.pickRegion(context),
               child: Row(
                 children: [
-                  Text('birth_region'.tr + ':', style: TextStyle(fontSize: 16)),
+                  Text('${'birth_region'.tr}:', style: TextStyle(fontSize: 16)),
                   SizedBox(width: 20),
                   Expanded(
                     child: Obx(() {
@@ -405,7 +405,7 @@ class HomePage extends GetView<HomeController> {
                     }),
                   ),
                   const SizedBox(width: 12),
-                  Text('true_solar_time'.tr + ':', style: TextStyle(fontSize: 16)),
+                  Text('${'true_solar_time'.tr}:', style: TextStyle(fontSize: 16)),
                   const SizedBox(width: 8),
                   Obx(() => Checkbox(
                         value: controller.trueSolarTime.value,
@@ -424,7 +424,7 @@ class HomePage extends GetView<HomeController> {
             // 姓名输入 + 保存开关 + 分组
             Row(
               children: [
-                Text('name'.tr + '    :', style: TextStyle(fontSize: 16)),
+                Text('${'name'.tr}    :', style: TextStyle(fontSize: 16)),
                 SizedBox(width: 20),
                 Expanded(
                   child: TextField(

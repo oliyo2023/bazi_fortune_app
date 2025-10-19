@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:bazi_fortune_app/app/controllers/app_controller.dart';
 
 class LanguageSwitcher extends StatelessWidget {
-  const LanguageSwitcher({Key? key}) : super(key: key);
+  const LanguageSwitcher({super.key});
 
   @override
   Widget build(BuildContext context) {

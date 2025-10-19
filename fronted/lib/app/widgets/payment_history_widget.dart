@@ -6,7 +6,7 @@ import 'package:bazi_fortune_app/app/widgets/language_switcher.dart';
 
 /// 支付历史组件
 class PaymentHistoryWidget extends StatefulWidget {
-  const PaymentHistoryWidget({Key? key}) : super(key: key);
+  const PaymentHistoryWidget({super.key});
 
   @override
   State<PaymentHistoryWidget> createState() => _PaymentHistoryWidgetState();
@@ -272,14 +272,14 @@ class _PaymentHistoryWidgetState extends State<PaymentHistoryWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'total_payments'.tr + ': $_total',
+                  '${'total_payments'.tr}: $_total',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
-                  'showing'.tr + ': ${_payments.length}',
+                  '${'showing'.tr}: ${_payments.length}',
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
@@ -372,7 +372,7 @@ class _PaymentHistoryWidgetState extends State<PaymentHistoryWidget> {
           ),
           const SizedBox(height: 8),
           Text(
-            'payment_date'.tr + ': ${payment.formattedPaymentDate}',
+            '${'payment_date'.tr}: ${payment.formattedPaymentDate}',
             style: const TextStyle(
               fontSize: 14,
               color: Colors.grey,
@@ -381,7 +381,7 @@ class _PaymentHistoryWidgetState extends State<PaymentHistoryWidget> {
           if (payment.transactionId != null) ...[
             const SizedBox(height: 4),
             Text(
-              'transaction_id'.tr + ': ${payment.transactionId}',
+              '${'transaction_id'.tr}: ${payment.transactionId}',
               style: const TextStyle(
                 fontSize: 14,
                 color: Colors.grey,

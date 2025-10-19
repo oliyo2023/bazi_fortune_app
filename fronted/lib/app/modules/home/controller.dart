@@ -162,7 +162,7 @@ class HomeController extends GetxController {
         location: birthRegion.value, // 暂传文本
         timezone: 'Asia/Shanghai',
       );
-      Get.snackbar('success'.tr, 'chart_created'.tr + '：$id');
+      Get.snackbar('success'.tr, '${'chart_created'.tr}：$id');
     } catch (e) {
       Get.snackbar('submit_failed'.tr, e.toString());
     } finally {

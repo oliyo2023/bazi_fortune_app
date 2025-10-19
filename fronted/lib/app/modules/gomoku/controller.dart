@@ -100,7 +100,7 @@ class GomokuController extends GetxController {
   
   void makeMove(int row, int col, String player) {
     board[row][col] = player;
-    lastMove?.value = {'row': row, 'col': col, 'player': player};
+    lastMove.value = {'row': row, 'col': col, 'player': player};
     moveHistory.add({
       'row': row, 
       'col': col, 
@@ -283,14 +283,17 @@ class GomokuController extends GetxController {
       if (count >= 5) {
         score += 100000;
       } else if (count == 4) {
-        if (openEnds == 2) score += 10000;
-        else if (openEnds == 1) score += 1000;
+        if (openEnds == 2) {
+          score += 10000;
+        } else if (openEnds == 1) score += 1000;
       } else if (count == 3) {
-        if (openEnds == 2) score += 1000;
-        else if (openEnds == 1) score += 100;
+        if (openEnds == 2) {
+          score += 1000;
+        } else if (openEnds == 1) score += 100;
       } else if (count == 2) {
-        if (openEnds == 2) score += 100;
-        else if (openEnds == 1) score += 10;
+        if (openEnds == 2) {
+          score += 100;
+        } else if (openEnds == 1) score += 10;
       }
     }
     

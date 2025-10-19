@@ -7,7 +7,7 @@ import 'package:bazi_fortune_app/app/widgets/language_switcher.dart';
 
 /// 会员套餐列表组件
 class MembershipPlansWidget extends StatefulWidget {
-  const MembershipPlansWidget({Key? key}) : super(key: key);
+  const MembershipPlansWidget({super.key});
 
   @override
   State<MembershipPlansWidget> createState() => _MembershipPlansWidgetState();
@@ -80,14 +80,14 @@ class _MembershipPlansWidgetState extends State<MembershipPlansWidget> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('order_number'.tr + ': ${orderResponse.orderNumber}'),
+            Text('${'order_number'.tr}: ${orderResponse.orderNumber}'),
             const SizedBox(height: 8),
-            Text('amount'.tr + ': ${orderResponse.formattedAmount}'),
+            Text('${'amount'.tr}: ${orderResponse.formattedAmount}'),
             const SizedBox(height: 8),
-            Text('payment_method'.tr + ': ${_getPaymentMethodDisplayName(_selectedPaymentMethod)}'),
+            Text('${'payment_method'.tr}: ${_getPaymentMethodDisplayName(_selectedPaymentMethod)}'),
             if (_couponCode != null) ...[
               const SizedBox(height: 8),
-              Text('coupon_code'.tr + ': $_couponCode'),
+              Text('${'coupon_code'.tr}: $_couponCode'),
             ],
           ],
         ),
@@ -145,7 +145,7 @@ class _MembershipPlansWidgetState extends State<MembershipPlansWidget> {
             const SizedBox(height: 16),
             Text('payment_successful'.tr),
             const SizedBox(height: 8),
-            Text('transaction_id'.tr + ': ${response.transactionId}'),
+            Text('${'transaction_id'.tr}: ${response.transactionId}'),
           ],
         ),
         actions: [
@@ -287,7 +287,7 @@ class _MembershipPlansWidgetState extends State<MembershipPlansWidget> {
             ),
           ),
           const SizedBox(height: 16),
-          ..._plans.map((plan) => _buildPlanCard(plan)).toList(),
+          ..._plans.map((plan) => _buildPlanCard(plan)),
           const SizedBox(height: 24),
           _buildPaymentOptions(),
           const SizedBox(height: 24),
@@ -382,7 +382,7 @@ class _MembershipPlansWidgetState extends State<MembershipPlansWidget> {
             ],
             const SizedBox(height: 12),
             Text(
-              'duration'.tr + ': ${plan.formattedDuration}',
+              '${'duration'.tr}: ${plan.formattedDuration}',
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -391,7 +391,7 @@ class _MembershipPlansWidgetState extends State<MembershipPlansWidget> {
             const SizedBox(height: 8),
             if (plan.features.isNotEmpty) ...[
               Text(
-                'features'.tr + ':',
+                '${'features'.tr}:',
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,

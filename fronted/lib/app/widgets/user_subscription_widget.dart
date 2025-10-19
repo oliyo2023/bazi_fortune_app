@@ -6,7 +6,7 @@ import 'package:bazi_fortune_app/app/widgets/language_switcher.dart';
 
 /// 用户订阅状态组件
 class UserSubscriptionWidget extends StatefulWidget {
-  const UserSubscriptionWidget({Key? key}) : super(key: key);
+  const UserSubscriptionWidget({super.key});
 
   @override
   State<UserSubscriptionWidget> createState() => _UserSubscriptionWidgetState();
