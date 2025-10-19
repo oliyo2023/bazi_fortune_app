@@ -20,6 +20,11 @@ import '../modules/almanac_detail/bindings/almanac_detail_binding.dart';
 import '../modules/almanac_detail/view.dart';
 import '../modules/gomoku/bindings/gomoku_binding.dart';
 import '../modules/gomoku/view.dart';
+import '../modules/astrology/bindings/astrology_binding.dart';
+import '../modules/astrology/views/astrology_list_view.dart';
+import '../modules/astrology/views/astrology_chart_view.dart';
+import '../modules/astrology/views/astrology_interpretation_view.dart';
+import '../modules/astrology/views/astrology_detail_view.dart';
 
 part 'app_routes.dart';
 
@@ -76,6 +81,26 @@ class AppPages {
       name: _Paths.gomoku,
       page: () => GomokuPage(),
       binding: GomokuBinding(),
+    ),
+    GetPage(
+      name: _Paths.astrology,
+      page: () => const AstrologyListPage(),
+      binding: AstrologyBinding(),
+    ),
+    GetPage(
+      name: _Paths.astrologyChart,
+      page: () => const AstrologyChartPage(),
+      binding: AstrologyBinding(),
+    ),
+    GetPage(
+      name: _Paths.astrologyInterpretation,
+      page: () => const AstrologyInterpretationPage(),
+      binding: AstrologyBinding(),
+    ),
+    GetPage(
+      name: _Paths.astrologyDetail,
+      page: () => const AstrologyDetailPage(),
+      binding: AstrologyBinding(),
     ),
   ];
 }

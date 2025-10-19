@@ -14,6 +14,10 @@ abstract class Routes {
   static const settings = _Paths.settings;
   static const almanacDetail = _Paths.almanacDetail;
   static const gomoku = _Paths.gomoku;
+  static const astrology = _Paths.astrology;
+  static const astrologyChart = _Paths.astrologyChart;
+  static const astrologyInterpretation = _Paths.astrologyInterpretation;
+  static const astrologyDetail = _Paths.astrologyDetail;
 }
 
 abstract class _Paths {
@@ -27,4 +31,8 @@ abstract class _Paths {
   static const settings = '/settings';
   static const almanacDetail = '/almanac-detail';
   static const gomoku = '/gomoku';
+  static const astrology = '/astrology';
+  static const astrologyChart = '/astrology-chart';
+  static const astrologyInterpretation = '/astrology-interpretation';
+  static const astrologyDetail = '/astrology-detail';
 }
