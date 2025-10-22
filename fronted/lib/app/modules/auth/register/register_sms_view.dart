@@ -325,7 +325,7 @@ class RegisterSmsPage extends GetView<RegisterController> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6.r),
               ),
-              fillColor: MaterialStateProperty.all(Color(0xFF8B6FD9)),
+              fillColor: WidgetStateProperty.all(Color(0xFF8B6FD9)),
               checkColor: Colors.white,
             ),
           ),

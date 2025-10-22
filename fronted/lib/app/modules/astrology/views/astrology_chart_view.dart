@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../controllers/astrology_controller.dart';
 import '../models/astrology_model.dart';
 import '../widgets/astrology_chart_painter.dart';
-import '../models/astrology_constants.dart';
 
 class AstrologyChartPage extends GetView<AstrologyController> {
   const AstrologyChartPage({super.key});

@@ -6,9 +6,14 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'controller.dart';
 
-class AlmanacDetailPage extends GetView<AlmanacDetailController> {
-  AlmanacDetailPage({super.key});
+class AlmanacDetailPage extends StatefulWidget {
+  const AlmanacDetailPage({super.key});
 
+  @override
+  State<AlmanacDetailPage> createState() => _AlmanacDetailPageState();
+}
+
+class _AlmanacDetailPageState extends State<AlmanacDetailPage> {
   InAppWebViewController? _webController;
 
   @override
@@ -53,23 +58,24 @@ class AlmanacDetailPage extends GetView<AlmanacDetailController> {
           pullToRefreshController?.endRefreshing();
           // 注入 GetX 控制器数据
           try {
+            final almanacController = Get.find<AlmanacDetailController>();
             final data = {
-              'monthTitle': this.controller.monthTitle.value,
-              'lunarLine': this.controller.lunarLine.value,
-              'yi': this.controller.yiList.value,
-              'ji': this.controller.jiList.value,
-              'wuXing': this.controller.wuXing.value,
-              'chongSha': this.controller.chongSha.value,
-              'zhiShen': this.controller.zhiShen.value,
-              'shenYiQu': this.controller.shenYiQu.value,
-              'taiShen': this.controller.taiShen.value,
-              'xiongShen': this.controller.xiongShen.value,
-              'baiLu': this.controller.baiLu.value,
-              'currentHourTitle': this.controller.currentHourTitle.value,
-              'xiShen': this.controller.xiShen.value,
-              'hourYi': this.controller.hourYi.value,
-              'hourJi': this.controller.hourJi.value,
-              'hours': this.controller.hours, // [{label:'子',status:'吉',active:true}, ...]
+              'monthTitle': almanacController.monthTitle.value,
+              'lunarLine': almanacController.lunarLine.value,
+              'yi': almanacController.yiList.value,
+              'ji': almanacController.jiList.value,
+              'wuXing': almanacController.wuXing.value,
+              'chongSha': almanacController.chongSha.value,
+              'zhiShen': almanacController.zhiShen.value,
+              'shenYiQu': almanacController.shenYiQu.value,
+              'taiShen': almanacController.taiShen.value,
+              'xiongShen': almanacController.xiongShen.value,
+              'baiLu': almanacController.baiLu.value,
+              'currentHourTitle': almanacController.currentHourTitle.value,
+              'xiShen': almanacController.xiShen.value,
+              'hourYi': almanacController.hourYi.value,
+              'hourJi': almanacController.hourJi.value,
+              'hours': almanacController.hours, // [{label:'子',status:'吉',active:true}, ...]
             };
             final js = "window.renderAlmanac(${jsonEncode(data)});";
             await controller.evaluateJavascript(source: js);

@@ -211,7 +211,6 @@ class AstrologyChartPainter extends CustomPainter {
 
   // 绘制中心信息（太阳、月亮、上升星座）
   void _drawCenterInfo(Canvas canvas, Offset center) {
-    final infoRadius = 30.0;
 
     // 太阳
     _drawCenterItem(
