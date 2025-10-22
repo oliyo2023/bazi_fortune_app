@@ -1,0 +1,589 @@
+package handlers
+
+import (
+	"encoding/json"
+	"net/http"
+	"strconv"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+	// "bazi_fortune_app/backend/util"
+	"bazi_fortune_app/backend/models"
+)
+
+// PaymentHandler 支付处理器
+type PaymentHandler struct {
+	db *gorm.DB
+}
+
+// NewPaymentHandler 创建支付处理器
+func NewPaymentHandler(db *gorm.DB) *PaymentHandler {
+	return &PaymentHandler{db: db}
+}
+
+// GetMembershipPlans 获取会员套餐列表
+func (h *PaymentHandler) GetMembershipPlans(c *gin.Context) {
+	lang := c.GetHeader("Accept-Language")
+	if lang == "" {
+		lang = "zh"
+	}
+
+	var plans []models.MembershipPlan
+	if err := h.db.Where("is_active = ?", true).Order("sort_order ASC, price ASC").Find(&plans).Error; err != nil {
+		JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+		return
+	}
+
+	JSONOK(c, plans)
+}
+
+// GetUserSubscription 获取用户当前订阅
+func (h *PaymentHandler) GetUserSubscription(c *gin.Context) {
+	lang := c.GetHeader("Accept-Language")
+	if lang == "" {
+		lang = "zh"
+	}
+
+	userID, exists := c.Get("user_id")
+	if !exists {
+		JSONError(c, 401, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var subscription models.UserSubscription
+	err := h.db.Where("user_id = ? AND status = ?", userID, "active").
+		Preload("Plan").
+		First(&subscription).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			JSONOK(c, nil)
+			return
+		}
+
+		JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+		return
+	}
+
+	// 计算剩余天数
+	remainingDays := int(subscription.EndDate.Sub(time.Now()).Hours() / 24)
+	if remainingDays < 0 {
+		remainingDays = 0
+	}
+
+	response := map[string]interface{}{
+		"id":             subscription.ID,
+		"plan_name":      subscription.PlanName,
+		"status":          subscription.Status,
+		"start_date":      subscription.StartDate,
+		"end_date":        subscription.EndDate,
+		"auto_renewal":     subscription.AutoRenewal,
+		"remaining_days":  remainingDays,
+		"plan":            subscription.Plan,
+	}
+
+	JSONOK(c, response)
+}
+
+// CreatePaymentOrder 创建支付订单
+func (h *PaymentHandler) CreatePaymentOrder(c *gin.Context) {
+	lang := c.GetHeader("Accept-Language")
+	if lang == "" {
+		lang = "zh"
+	}
+
+	userID, exists := c.Get("user_id")
+	if !exists {
+		JSONError(c, 401, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var req struct {
+		PlanID       string `json:"plan_id" binding:"required"`
+		PaymentMethod string `json:"payment_method" binding:"required"`
+		CouponCode   string `json:"coupon_code"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		JSONError(c, 400, "invalid_request", http.StatusBadRequest)
+		return
+	}
+
+	// 验证会员套餐
+	planID, err := uuid.Parse(req.PlanID)
+	if err != nil {
+		JSONError(c, 400, "invalid_request", http.StatusBadRequest)
+		return
+	}
+
+	var plan models.MembershipPlan
+	if err := h.db.First(&plan, planID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			JSONError(c, 404, "subscription_plan_not_found", http.StatusNotFound)
+			return
+		}
+
+		JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+		return
+	}
+
+	// 检查用户是否已有活跃订阅
+	var existingSubscription models.UserSubscription
+	err = h.db.Where("user_id = ? AND status = ?", userID, "active").First(&existingSubscription).Error
+	if err == nil {
+		JSONError(c, 400, "subscription_already_exists", http.StatusBadRequest)
+		return
+	}
+
+	// 计算最终价格
+	finalPrice := plan.Price
+	var coupon *models.Coupon
+	if req.CouponCode != "" {
+		if err := h.db.Where("code = ? AND is_active = ?", req.CouponCode, true).First(&coupon).Error; err == nil {
+			// 验证优惠券有效性
+			if coupon.IsValid() {
+				if coupon.DiscountType == "percentage" {
+					finalPrice = plan.Price * (1 - coupon.DiscountValue/100)
+				} else {
+					finalPrice = plan.Price - coupon.DiscountValue
+				}
+				if finalPrice < 0 {
+					finalPrice = 0
+				}
+			}
+		}
+	}
+
+	// 创建订单
+	order := models.Order{
+		UserID:   userID.(uuid.UUID),
+		Type:     "membership",
+		Status:   "pending",
+		Amount:   finalPrice,
+		Currency: plan.Currency,
+	}
+
+	// 创建订单项目
+	items := map[string]interface{}{
+		"plan_id":        plan.ID,
+		"plan_name":      plan.Name,
+		"duration":       plan.Duration,
+		"duration_unit":  plan.DurationUnit,
+		"payment_method": req.PaymentMethod,
+	}
+	itemsJSON, _ := json.Marshal(items)
+	order.Items = string(itemsJSON)
+
+	if err := h.db.Create(&order).Error; err != nil {
+		JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+		return
+	}
+
+	// 如果使用了优惠券，创建用户优惠券记录
+	if coupon != nil && coupon.IsValid() {
+		userCoupon := models.UserCoupon{
+			UserID:    userID.(uuid.UUID),
+			CouponID:  coupon.ID,
+			Status:    "used",
+			UsedAt:    &[]time.Time{time.Now()}[0],
+			OrderID:   &order.ID,
+		}
+		h.db.Create(&userCoupon)
+
+		// 更新优惠券使用次数
+		h.db.Model(&coupon).Update("usage_count", gorm.Expr("usage_count + ?", 1))
+	}
+
+	// 根据支付方式创建支付意图
+	var paymentIntentID string
+	switch req.PaymentMethod {
+	case "stripe":
+		paymentIntentID, err = h.createStripePaymentIntent(order, plan, finalPrice)
+	case "paypal":
+		paymentIntentID, err = h.createPayPalPayment(order, plan, finalPrice)
+	case "alipay":
+		paymentIntentID, err = h.createAlipayPayment(order, plan, finalPrice)
+	case "wechat":
+		paymentIntentID, err = h.createWechatPayment(order, plan, finalPrice)
+	default:
+		JSONError(c, 400, "payment_method_invalid", http.StatusBadRequest)
+		return
+	}
+
+	if err != nil {
+		JSONError(c, 500, "payment_gateway_error", http.StatusInternalServerError)
+		return
+	}
+
+	response := map[string]interface{}{
+		"order_id":          order.ID,
+		"order_number":      order.OrderNumber,
+		"amount":            finalPrice,
+		"currency":          plan.Currency,
+		"payment_intent_id": paymentIntentID,
+	}
+
+	JSONOK(c, response)
+}
+
+// ConfirmPayment 确认支付
+func (h *PaymentHandler) ConfirmPayment(c *gin.Context) {
+	lang := c.GetHeader("Accept-Language")
+	if lang == "" {
+		lang = "zh"
+	}
+
+	userID, exists := c.Get("user_id")
+	if !exists {
+		JSONError(c, 401, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var req struct {
+		OrderID         string `json:"order_id" binding:"required"`
+		PaymentIntentID string `json:"payment_intent_id" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		JSONError(c, 400, "invalid_request", http.StatusBadRequest)
+		return
+	}
+
+	orderID, err := uuid.Parse(req.OrderID)
+	if err != nil {
+		JSONError(c, 400, "invalid_request", http.StatusBadRequest)
+		return
+	}
+
+	// 获取订单
+	var order models.Order
+	if err := h.db.Preload("User").First(&order, orderID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			JSONError(c, 404, "order_not_found", http.StatusNotFound)
+			return
+		}
+
+		JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+		return
+	}
+
+	// 验证订单所有权
+	if order.UserID != userID.(uuid.UUID) {
+		JSONError(c, 403, "forbidden", http.StatusForbidden)
+		return
+	}
+
+	// 解析订单项目
+	var items map[string]interface{}
+	if err := json.Unmarshal([]byte(order.Items), &items); err != nil {
+		JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+		return
+	}
+
+	// 验证支付状态
+	var transactionID string
+	var paymentStatus string
+	var gatewayResponse map[string]interface{}
+
+	paymentMethod, _ := items["payment_method"].(string)
+	switch paymentMethod {
+	case "stripe":
+		transactionID, paymentStatus, gatewayResponse, err = h.confirmStripePayment(req.PaymentIntentID)
+	case "paypal":
+		transactionID, paymentStatus, gatewayResponse, err = h.confirmPayPalPayment(req.PaymentIntentID)
+	case "alipay":
+		transactionID, paymentStatus, gatewayResponse, err = h.confirmAlipayPayment(req.PaymentIntentID)
+	case "wechat":
+		transactionID, paymentStatus, gatewayResponse, err = h.confirmWechatPayment(req.PaymentIntentID)
+	}
+
+	if err != nil {
+		JSONError(c, 500, "payment_verification_failed", http.StatusInternalServerError)
+		return
+	}
+
+	// 创建支付记录
+	payment := models.Payment{
+		UserID:          userID.(uuid.UUID),
+		OrderID:         order.ID,
+		PaymentMethod:   paymentMethod,
+		Amount:          order.Amount,
+		Currency:        order.Currency,
+		Status:          paymentStatus,
+		TransactionID:   transactionID,
+	}
+
+	if paymentStatus == "completed" {
+		paymentDate := time.Now()
+		payment.PaymentDate = &paymentDate
+	}
+
+	// 序列化网关响应
+	if gatewayResponse != nil {
+		responseJSON, _ := json.Marshal(gatewayResponse)
+		payment.GatewayResponse = string(responseJSON)
+	}
+
+	if err := h.db.Create(&payment).Error; err != nil {
+		JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+		return
+	}
+
+	// 更新订单状态
+	order.Status = paymentStatus
+	if err := h.db.Save(&order).Error; err != nil {
+		JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+		return
+	}
+
+	// 如果支付成功，创建用户订阅
+	if paymentStatus == "completed" && order.Type == "membership" {
+		planID, _ := items["plan_id"].(uuid.UUID)
+		planName, _ := items["plan_name"].(string)
+		duration, _ := items["duration"].(int)
+		unit, _ := items["duration_unit"].(string)
+
+		// 计算订阅结束时间
+		var endDate time.Time
+		now := time.Now()
+		switch unit {
+		case "day":
+			endDate = now.AddDate(0, 0, duration)
+		case "month":
+			endDate = now.AddDate(0, duration, 0)
+		case "year":
+			endDate = now.AddDate(duration, 0, 0)
+		}
+
+		subscription := models.UserSubscription{
+			UserID:      userID.(uuid.UUID),
+			PlanID:      planID,
+			PlanName:    planName,
+			Status:      "active",
+			StartDate:   now,
+			EndDate:     endDate,
+			AutoRenewal: false,
+			Amount:      order.Amount,
+			Currency:    order.Currency,
+		}
+
+		if err := h.db.Create(&subscription).Error; err != nil {
+			JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	response := map[string]interface{}{
+		"payment_id":     payment.ID,
+		"status":         paymentStatus,
+		"transaction_id": transactionID,
+	}
+
+	JSONOKWithMessage(c, "payment_successful", response)
+}
+
+// GetPaymentHistory 获取支付历史
+func (h *PaymentHandler) GetPaymentHistory(c *gin.Context) {
+	lang := c.GetHeader("Accept-Language")
+	if lang == "" {
+		lang = "zh"
+	}
+
+	userID, exists := c.Get("user_id")
+	if !exists {
+		JSONError(c, 401, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 || limit > 100 {
+		limit = 10
+	}
+
+	offset := (page - 1) * limit
+
+	var payments []models.Payment
+	var total int64
+
+	// 获取总数
+	h.db.Model(&models.Payment{}).Where("user_id = ?", userID).Count(&total)
+
+	// 获取分页数据
+	if err := h.db.Where("user_id = ?", userID).
+		Preload("Order").
+		Order("created_at DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&payments).Error; err != nil {
+		JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+		return
+	}
+
+	response := map[string]interface{}{
+		"payments": payments,
+		"total":    total,
+		"page":     page,
+		"limit":    limit,
+	}
+
+	JSONOK(c, response)
+}
+
+// RequestRefund 申请退款
+func (h *PaymentHandler) RequestRefund(c *gin.Context) {
+	lang := c.GetHeader("Accept-Language")
+	if lang == "" {
+		lang = "zh"
+	}
+
+	userID, exists := c.Get("user_id")
+	if !exists {
+		JSONError(c, 401, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var req struct {
+		OrderID string `json:"order_id" binding:"required"`
+		Reason  string `json:"reason" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		JSONError(c, 400, "invalid_request", http.StatusBadRequest)
+		return
+	}
+
+	orderID, err := uuid.Parse(req.OrderID)
+	if err != nil {
+		JSONError(c, 400, "invalid_request", http.StatusBadRequest)
+		return
+	}
+
+	// 获取订单
+	var order models.Order
+	if err := h.db.First(&order, orderID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			JSONError(c, 404, "order_not_found", http.StatusNotFound)
+			return
+		}
+
+		JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+		return
+	}
+
+	// 验证订单所有权
+	if order.UserID != userID.(uuid.UUID) {
+		JSONError(c, 403, "forbidden", http.StatusForbidden)
+		return
+	}
+
+	// 检查是否已有退款申请
+	var existingRefund models.Refund
+	err = h.db.Where("order_id = ? AND status IN ?", orderID, []string{"pending", "approved", "processed"}).First(&existingRefund).Error
+	if err == nil {
+		JSONError(c, 400, "refund_already_exists", http.StatusBadRequest)
+		return
+	}
+
+	// 获取支付记录
+	var payment models.Payment
+	if err := h.db.Where("order_id = ? AND status = ?", orderID, "completed").First(&payment).Error; err != nil {
+		JSONError(c, 400, "payment_not_found", http.StatusBadRequest)
+		return
+	}
+
+	// 创建退款申请
+	refund := models.Refund{
+		UserID:    userID.(uuid.UUID),
+		OrderID:   orderID,
+		PaymentID: payment.ID,
+		Amount:    payment.Amount,
+		Currency:  payment.Currency,
+		Reason:    req.Reason,
+		Status:    "pending",
+	}
+
+	if err := h.db.Create(&refund).Error; err != nil {
+		JSONError(c, 500, "internal_server_error", http.StatusInternalServerError)
+		return
+	}
+
+	response := map[string]interface{}{
+		"refund_id": refund.ID,
+		"status":    refund.Status,
+	}
+
+	JSONOKWithMessage(c, "refund_request_submitted", response)
+}
+
+// 以下是支付网关集成的占位符方法，实际实现需要根据具体的支付网关SDK来完成
+
+func (h *PaymentHandler) createStripePaymentIntent(order models.Order, plan models.MembershipPlan, amount float64) (string, error) {
+	// TODO: 实现Stripe支付意图创建
+	return "pi_stripe_placeholder", nil
+}
+
+func (h *PaymentHandler) createPayPalPayment(order models.Order, plan models.MembershipPlan, amount float64) (string, error) {
+	// TODO: 实现PayPal支付创建
+	return "paypal_placeholder", nil
+}
+
+func (h *PaymentHandler) createAlipayPayment(order models.Order, plan models.MembershipPlan, amount float64) (string, error) {
+	// TODO: 实现支付宝支付创建
+	return "alipay_placeholder", nil
+}
+
+func (h *PaymentHandler) createWechatPayment(order models.Order, plan models.MembershipPlan, amount float64) (string, error) {
+	// TODO: 实现微信支付创建
+	return "wechat_placeholder", nil
+}
+
+func (h *PaymentHandler) confirmStripePayment(paymentIntentID string) (string, string, map[string]interface{}, error) {
+	// TODO: 实现Stripe支付确认
+	return "txn_stripe_placeholder", "completed", map[string]interface{}{}, nil
+}
+
+func (h *PaymentHandler) confirmPayPalPayment(paymentID string) (string, string, map[string]interface{}, error) {
+	// TODO: 实现PayPal支付确认
+	return "txn_paypal_placeholder", "completed", map[string]interface{}{}, nil
+}
+
+func (h *PaymentHandler) confirmAlipayPayment(paymentID string) (string, string, map[string]interface{}, error) {
+	// TODO: 实现支付宝支付确认
+	return "txn_alipay_placeholder", "completed", map[string]interface{}{}, nil
+}
+
+func (h *PaymentHandler) confirmWechatPayment(paymentID string) (string, string, map[string]interface{}, error) {
+	// TODO: 实现微信支付确认
+	return "txn_wechat_placeholder", "completed", map[string]interface{}{}, nil
+}
+
+// IsValid 检查优惠券是否有效
+func (c *models.Coupon) IsValid() bool {
+	if !c.IsActive {
+		return false
+	}
+
+	now := time.Now()
+	
+	// 检查有效期
+	if c.ValidFrom != nil && now.Before(*c.ValidFrom) {
+		return false
+	}
+	
+	if c.ValidUntil != nil && now.After(*c.ValidUntil) {
+		return false
+	}
+
+	// 检查使用次数限制
+	if c.UsageLimit != nil && c.UsageCount >= *c.UsageLimit {
+		return false
+	}
+
+	return true
+}

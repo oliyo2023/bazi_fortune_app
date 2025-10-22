@@ -1,0 +1,35 @@
+{
+  "name": "bazi-fortune-workers-api",
+  "version": "1.0.0",
+  "description": "八字算命应用后端API - Cloudflare Workers版本",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "build": "tsc"
+  },
+  "keywords": [
+    "bazi",
+    "fortune-telling",
+    "cloudflare-workers",
+    "supabase"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@hono/node-server": "^1.4.0",
+    "@prisma/adapter-d1": "^5.1.1",
+    "@prisma/client": "^5.1.1",
+    "hono": "^4.0.0",
+    "prisma": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.0",
+    "typescript": "^5.1.6",
+    "wrangler": "^4.43.0"
+  }
+}

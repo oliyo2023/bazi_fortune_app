@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "copy-sqlite-config",
+            "type": "shell",
+            "command": "copy",
+            "args": [
+                "${workspaceFolder}\\backend\\config.example.yaml",
+                "${workspaceFolder}\\backend\\config.yaml"
+            ],
+            "problemMatcher": [],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ]
+}
