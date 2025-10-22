@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_model.dart';
@@ -30,11 +31,11 @@ class ApiService extends GetxService {
       return null;
     } on AuthException catch (e) {
       // 保留 SDK 的原始异常（包含 message/statusCode/可能的 code），便于上层做映射
-      print('登录错误(AuthException): $e');
+      developer.log('登录错误(AuthException): $e', name: 'ApiService', error: e);
       rethrow;
     } catch (e) {
       // 其它错误统一抛出，让上层映射为通用提示
-      print('登录错误(Other): $e');
+      developer.log('登录错误(Other): $e', name: 'ApiService', error: e);
       rethrow;
     }
   }
@@ -66,7 +67,7 @@ class ApiService extends GetxService {
       }
       return null;
     } catch (e) {
-      print('注册错误: $e');
+      developer.log('注册错误: $e', name: 'ApiService', error: e);
       throw Exception('注册失败: ${e.toString()}');
     }
   }
@@ -75,7 +76,7 @@ class ApiService extends GetxService {
     try {
       await _supabase.auth.signOut();
     } catch (e) {
-      print('登出错误: $e');
+      developer.log('登出错误: $e', name: 'ApiService', error: e);
       throw Exception('登出失败: ${e.toString()}');
     }
   }
@@ -94,7 +95,7 @@ class ApiService extends GetxService {
       }
       return null;
     } catch (e) {
-      print('获取当前用户错误: $e');
+      developer.log('获取当前用户错误: $e', name: 'ApiService', error: e);
       return null;
     }
   }
@@ -138,7 +139,7 @@ class ApiService extends GetxService {
         throw Exception('八字计算失败: ${response.body['message']}');
       }
     } catch (e) {
-      print('八字计算错误: $e');
+      developer.log('八字计算错误: $e', name: 'ApiService', error: e);
       throw Exception('八字计算失败: ${e.toString()}');
     }
   }
@@ -162,7 +163,7 @@ class ApiService extends GetxService {
         throw Exception('AI解读失败: ${response.body['message']}');
       }
     } catch (e) {
-      print('AI解读错误: $e');
+      developer.log('AI解读错误: $e', name: 'ApiService', error: e);
       throw Exception('AI解读失败: ${e.toString()}');
     }
   }
@@ -185,13 +186,13 @@ class ApiService extends GetxService {
     } on PostgrestException catch (e) {
       if (e.code == 'PGRST205') {
         // 表不存在错误
-        print('数据库表 bazi_data 不存在，请运行迁移');
+        developer.log('数据库表 bazi_data 不存在，请运行迁移', name: 'ApiService');
         throw Exception('数据库准备中，请稍后重试或联系管理员');
       }
-      print('获取历史记录错误: $e');
+      developer.log('获取历史记录错误: $e', name: 'ApiService', error: e);
       throw Exception('获取历史记录失败: ${e.toString()}');
     } catch (e) {
-      print('获取历史记录错误: $e');
+      developer.log('获取历史记录错误: $e', name: 'ApiService', error: e);
       throw Exception('获取历史记录失败: ${e.toString()}');
     }
   }
@@ -293,7 +294,7 @@ class ApiService extends GetxService {
       }
       return null;
     } catch (e) {
-      print('获取八字详情错误: $e');
+      developer.log('获取八字详情错误: $e', name: 'ApiService', error: e);
       return null;
     }
   }

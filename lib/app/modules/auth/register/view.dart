@@ -72,7 +72,7 @@ class RegisterPage extends GetView<RegisterController> {
           '加入我们，开启命运探索之旅',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
           ),
         ),
       ],
@@ -87,7 +87,7 @@ class RegisterPage extends GetView<RegisterController> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -236,7 +236,7 @@ class RegisterPage extends GetView<RegisterController> {
         Text(
           '已有账号？',
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
           ),
         ),
         TextButton(

@@ -58,7 +58,7 @@ class LoginPage extends GetView<LoginController> {
           width: 100,
           height: 100,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(50),
           ),
           child: Icon(
@@ -81,7 +81,7 @@ class LoginPage extends GetView<LoginController> {
           '探索命运的奥秘',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
           ),
         ),
       ],
@@ -96,7 +96,7 @@ class LoginPage extends GetView<LoginController> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -199,7 +199,7 @@ class LoginPage extends GetView<LoginController> {
       child: Text(
         '忘记密码？',
         style: TextStyle(
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha: 0.8),
           fontSize: 14,
         ),
       ),
@@ -213,7 +213,7 @@ class LoginPage extends GetView<LoginController> {
         Text(
           '还没有账号？',
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
           ),
         ),
         TextButton(

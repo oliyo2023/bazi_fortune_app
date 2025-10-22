@@ -75,7 +75,7 @@ class ResultPage extends GetView<ResultController> {
           children: [
             CircleAvatar(
               radius: 30,
-              backgroundColor: Colors.white.withOpacity(0.2),
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
               child: Text(
                 controller.userName.value.isNotEmpty 
                     ? controller.userName.value[0] 
@@ -101,7 +101,7 @@ class ResultPage extends GetView<ResultController> {
               '${controller.baziResult.value!.gender == 'male' ? '男' : '女'} • ${controller.baziResult.value!.birthYear}年${controller.baziResult.value!.birthMonth}月${controller.baziResult.value!.birthDay}日',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
           ],

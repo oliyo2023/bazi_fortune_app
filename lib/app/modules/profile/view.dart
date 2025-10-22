@@ -427,7 +427,7 @@ class _FeatureTile extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: color.withOpacity(.12),
+            color: color.withValues(alpha: .12),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: color, size: 26),
