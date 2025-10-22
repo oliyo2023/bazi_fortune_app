@@ -6,13 +6,19 @@ class HttpService extends GetxService {
   static HttpService get to => Get.find();
 
   final String _baseUrl = 'http://127.0.0.1:8081/api/v1';
-  
-  // 获取带语言信息的请求头
-  Map<String, String> get _headers => {
+
+  // 请求头基础配置
+  final Map<String, String> _baseHeaders = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'Accept-Language': Get.locale?.languageCode ?? 'zh',
   };
+
+  // 获取带语言信息的请求头
+  Map<String, String> get _headers {
+    final headers = Map<String, String>.from(_baseHeaders);
+    headers['Accept-Language'] = Get.locale?.languageCode ?? 'zh';
+    return headers;
+  }
 
   void setToken(String token) {
     _headers['Authorization'] = 'Bearer $token';
@@ -40,7 +46,7 @@ class HttpService extends GetxService {
       }
       return null;
     } catch (e) {
-      print('Login error: $e');
+      Get.log('Login error: $e');
       return null;
     }
   }
@@ -66,7 +72,7 @@ class HttpService extends GetxService {
       }
       return null;
     } catch (e) {
-      print('Register error: $e');
+      Get.log('Register error: $e');
       return null;
     }
   }
@@ -98,7 +104,7 @@ class HttpService extends GetxService {
       }
       return null;
     } catch (e) {
-      print('Calculate bazi error: $e');
+      Get.log('Calculate bazi error: $e');
       return null;
     }
   }
@@ -117,7 +123,7 @@ class HttpService extends GetxService {
       }
       return null;
     } catch (e) {
-      print('AI analyze error: $e');
+      Get.log('AI analyze error: $e');
       return null;
     }
   }
@@ -136,7 +142,7 @@ class HttpService extends GetxService {
       }
       return null;
     } catch (e) {
-      print('Get history error: $e');
+      Get.log('Get history error: $e');
       return null;
     }
   }
@@ -150,7 +156,7 @@ class HttpService extends GetxService {
       );
       return response.statusCode == 200;
     } catch (e) {
-      print('Health check error: $e');
+      Get.log('Health check error: $e');
       return false;
     }
   }

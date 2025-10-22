@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:get/get.dart';
-
+import 'package:logger/logger.dart';
 
 import '../models/user_model.dart';
 import '../models/bazi_model.dart';
@@ -13,6 +13,7 @@ class ApiService extends GetxService {
   final String _baseUrl = 'http://localhost:8081/api/v1'; // 后端API地址（统一为 localhost）
   final TokenManager _tokenManager = TokenManager();
   final GetConnect _client = GetConnect();
+  final Logger _logger = Logger();
 
   bool _isRefreshing = false;
   Completer<bool>? _refreshCompleter;
@@ -245,7 +246,7 @@ class ApiService extends GetxService {
         throw Exception('八字计算失败: ${response.body['message']}');
       }
     } catch (e) {
-      print('八字计算错误: $e');
+      _logger.e('八字计算错误: $e');
       throw Exception('八字计算失败: ${e.toString()}');
     }
   }
@@ -266,7 +267,7 @@ class ApiService extends GetxService {
         throw Exception('AI解读失败: ${response.body['message']}');
       }
     } catch (e) {
-      print('AI解读错误: $e');
+      _logger.e('AI解读错误: $e');
       throw Exception('AI解读失败: ${e.toString()}');
     }
   }
@@ -287,7 +288,7 @@ class ApiService extends GetxService {
         throw Exception('获取历史记录失败: ${response.body?['message'] ?? response.statusText}');
       }
     } catch (e) {
-      print('获取历史记录错误: $e');
+      _logger.e('获取历史记录错误: $e');
       throw Exception('获取历史记录失败: ${e.toString()}');
     }
   }
@@ -331,7 +332,7 @@ class ApiService extends GetxService {
         throw Exception('创建排盘记录失败: ${response.body?['message'] ?? response.statusText}');
       }
     } catch (e) {
-      print('创建排盘记录错误: $e');
+      _logger.e('创建排盘记录错误: $e');
       throw Exception('创建排盘记录失败: ${e.toString()}');
     }
   }
@@ -361,7 +362,7 @@ class ApiService extends GetxService {
         throw Exception('更新计算结果失败: ${response.body?['message'] ?? response.statusText}');
       }
     } catch (e) {
-      print('更新计算结果错误: $e');
+      _logger.e('更新计算结果错误: $e');
       throw Exception('更新计算结果失败: ${e.toString()}');
     }
   }
@@ -430,7 +431,7 @@ class ApiService extends GetxService {
       }
       return null;
     } catch (e) {
-      print('获取八字详情错误: $e');
+      _logger.e('获取八字详情错误: $e');
       return null;
     }
   }

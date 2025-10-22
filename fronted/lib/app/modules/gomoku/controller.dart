@@ -3,8 +3,12 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:logger/logger.dart';
 
 class GomokuController extends GetxController {
+  // 日志记录器
+  final Logger logger = Logger();
+
   // 棋盘大小
   static const int boardSize = 15;
   
@@ -134,7 +138,7 @@ class GomokuController extends GetxController {
         move = getTraditionalMove();
       }
     } catch (error) {
-      print('AI移动失败: $error');
+      logger.e('AI移动失败: $error');
       addThinkingLog('AI移动失败，使用传统算法');
       move = getTraditionalMove();
     }
@@ -284,15 +288,21 @@ class GomokuController extends GetxController {
       } else if (count == 4) {
         if (openEnds == 2) {
           score += 10000;
-        } else if (openEnds == 1) score += 1000;
+        } else if (openEnds == 1) {
+          score += 1000;
+        }
       } else if (count == 3) {
         if (openEnds == 2) {
           score += 1000;
-        } else if (openEnds == 1) score += 100;
+        } else if (openEnds == 1) {
+          score += 100;
+        }
       } else if (count == 2) {
         if (openEnds == 2) {
           score += 100;
-        } else if (openEnds == 1) score += 10;
+        } else if (openEnds == 1) {
+          score += 10;
+        }
       }
     }
     
@@ -588,9 +598,9 @@ $boardState
     }
     
     try {
-      print('发送API请求到: ${apiEndpoint.value}');
-      print('使用模型: ${model.value}');
-      
+      logger.d('发送API请求到: ${apiEndpoint.value}');
+      logger.d('使用模型: ${model.value}');
+
       final requestBody = jsonEncode({
         'model': model.value,
         'messages': [
@@ -602,8 +612,8 @@ $boardState
         'temperature': 0.7,
         'max_tokens': 1000,
       });
-      
-      print('请求体: $requestBody');
+
+      logger.d('请求体: $requestBody');
       
       final response = await http.post(
         Uri.parse(apiEndpoint.value),
@@ -614,26 +624,26 @@ $boardState
         body: requestBody,
       ).timeout(const Duration(seconds: 60)); // 增加超时时间到60秒
 
-      print('响应状态码: ${response.statusCode}');
-      print('响应体: ${response.body}');
+      logger.d('响应状态码: ${response.statusCode}');
+      logger.d('响应体: ${response.body}');
 
       if (response.statusCode == 200) {
         try {
           final responseBody = response.body;
-          print('原始响应长度: ${responseBody.length}');
-          print('原始响应前100字符: ${responseBody.substring(0, responseBody.length > 100 ? 100 : responseBody.length)}');
-          
+          logger.d('原始响应长度: ${responseBody.length}');
+          logger.d('原始响应前100字符: ${responseBody.substring(0, responseBody.length > 100 ? 100 : responseBody.length)}');
+
           // 检查响应是否为空
           if (responseBody.isEmpty) {
             throw Exception('API返回空响应');
           }
-          
+
           final data = jsonDecode(responseBody);
-          print('解析后的JSON: $data');
-          
+          logger.d('解析后的JSON: $data');
+
           if (data['choices'] != null && data['choices'].isNotEmpty) {
             final content = data['choices'][0]['message']['content'];
-            print('提取的内容: $content');
+            logger.d('提取的内容: $content');
             
             // 检查内容是否为空
             if (content == null || content.isEmpty) {
@@ -642,25 +652,25 @@ $boardState
             
             return content;
           } else {
-            print('API响应中没有choices字段');
+            logger.e('API响应中没有choices字段');
             throw Exception('API响应格式错误：缺少choices字段');
           }
         } on FormatException catch (e) {
-          print('JSON格式错误: $e');
-          print('原始响应: ${response.body}');
+          logger.e('JSON格式错误: $e');
+          logger.e('原始响应: ${response.body}');
           throw Exception('JSON格式错误: ${e.message}');
         } catch (e) {
-          print('JSON解析失败: $e');
-          print('原始响应: ${response.body}');
+          logger.e('JSON解析失败: $e');
+          logger.e('原始响应: ${response.body}');
           throw Exception('JSON解析失败: $e');
         }
       } else {
-        print('API请求失败，状态码: ${response.statusCode}');
-        print('响应内容: ${response.body}');
+        logger.e('API请求失败，状态码: ${response.statusCode}');
+        logger.e('响应内容: ${response.body}');
         throw Exception('API请求失败，状态码: ${response.statusCode}');
       }
     } catch (e) {
-      print('API调用异常: $e');
+      logger.e('API调用异常: $e');
       throw Exception('API调用失败: $e');
     }
   }
@@ -674,7 +684,7 @@ $boardState
         return {'row': data['row'], 'col': data['col']};
       }
     } catch (error) {
-      print('解析LLM响应失败: $error');
+      logger.e('解析LLM响应失败: $error');
     }
     
     return null;
@@ -715,8 +725,8 @@ $boardState
       }
       
       final testPrompt = '请回复：{"test":"ok"}';
-      print('开始测试API连接...');
-      
+      logger.d('开始测试API连接...');
+
       final response = await callLLMAPI(testPrompt);
       
       if (response.isNotEmpty) {
@@ -758,7 +768,7 @@ $boardState
       
       return move;
     } catch (error) {
-      print('LLM API调用失败: $error');
+      logger.e('LLM API调用失败: $error');
       addThinkingLog('API调用失败，使用传统算法');
       return getTraditionalMove();
     }

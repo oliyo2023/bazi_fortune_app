@@ -28,7 +28,7 @@ class _WebviewPageState extends State<WebviewPage> {
     _initialUri = Uri.parse(widget.url);
     if (Platform.isAndroid || Platform.isIOS) {
       _pullToRefreshController = PullToRefreshController(
-        options: PullToRefreshOptions(color: Colors.white, backgroundColor: Colors.black54),
+        settings: PullToRefreshSettings(color: Colors.white, backgroundColor: Colors.black54),
         onRefresh: () async {
           _hasError = false;
           _isLoading = true;
@@ -151,13 +151,6 @@ class _WebviewPageState extends State<WebviewPage> {
                 _pullToRefreshController?.endRefreshing();
               },
               onReceivedError: (controller, request, error) {
-                setState(() {
-                  _isLoading = false;
-                  _hasError = true;
-                });
-                _pullToRefreshController?.endRefreshing();
-              },
-              onLoadError: (controller, url, code, message) {
                 setState(() {
                   _isLoading = false;
                   _hasError = true;

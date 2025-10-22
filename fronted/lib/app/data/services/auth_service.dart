@@ -1,13 +1,15 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:logger/logger.dart';
 import '../models/user_model.dart';
 import 'api_service.dart';
 import '../../core/utils/error_mapper.dart';
 
 class AuthService extends GetxService {
   static AuthService get to => Get.find();
-  
+
   final GetStorage _storage = GetStorage();
+  final Logger _logger = Logger();
   final Rx<UserModel?> currentUser = Rx<UserModel?>(null);
   final RxBool isLoggedIn = false.obs;
 
@@ -25,7 +27,7 @@ class AuthService extends GetxService {
         isLoggedIn.value = true;
       }
     } catch (e) {
-      print('检查登录状态错误: $e');
+      _logger.e('检查登录状态错误: $e');
     }
   }
 

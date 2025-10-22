@@ -438,7 +438,7 @@ class _LuckBanner extends StatelessWidget {
         child: Image.asset(
           'assets/images/year_luck_2025.png',
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) {
+          errorBuilder: (_, _, _) {
             return Container(
               color: const Color(0xFFFF6A00),
               alignment: Alignment.center,

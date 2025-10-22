@@ -39,7 +39,7 @@ class ResultController extends GetxController {
       aiAnalysis.value = analysis['analysis'] ?? '暂无AI解读';
     } catch (e) {
       aiAnalysis.value = '获取AI解读失败，请稍后重试';
-      print('获取AI解读错误: $e');
+      Get.snackbar('错误', '获取AI解读失败: ${e.toString()}');
     } finally {
       isLoadingAi.value = false;
     }

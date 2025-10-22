@@ -25,6 +25,7 @@ dependencies:
   # 新增依赖
   flutter_screenutil: ^5.9.0
   flutter_otp_text_field: ^1.1.1
+  logger: ^2.0.2
 
 dev_dependencies:
   flutter_test:

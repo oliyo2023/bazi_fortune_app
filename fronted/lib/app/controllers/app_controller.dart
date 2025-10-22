@@ -65,7 +65,7 @@ class AppController extends GetxController {
       _storage.write('language', languageCode);
     } catch (e) {
       // 保存失败时的处理
-      print('保存语言设置失败: $e');
+      Get.log('保存语言设置失败: $e');
     }
   }
   
