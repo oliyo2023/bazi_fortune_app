@@ -139,7 +139,7 @@ class AstrologyChartPage extends GetView<AstrologyController> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF667EEA).withOpacity(0.2),
+            color: Color(0xFF667EEA).withValues(alpha: 0.2),
             blurRadius: 16,
             offset: Offset(0, 4),
           ),
@@ -214,7 +214,7 @@ class AstrologyChartPage extends GetView<AstrologyController> {
         borderRadius: BorderRadius.circular(12.r),
         color: Colors.white,
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
           width: 1.w,
         ),
       ),
@@ -226,7 +226,7 @@ class AstrologyChartPage extends GetView<AstrologyController> {
             height: 40.w,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10.r),
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
             ),
             child: Center(
               child: Text(
@@ -325,7 +325,7 @@ class AstrologyChartPage extends GetView<AstrologyController> {
                           style: TextStyle(
                             fontSize: 10.sp,
                             color: controller.selectedHouse.value == index + 1
-                                ? Colors.white.withOpacity(0.8)
+                                ? Colors.white.withValues(alpha: 0.8)
                                 : Color(0xFF999999),
                           ),
                         ),
@@ -353,9 +353,9 @@ class AstrologyChartPage extends GetView<AstrologyController> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
-        color: Color(0xFF667EEA).withOpacity(0.1),
+        color: Color(0xFF667EEA).withValues(alpha: 0.1),
         border: Border.all(
-          color: Color(0xFF667EEA).withOpacity(0.3),
+          color: Color(0xFF667EEA).withValues(alpha: 0.3),
           width: 1.w,
         ),
       ),

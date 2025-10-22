@@ -87,7 +87,7 @@ class AccountPasswordLoginPage extends GetView<LoginController> {
             height: 250.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Color(0xFF667EEA).withOpacity(0.08),
+              color: Color(0xFF667EEA).withValues(alpha: 0.08),
             ),
           ),
         ),
@@ -99,7 +99,7 @@ class AccountPasswordLoginPage extends GetView<LoginController> {
             height: 180.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Color(0xFF764BA2).withOpacity(0.06),
+              color: Color(0xFF764BA2).withValues(alpha: 0.06),
             ),
           ),
         ),
@@ -153,7 +153,7 @@ class AccountPasswordLoginPage extends GetView<LoginController> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 14,
                     offset: Offset(0, 4),
                   ),
@@ -242,7 +242,7 @@ class AccountPasswordLoginPage extends GetView<LoginController> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 14,
                     offset: Offset(0, 4),
                   ),
@@ -337,7 +337,7 @@ class AccountPasswordLoginPage extends GetView<LoginController> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF8B6FD9).withOpacity(0.35),
+                color: Color(0xFF8B6FD9).withValues(alpha: 0.35),
                 blurRadius: 16,
                 offset: Offset(0, 6),
               ),

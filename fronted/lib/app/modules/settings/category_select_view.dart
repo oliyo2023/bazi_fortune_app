@@ -137,7 +137,7 @@ class _CategorySelectPageState extends State<CategorySelectPage> {
 
   Widget _chip({required String label, required bool selected, bool primary = false, VoidCallback? onTap}) {
     final borderColor = selected ? AppColors.primary : const Color(0xFFE0E0E0);
-    final bgColor = selected ? AppColors.primary.withOpacity(0.12) : Colors.white;
+    final bgColor = selected ? AppColors.primary.withValues(alpha: 0.12) : Colors.white;
     final textColor = selected ? AppColors.primary : const Color(0xFF333333);
 
     return GestureDetector(

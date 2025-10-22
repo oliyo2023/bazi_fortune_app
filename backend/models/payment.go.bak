@@ -1,0 +1,282 @@
+package models
+
+import (
+	"time"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+// MembershipPlan 会员套餐
+type MembershipPlan struct {
+	ID           uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Name         string     `gorm:"size:100;not null" json:"name"`
+	Description  string     `gorm:"type:text" json:"description"`
+	Price        float64    `gorm:"type:decimal(10,2);not null" json:"price"`
+	Currency     string     `gorm:"size:3;default:'CNY'" json:"currency"`
+	Duration     int        `gorm:"not null" json:"duration"`
+	DurationUnit string     `gorm:"size:10;not null" json:"duration_unit"` // day, month, year
+	Features     string     `gorm:"type:jsonb" json:"features"`        // JSON array
+	IsActive     bool       `gorm:"default:true" json:"is_active"`
+	SortOrder    int        `gorm:"default:0" json:"sort_order"`
+	CreatedAt    time.Time  `json:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+// UserSubscription 用户订阅
+type UserSubscription struct {
+	ID          uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	UserID      uuid.UUID  `gorm:"type:uuid;not null;index" json:"user_id"`
+	PlanID      uuid.UUID  `gorm:"type:uuid;not null;index" json:"plan_id"`
+	PlanName    string     `gorm:"size:100;not null" json:"plan_name"`
+	Status      string     `gorm:"size:20;not null;index" json:"status"` // active, expired, cancelled, pending
+	StartDate   time.Time  `gorm:"not null" json:"start_date"`
+	EndDate     time.Time  `gorm:"not null;index" json:"end_date"`
+	AutoRenewal bool       `gorm:"default:false" json:"auto_renewal"`
+	Amount      float64    `gorm:"type:decimal(10,2);not null" json:"amount"`
+	Currency    string     `gorm:"size:3;default:'CNY'" json:"currency"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
+	
+	// 关联
+	User User          `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Plan MembershipPlan `gorm:"foreignKey:PlanID" json:"plan,omitempty"`
+}
+
+// Order 订单
+type Order struct {
+	ID           uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	UserID       uuid.UUID  `gorm:"type:uuid;not null;index" json:"user_id"`
+	OrderNumber  string     `gorm:"size:50;unique;not null;index" json:"order_number"`
+	Type         string     `gorm:"size:20;not null;index" json:"type"` // membership, consultation, product
+	Status       string     `gorm:"size:20;not null;index" json:"status"` // pending, paid, cancelled, refunded
+	Amount       float64    `gorm:"type:decimal(10,2);not null" json:"amount"`
+	Currency     string     `gorm:"size:3;default:'CNY'" json:"currency"`
+	Items        string     `gorm:"type:jsonb" json:"items"` // JSON array
+	CreatedAt    time.Time  `json:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	
+	// 关联
+	User User `gorm:"foreignKey:UserID" json:"user,omitempty"`
+}
+
+// Payment 支付记录
+type Payment struct {
+	ID              uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	UserID          uuid.UUID  `gorm:"type:uuid;not null;index" json:"user_id"`
+	OrderID         uuid.UUID  `gorm:"type:uuid;not null;index" json:"order_id"`
+	PaymentMethod   string     `gorm:"size:20;not null;index" json:"payment_method"` // stripe, paypal, alipay, wechat
+	Amount          float64    `gorm:"type:decimal(10,2);not null" json:"amount"`
+	Currency        string     `gorm:"size:3;default:'CNY'" json:"currency"`
+	Status          string     `gorm:"size:20;not null;index" json:"status"` // pending, completed, failed, refunded
+	TransactionID   string     `gorm:"size:100;index" json:"transaction_id"`
+	GatewayResponse string     `gorm:"type:jsonb" json:"gateway_response"` // JSON object
+	PaymentDate     *time.Time `json:"payment_date"`
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at"`
+	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
+	
+	// 关联
+	User  User  `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Order Order `gorm:"foreignKey:OrderID" json:"order,omitempty"`
+}
+
+// Refund 退款记录
+type Refund struct {
+	ID          uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	UserID      uuid.UUID  `gorm:"type:uuid;not null;index" json:"user_id"`
+	OrderID     uuid.UUID  `gorm:"type:uuid;not null;index" json:"order_id"`
+	PaymentID   uuid.UUID  `gorm:"type:uuid;not null;index" json:"payment_id"`
+	Amount      float64    `gorm:"type:decimal(10,2);not null" json:"amount"`
+	Currency    string     `gorm:"size:3;default:'CNY'" json:"currency"`
+	Reason      string     `gorm:"type:text" json:"reason"`
+	Status      string     `gorm:"size:20;not null;index" json:"status"` // pending, approved, rejected, processed
+	ProcessedBy *uuid.UUID `gorm:"type:uuid" json:"processed_by"`
+	ProcessedAt *time.Time `json:"processed_at"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
+	
+	// 关联
+	User     User    `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Order    Order   `gorm:"foreignKey:OrderID" json:"order,omitempty"`
+	Payment  Payment `gorm:"foreignKey:PaymentID" json:"payment,omitempty"`
+	Processor *User   `gorm:"foreignKey:ProcessedBy" json:"processor,omitempty"`
+}
+
+// Invoice 发票
+type Invoice struct {
+	ID            uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	UserID        uuid.UUID  `gorm:"type:uuid;not null;index" json:"user_id"`
+	OrderID       uuid.UUID  `gorm:"type:uuid;not null;index" json:"order_id"`
+	InvoiceNumber string     `gorm:"size:50;unique;not null;index" json:"invoice_number"`
+	Amount        float64    `gorm:"type:decimal(10,2);not null" json:"amount"`
+	Currency      string     `gorm:"size:3;default:'CNY'" json:"currency"`
+	Status        string     `gorm:"size:20;not null;index" json:"status"` // draft, sent, paid, overdue, cancelled
+	IssuedAt      *time.Time `json:"issued_at"`
+	DueDate       *time.Time `json:"due_date"`
+	PaidAt        *time.Time `json:"paid_at"`
+	CreatedAt     time.Time  `json:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at"`
+	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
+	
+	// 关联
+	User  User  `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Order Order `gorm:"foreignKey:OrderID" json:"order,omitempty"`
+}
+
+// Coupon 优惠券
+type Coupon struct {
+	ID            uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Code          string     `gorm:"size:20;unique;not null;index" json:"code"`
+	Description   string     `gorm:"type:text" json:"description"`
+	DiscountType  string     `gorm:"size:10;not null" json:"discount_type"` // percentage, fixed
+	DiscountValue float64    `gorm:"type:decimal(10,2);not null" json:"discount_value"`
+	MinimumAmount *float64   `gorm:"type:decimal(10,2)" json:"minimum_amount"`
+	UsageLimit    *int       `json:"usage_limit"`
+	UsageCount    int        `gorm:"default:0" json:"usage_count"`
+	ValidFrom     *time.Time `json:"valid_from"`
+	ValidUntil    *time.Time `json:"valid_until"`
+	IsActive      bool       `gorm:"default:true" json:"is_active"`
+	CreatedAt     time.Time  `json:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at"`
+	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+// UserCoupon 用户优惠券
+type UserCoupon struct {
+	ID        uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	UserID    uuid.UUID  `gorm:"type:uuid;not null;index" json:"user_id"`
+	CouponID  uuid.UUID  `gorm:"type:uuid;not null;index" json:"coupon_id"`
+	Status    string     `gorm:"size:20;not null;index" json:"status"` // available, used, expired
+	UsedAt    *time.Time `json:"used_at"`
+	OrderID   *uuid.UUID `gorm:"type:uuid;index" json:"order_id"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	
+	// 关联
+	User   User    `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Coupon Coupon  `gorm:"foreignKey:CouponID" json:"coupon,omitempty"`
+	Order  *Order  `gorm:"foreignKey:OrderID" json:"order,omitempty"`
+}
+
+// BillingAddress 账单地址
+type BillingAddress struct {
+	ID        uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	UserID    uuid.UUID `gorm:"type:uuid;not null;index" json:"user_id"`
+	Name      string    `gorm:"size:100;not null" json:"name"`
+	Email     string    `gorm:"size:100;not null" json:"email"`
+	Phone     string    `gorm:"size:20" json:"phone"`
+	Country   string    `gorm:"size:50" json:"country"`
+	State     string    `gorm:"size:50" json:"state"`
+	City      string    `gorm:"size:50" json:"city"`
+	Address   string    `gorm:"size:200" json:"address"`
+	ZipCode   string    `gorm:"size:20" json:"zip_code"`
+	IsDefault bool      `gorm:"default:false" json:"is_default"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	
+	// 关联
+	User User `gorm:"foreignKey:UserID" json:"user,omitempty"`
+}
+
+// PaymentMethod 支付方式
+type PaymentMethod struct {
+	ID           uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	UserID       uuid.UUID `gorm:"type:uuid;not null;index" json:"user_id"`
+	Type         string    `gorm:"size:20;not null" json:"type"` // card, bank_account
+	Provider     string    `gorm:"size:20;not null" json:"provider"` // stripe, paypal, alipay, wechat
+	ProviderID   string    `gorm:"size:100;not null" json:"provider_id"` // 外部支付方式的ID
+	LastFour     string    `gorm:"size:4" json:"last_four"`
+	ExpiryMonth  *int      `json:"expiry_month"`
+	ExpiryYear   *int      `json:"expiry_year"`
+	CardBrand    string    `gorm:"size:20" json:"card_brand"`
+	IsDefault    bool      `gorm:"default:false" json:"is_default"`
+	IsActive     bool      `gorm:"default:true" json:"is_active"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	
+	// 关联
+	User User `gorm:"foreignKey:UserID" json:"user,omitempty"`
+}
+
+// TableName 设置表名
+func (MembershipPlan) TableName() string {
+	return "membership_plans"
+}
+
+func (UserSubscription) TableName() string {
+	return "user_subscriptions"
+}
+
+func (Order) TableName() string {
+	return "orders"
+}
+
+func (Payment) TableName() string {
+	return "payments"
+}
+
+func (Refund) TableName() string {
+	return "refunds"
+}
+
+func (Invoice) TableName() string {
+	return "invoices"
+}
+
+func (Coupon) TableName() string {
+	return "coupons"
+}
+
+func (UserCoupon) TableName() string {
+	return "user_coupons"
+}
+
+func (BillingAddress) TableName() string {
+	return "billing_addresses"
+}
+
+func (PaymentMethod) TableName() string {
+	return "payment_methods"
+}
+
+// BeforeCreate 创建前的钩子
+func (o *Order) BeforeCreate(tx *gorm.DB) error {
+	if o.OrderNumber == "" {
+		o.OrderNumber = generateOrderNumber()
+	}
+	return nil
+}
+
+func (i *Invoice) BeforeCreate(tx *gorm.DB) error {
+	if i.InvoiceNumber == "" {
+		i.InvoiceNumber = generateInvoiceNumber()
+	}
+	return nil
+}
+
+// 生成订单号
+func generateOrderNumber() string {
+	return "ORD" + time.Now().Format("20060102") + generateRandomNumber(6)
+}
+
+// 生成发票号
+func generateInvoiceNumber() string {
+	return "INV" + time.Now().Format("20060102") + generateRandomNumber(6)
+}
+
+// 生成随机数字
+func generateRandomNumber(length int) string {
+	digits := "0123456789"
+	result := ""
+	for i := 0; i < length; i++ {
+		result += string(digits[time.Now().UnixNano()%int64(len(digits))])
+	}
+	return result
+}

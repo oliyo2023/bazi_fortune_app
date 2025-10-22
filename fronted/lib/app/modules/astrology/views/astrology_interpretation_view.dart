@@ -165,7 +165,7 @@ class AstrologyInterpretationPage extends GetView<AstrologyController> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -217,12 +217,12 @@ class AstrologyInterpretationPage extends GetView<AstrologyController> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFFFFE6CC).withOpacity(0.5),
-            Color(0xFFFFCCCC).withOpacity(0.5),
+            Color(0xFFFFE6CC).withValues(alpha: 0.5),
+            Color(0xFFFFCCCC).withValues(alpha: 0.5),
           ],
         ),
         border: Border.all(
-          color: Color(0xFFFFB74D).withOpacity(0.3),
+          color: Color(0xFFFFB74D).withValues(alpha: 0.3),
           width: 1.w,
         ),
       ),

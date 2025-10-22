@@ -94,7 +94,7 @@ class MainNavigationPage extends GetView<MainNavigationController> {
               Icon(
                 icon,
                 size: 80,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
               SizedBox(height: 24),
               Text(
@@ -110,7 +110,7 @@ class MainNavigationPage extends GetView<MainNavigationController> {
                 'coming_soon'.tr,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
               ),
               SizedBox(height: 32),

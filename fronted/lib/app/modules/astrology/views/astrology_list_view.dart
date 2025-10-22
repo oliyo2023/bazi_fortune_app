@@ -104,7 +104,7 @@ class AstrologyListPage extends GetView<AstrologyController> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Color(0xFF8B6FD9).withOpacity(0.3),
+              color: Color(0xFF8B6FD9).withValues(alpha: 0.3),
               blurRadius: 12,
               offset: Offset(0, 4),
             ),
@@ -133,7 +133,7 @@ class AstrologyListPage extends GetView<AstrologyController> {
               '快速创建新的占星图表',
               style: TextStyle(
                 fontSize: 13.sp,
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
             ),
           ],
@@ -196,7 +196,7 @@ class AstrologyListPage extends GetView<AstrologyController> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: Offset(0, 2),
             ),
@@ -262,9 +262,9 @@ class AstrologyListPage extends GetView<AstrologyController> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.r),
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1.w,
         ),
       ),

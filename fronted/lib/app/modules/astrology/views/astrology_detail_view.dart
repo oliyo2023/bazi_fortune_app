@@ -124,12 +124,12 @@ class AstrologyDetailPage extends GetView<AstrologyController> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF667EEA).withOpacity(0.1),
-            Color(0xFF764BA2).withOpacity(0.1),
+            Color(0xFF667EEA).withValues(alpha: 0.1),
+            Color(0xFF764BA2).withValues(alpha: 0.1),
           ],
         ),
         border: Border.all(
-          color: Color(0xFF667EEA).withOpacity(0.2),
+          color: Color(0xFF667EEA).withValues(alpha: 0.2),
           width: 1.w,
         ),
       ),
@@ -171,7 +171,7 @@ class AstrologyDetailPage extends GetView<AstrologyController> {
         borderRadius: BorderRadius.circular(8.r),
         color: Colors.white,
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
           width: 1.w,
         ),
       ),
@@ -207,7 +207,7 @@ class AstrologyDetailPage extends GetView<AstrologyController> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -270,7 +270,7 @@ class AstrologyDetailPage extends GetView<AstrologyController> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -312,7 +312,7 @@ class AstrologyDetailPage extends GetView<AstrologyController> {
                       height: 28.w,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(6.r),
-                        color: _getPlanetColor(index).withOpacity(0.1),
+                        color: _getPlanetColor(index).withValues(alpha: 0.1),
                       ),
                       child: Center(
                         child: Text(
@@ -373,7 +373,7 @@ class AstrologyDetailPage extends GetView<AstrologyController> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -418,7 +418,7 @@ class AstrologyDetailPage extends GetView<AstrologyController> {
                           height: 28.w,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(6.r),
-                            color: Color(0xFF667EEA).withOpacity(0.1),
+                            color: Color(0xFF667EEA).withValues(alpha: 0.1),
                           ),
                           child: Center(
                             child: Text(

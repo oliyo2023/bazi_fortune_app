@@ -40,14 +40,14 @@ class AstrologyChartPainter extends CustomPainter {
   // 绘制背景
   void _drawBackground(Canvas canvas, Offset center, double radius) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.95)
+      ..color = Colors.white.withValues(alpha: 0.95)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(center, radius, paint);
 
     // 绘制外圆框
     final borderPaint = Paint()
-      ..color = primaryColor.withOpacity(0.3)
+      ..color = primaryColor.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
@@ -73,7 +73,7 @@ class AstrologyChartPainter extends CustomPainter {
       );
 
       final paint = Paint()
-        ..color = primaryColor.withOpacity(0.2)
+        ..color = primaryColor.withValues(alpha: 0.2)
         ..strokeWidth = 1;
 
       canvas.drawLine(start, end, paint);
@@ -124,8 +124,8 @@ class AstrologyChartPainter extends CustomPainter {
       // 绘制星座符号背景圆
       final bgPaint = Paint()
         ..color = selectedHouse == i + 1
-            ? primaryColor.withOpacity(0.3)
-            : Colors.grey.withOpacity(0.1)
+            ? primaryColor.withValues(alpha: 0.3)
+            : Colors.grey.withValues(alpha: 0.1)
         ..style = PaintingStyle.fill;
 
       canvas.drawCircle(offset, 16, bgPaint);
@@ -250,7 +250,7 @@ class AstrologyChartPainter extends CustomPainter {
   ) {
     // 背景圆
     final bgPaint = Paint()
-      ..color = color.withOpacity(0.2)
+      ..color = color.withValues(alpha: 0.2)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(offset, 18, bgPaint);

@@ -222,7 +222,7 @@ class ResultPage extends GetView<ResultController> {
               data['element'],
               data['score'],
               Color(data['color']),
-            )).toList(),
+            )),
             SizedBox(height: 12),
             Container(
               padding: EdgeInsets.all(12),

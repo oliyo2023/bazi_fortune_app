@@ -65,7 +65,7 @@ class LoginPage extends GetView<LoginController> {
             height: 250.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Color(0xFF667EEA).withOpacity(0.08),
+              color: Color(0xFF667EEA).withValues(alpha: 0.08),
             ),
           ),
         ),
@@ -77,7 +77,7 @@ class LoginPage extends GetView<LoginController> {
             height: 180.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Color(0xFF764BA2).withOpacity(0.06),
+              color: Color(0xFF764BA2).withValues(alpha: 0.06),
             ),
           ),
         ),
@@ -97,12 +97,12 @@ class LoginPage extends GetView<LoginController> {
             shape: BoxShape.circle,
             gradient: LinearGradient(
               colors: [
-                Color(0xFF667EEA).withOpacity(0.2),
-                Color(0xFF764BA2).withOpacity(0.1),
+                Color(0xFF667EEA).withValues(alpha: 0.2),
+                Color(0xFF764BA2).withValues(alpha: 0.1),
               ],
             ),
             border: Border.all(
-              color: Color(0xFF667EEA).withOpacity(0.3),
+              color: Color(0xFF667EEA).withValues(alpha: 0.3),
               width: 2.w,
             ),
           ),
@@ -353,7 +353,7 @@ class LoginPage extends GetView<LoginController> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: Offset(0, 2),
             ),
@@ -383,7 +383,7 @@ class LoginPage extends GetView<LoginController> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF667EEA).withOpacity(0.3),
+                  color: Color(0xFF667EEA).withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: Offset(0, 4),
                 ),

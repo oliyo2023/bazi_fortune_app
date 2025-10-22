@@ -89,7 +89,7 @@ class GomokuPage extends GetView<GomokuController> {
                 shadows: [
                   Shadow(
                     blurRadius: 4,
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     offset: Offset(2, 2),
                   ),
                 ],
@@ -105,11 +105,11 @@ class GomokuPage extends GetView<GomokuController> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
+        color: Colors.white.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -241,11 +241,11 @@ class GomokuPage extends GetView<GomokuController> {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Color(0xFFE0C3FC).withOpacity(0.95),
+          color: Color(0xFFE0C3FC).withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: Offset(0, 5),
             ),
@@ -309,8 +309,8 @@ class GomokuPage extends GetView<GomokuController> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: controller.apiTestSuccess.value
-                      ? Colors.green.withOpacity(0.1)
-                      : Colors.red.withOpacity(0.1),
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.red.withValues(alpha: 0.1),
                   border: Border.all(
                     color: controller.apiTestSuccess.value
                         ? Colors.green
@@ -372,7 +372,7 @@ class GomokuPage extends GetView<GomokuController> {
               borderSide: BorderSide(color: Color(0xFF6B46C1), width: 2),
             ),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.9),
+            fillColor: Colors.white.withValues(alpha: 0.9),
           ),
           onChanged: (text) {
             onChanged(text);
@@ -440,7 +440,7 @@ class GomokuPage extends GetView<GomokuController> {
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 10,
               offset: Offset(0, 5),
             ),
@@ -501,7 +501,7 @@ class GomokuPage extends GetView<GomokuController> {
                                 ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
+                              color: Colors.black.withValues(alpha: 0.3),
                               blurRadius: 2,
                               offset: Offset(1, 1),
                             ),
@@ -557,11 +557,11 @@ class GomokuPage extends GetView<GomokuController> {
     return Obx(() => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
+        color: Colors.white.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -581,7 +581,7 @@ class GomokuPage extends GetView<GomokuController> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xFFC41E3A).withOpacity(0.3),
+                    color: Color(0xFFC41E3A).withValues(alpha: 0.3),
                     blurRadius: controller.aiThinking.value ? 15 : 10,
                     offset: Offset(0, 5),
                   ),
@@ -605,7 +605,7 @@ class GomokuPage extends GetView<GomokuController> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                                 width: 3,
                               ),
                             ),
@@ -641,7 +641,7 @@ class GomokuPage extends GetView<GomokuController> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF00FFFF).withOpacity(0.3),
+            color: Color(0xFF00FFFF).withValues(alpha: 0.3),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -701,7 +701,7 @@ class GomokuPage extends GetView<GomokuController> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFC41E3A).withOpacity(0.3),
+            color: Color(0xFFC41E3A).withValues(alpha: 0.3),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -763,7 +763,7 @@ class GomokuPage extends GetView<GomokuController> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFC41E3A).withOpacity(0.2),
+            color: Color(0xFFC41E3A).withValues(alpha: 0.2),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -792,7 +792,7 @@ class GomokuPage extends GetView<GomokuController> {
                   margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Color(0xFFFFD700).withOpacity(0.15),
+                    color: Color(0xFFFFD700).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                     border: Border(left: BorderSide(color: Color(0xFFC41E3A), width: 3)),
                   ),
@@ -831,7 +831,7 @@ class GomokuPage extends GetView<GomokuController> {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -884,7 +884,7 @@ class GomokuPage extends GetView<GomokuController> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFC41E3A).withOpacity(0.3),
+            color: Color(0xFFC41E3A).withValues(alpha: 0.3),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -934,7 +934,7 @@ class GomokuPage extends GetView<GomokuController> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF00FFFF).withOpacity(0.3),
+            color: Color(0xFF00FFFF).withValues(alpha: 0.3),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -999,7 +999,7 @@ class GomokuPage extends GetView<GomokuController> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFC41E3A).withOpacity(0.2),
+            color: Color(0xFFC41E3A).withValues(alpha: 0.2),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -1028,7 +1028,7 @@ class GomokuPage extends GetView<GomokuController> {
                   margin: const EdgeInsets.only(bottom: 4),
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Color(0xFFFFD700).withOpacity(0.15),
+                    color: Color(0xFFFFD700).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                     border: Border(left: BorderSide(color: Color(0xFFC41E3A), width: 2)),
                   ),

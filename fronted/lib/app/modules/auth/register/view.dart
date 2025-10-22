@@ -87,7 +87,7 @@ class RegisterPage extends GetView<RegisterController> {
             height: 250.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Color(0xFF667EEA).withOpacity(0.08),
+              color: Color(0xFF667EEA).withValues(alpha: 0.08),
             ),
           ),
         ),
@@ -99,7 +99,7 @@ class RegisterPage extends GetView<RegisterController> {
             height: 180.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Color(0xFF764BA2).withOpacity(0.06),
+              color: Color(0xFF764BA2).withValues(alpha: 0.06),
             ),
           ),
         ),
@@ -207,7 +207,7 @@ class RegisterPage extends GetView<RegisterController> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: Offset(0, 3),
           ),
@@ -262,7 +262,7 @@ class RegisterPage extends GetView<RegisterController> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: Offset(0, 3),
           ),
@@ -333,7 +333,7 @@ class RegisterPage extends GetView<RegisterController> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF8B6FD9).withOpacity(0.3),
+                  color: Color(0xFF8B6FD9).withValues(alpha: 0.3),
                   blurRadius: 14,
                   offset: Offset(0, 5),
                 ),

@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <title>消息</title>
+  <link rel="stylesheet" href="./messages.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="statusbar"></div>
+
+    <!-- Top quick actions -->
+    <div class="quick-actions">
+      <div class="q-card">
+        <div class="q-icon blue">
+          <!-- person icon -->
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.33 0-8 2.17-8 5v1h16v-1c0-2.83-3.67-5-8-5Z"/>
+          </svg>
+        </div>
+        <div class="q-text">问题反馈</div>
+      </div>
+      <div class="q-card" style="position:relative">
+        <div class="q-icon orange">
+          <!-- bell icon -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1Z"/>
+          </svg>
+        </div>
+        <span class="badge">25</span>
+        <div class="q-text">系统通知</div>
+      </div>
+      <div class="q-card">
+        <div class="q-icon brown">
+          <!-- clipboard -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M15 2H9a2 2 0 0 0-2 2H5v16h14V4h-2a2 2 0 0 0-2-2Zm-6 4h6V4H9Zm0 4h6v2H9Zm0 4h6v2H9Z"/>
+          </svg>
+        </div>
+        <div class="q-text">大师说</div>
+      </div>
+    </div>
+
+    <div class="section-title">— 会话列表 —<span class="line"></span></div>
+
+    <!-- Conversations -->
+    <div class="list">
+      <div class="item">
+        <div class="avatar" aria-hidden="true">S</div>
+        <div class="item-main">
+          <div class="row-top">
+            <div class="name">
+              系统消息 <span class="dot-badge">2</span>
+            </div>
+            <div class="time">下午 12:11</div>
+          </div>
+          <div class="preview">您好，若在使用我们平台过程中有任何问题…</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="avatar" aria-hidden="true">王</div>
+        <div class="item-main">
+          <div class="row-top">
+            <div class="name">王瑜</div>
+            <div class="time">7月10日 上午 08:57</div>
+          </div>
+          <div class="preview">您好，我是王瑜老师，请详细描述您的问题…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="div-gap"></div>
+    <div class="section-title blue">— 为您推荐大师 —<span class="line"></span></div>
+
+    <!-- Master Card 1 -->
+    <div class="card">
+      <div class="master">
+        <div class="m-ava" aria-hidden="true"></div>
+        <div class="m-head">
+          <div class="m-row1">
+            <div class="m-name">葛玄</div>
+            <div class="tag">新晋</div>
+            <div class="action-pill">观点精辟</div>
+          </div>
+          <div class="pills">
+            <span class="pill">责任心强</span>
+            <span class="pill">满意度高</span>
+            <span class="pill">就业预测</span>
+            <span class="pill">职场达人</span>
+          </div>
+          <div class="stars">
+            <div class="star">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.73L5.82 21z"/></svg>
+            </div>
+            <div class="star"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.73L5.82 21z"/></svg></div>
+            <div class="star"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.73L5.82 21z"/></svg></div>
+            <div class="star"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.73L5.82 21z"/></svg></div>
+            <div class="star"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.73L5.82 21z"/></svg></div>
+            <span class="score">4.95分</span>
+          </div>
+        </div>
+      </div>
+      <div class="desc">
+        来都来了。缘分使然。山人略通易数，能观星盘推命理，起六爻断吉凶。有甚迷惘？不妨坐下聊聊，借三枚铜钱一盏茶……
+      </div>
+      <div class="meta">
+        <div class="i">
+          <!-- chat bubble -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#8b949e"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/></svg>
+          146解答
+        </div>
+        <div class="i">
+          <!-- users -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#8b949e"><path d="M16 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-8 1a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.31 0-6 1.79-6 4v2h8v-2c0-1.64.8-3.09 2.09-4A7.27 7.27 0 0 0 8 14Zm8 0c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Z"/></svg>
+          91粉丝
+        </div>
+        <div class="i">
+          <!-- clock -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#8b949e"><path d="M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1Zm1 12h6v-2h-5V6h-2v7Z"/></svg>
+          <span class="time">3分钟</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Master Card 2 -->
+    <div class="card">
+      <div class="master">
+        <div class="m-ava" aria-hidden="true"></div>
+        <div class="m-head">
+          <div class="m-row1">
+            <div class="m-name">陈沐易</div>
+            <div class="tag" style="background:#eefaf3;color:#10b981">白银武者</div>
+          </div>
+          <div class="pills">
+            <span class="pill">责任心强</span>
+            <span class="pill">商业认知高</span>
+            <span class="pill">格局广</span>
+          </div>
+          <div class="stars">
+            <div class="star">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.73L5.82 21z"/></svg>
+            </div>
+            <div class="star"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.73L5.82 21z"/></svg></div>
+            <div class="star"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.73L5.82 21z"/></svg></div>
+            <div class="star"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.73L5.82 21z"/></svg></div>
+            <div class="star" style="opacity:.6"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.73L5.82 21z"/></svg></div>
+            <span class="score">4.74分</span>
+          </div>
+        </div>
+      </div>
+      <div class="desc">
+        少时书签名校，深耕命理运筹十余载；精研易学**广涉**卦象，融合天文地理逻辑之力。累积预测案例逾数千，秉承“知无不言”…
+      </div>
+      <div class="meta">
+        <div class="i">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#8b949e"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/></svg>
+          128解答
+        </div>
+        <div class="i">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#8b949e"><path d="M16 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-8 1a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-3.31 0-6 1.79-6 4v2h8v-2c0-1.64.8-3.09 2.09-4A7.27 7.27 0 0 0 8 14Zm8 0c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Z"/></svg>
+          73粉丝
+        </div>
+        <div class="i">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#8b949e"><path d="M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1Zm1 12h6v-2h-5V6h-2v7Z"/></svg>
+          <span class="time">5分钟</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom navigation -->
+    <div class="bottom" role="navigation" aria-label="主导航">
+      <div class="nav">
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3Z"/></svg>
+          <span>首页</span>
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4h18v12H6l-3 3Z"/></svg>
+          <span>大师咨询</span>
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14v4H5zM3 9h18v12H3z"/></svg>
+          <span>大师说</span>
+        </a>
+        <a class="nav-item active" href="#">
+          <span class="nav-badge">27</span>
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/></svg>
+          <span>消息</span>
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.33 0-8 2.17-8 5v1h16v-1c0-2.83-3.67-5-8-5Z"/></svg>
+          <span>我的</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -97,7 +97,7 @@ class _QAItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(.06), blurRadius: 12, offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .06), blurRadius: 12, offset: const Offset(0, 4))],
         ),
         alignment: Alignment.center,
         child: Stack(
@@ -181,7 +181,7 @@ class _ConversationList extends GetView<MessagesController> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(cardRadius),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(.05), blurRadius: 14, offset: const Offset(0, 6))],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .05), blurRadius: 14, offset: const Offset(0, 6))],
         ),
         child: Column(
           children: [
@@ -267,7 +267,7 @@ class _MasterCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(cardRadius),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(.05), blurRadius: 14, offset: const Offset(0, 6))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .05), blurRadius: 14, offset: const Offset(0, 6))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,7 +314,7 @@ class _MasterCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        ...List.generate(5, (i) => Icon(Icons.star, size: 14, color: const Color(0xFFF7B500).withOpacity(i < item.score.round() ? 1 : .5))),
+                        ...List.generate(5, (i) => Icon(Icons.star, size: 14, color: const Color(0xFFF7B500).withValues(alpha: i < item.score.round() ? 1 : .5))),
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
