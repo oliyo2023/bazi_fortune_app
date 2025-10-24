@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'controller.dart';
-import 'register_sms_view.dart';
 
 class RegisterPage extends GetView<RegisterController> {
   const RegisterPage({super.key});
@@ -37,8 +36,8 @@ class RegisterPage extends GetView<RegisterController> {
                     
                     SizedBox(height: 50.h),
                     
-                    // 注册表单
-                    _buildRegisterForm(),
+                    // 注册表单 - 默认显示手机号注册
+                    _buildPhoneRegisterForm(),
                     
                     SizedBox(height: 20.h),
                     
@@ -51,11 +50,6 @@ class RegisterPage extends GetView<RegisterController> {
                     _buildAgreementCheckbox(),
                     
                     SizedBox(height: 40.h),
-                    
-                    // 短信注册链接
-                    _buildSmsRegisterLink(),
-                    
-                    SizedBox(height: 12.h),
                     
                     // 登录链接
                     _buildLoginLink(),
@@ -138,13 +132,17 @@ class RegisterPage extends GetView<RegisterController> {
     );
   }
 
-  Widget _buildRegisterForm() {
+  Widget _buildPhoneRegisterForm() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Form(
         key: controller.formKey,
         child: Column(
           children: [
+            // 手机号输入框 - 作为第一个字段
+            _buildPhoneInputField(),
+            SizedBox(height: 14.h),
+            
             // 姓名输入框
             _buildInputField(
               controller: controller.nameController,
@@ -155,37 +153,212 @@ class RegisterPage extends GetView<RegisterController> {
             ),
             SizedBox(height: 14.h),
             
-            // 邮箱输入框
-            _buildInputField(
-              controller: controller.emailController,
-              label: '邮箱',
-              hintText: '请输入邮箱',
-              validator: controller.validateEmail,
-              icon: Icons.email_outlined,
-              keyboardType: TextInputType.emailAddress,
+            // 验证码输入框
+            _buildOtpInputField(),
+            SizedBox(height: 14.h),
+            
+            // 移除密码输入框，因为我们只支持手机号+验证码注册
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhoneInputField() {
+    return Container(
+      height: 56.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28.r),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 14,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 18.w),
+        child: Row(
+          children: [
+            // 国家代码
+            Text(
+              '+86',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF333333),
+              ),
             ),
-            SizedBox(height: 14.h),
-            
-            // 密码输入框
-            Obx(() => _buildPasswordField(
-              controller: controller.passwordController,
-              label: '密码',
-              hintText: '请输入密码',
-              validator: controller.validatePassword,
-              obscureText: controller.obscurePassword.value,
-              onVisibilityToggle: controller.togglePasswordVisibility,
-            )),
-            SizedBox(height: 14.h),
-            
-            // 确认密码输入框
-            Obx(() => _buildPasswordField(
-              controller: controller.confirmPasswordController,
-              label: '确认密码',
-              hintText: '请确认密码',
-              validator: controller.validateConfirmPassword,
-              obscureText: controller.obscureConfirmPassword.value,
-              onVisibilityToggle: controller.toggleConfirmPasswordVisibility,
-            )),
+            SizedBox(width: 10.w),
+            // 分隔线
+            Container(
+              width: 1.2.w,
+              height: 24.h,
+              color: Color(0xFFDDDDDD),
+            ),
+            SizedBox(width: 14.w),
+            // 手机号输入框
+            Expanded(
+              child: TextFormField(
+                controller: controller.phoneController,
+                keyboardType: TextInputType.phone,
+                validator: controller.validatePhone,
+                style: TextStyle(
+                  color: Color(0xFF333333),
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w400,
+                ),
+                decoration: InputDecoration(
+                  hintText: '手机号码',
+                  hintStyle: TextStyle(
+                    color: Color(0xFFD0D0D0),
+                    fontSize: 14.sp,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                  isDense: true,
+                ),
+              ),
+            ),
+            // 清空按钮
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: controller.phoneController,
+              builder: (context, value, child) {
+                return value.text.isNotEmpty
+                    ? GestureDetector(
+                        onTap: () => controller.phoneController.clear(),
+                        child: Container(
+                          width: 24.w,
+                          height: 24.h,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFFDDDDDD),
+                          ),
+                          child: Icon(
+                            Icons.clear,
+                            color: Colors.white,
+                            size: 14.sp,
+                          ),
+                        ),
+                      )
+                    : SizedBox.shrink();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOtpInputField() {
+    return Container(
+      height: 56.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28.r),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 14,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 18.w),
+        child: Row(
+          children: [
+            // 验证码输入框
+            Expanded(
+              child: Obx(() => controller.isOtpSent.value
+                ? TextFormField(
+                    controller: controller.otpController,
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF333333),
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 4,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: '验证码',
+                      hintStyle: TextStyle(
+                        color: Color(0xFFCCCCCC),
+                        fontSize: 14.sp,
+                      ),
+                      border: InputBorder.none,
+                      counterText: '',
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 12.h,
+                      ),
+                    ),
+                  )
+                : Center(
+                    child: Text(
+                      '请先获取验证码',
+                      style: TextStyle(
+                        color: Color(0xFFCCCCCC),
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  )),
+            ),
+            SizedBox(width: 14.w),
+            // 发送验证码按钮
+            Obx(() => controller.countdownSeconds.value > 0
+              ? Container(
+                  width: 95.w,
+                  height: 38.h,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.r),
+                    color: Color(0xFFF5F5F5),
+                    border: Border.all(
+                      color: Color(0xFFE8E8E8),
+                      width: 1.w,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${controller.countdownSeconds.value}s',
+                      style: TextStyle(
+                        color: Color(0xFF999999),
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                )
+              : GestureDetector(
+                  onTap: controller.sendOtp,
+                  child: Container(
+                    width: 95.w,
+                    height: 38.h,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.r),
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFF667EEA),
+                          Color(0xFF764BA2),
+                        ],
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '获取验证码',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                )),
           ],
         ),
       ),
@@ -247,71 +420,7 @@ class RegisterPage extends GetView<RegisterController> {
     );
   }
 
-  Widget _buildPasswordField({
-    required TextEditingController controller,
-    required String label,
-    required String hintText,
-    required String? Function(String?) validator,
-    required bool obscureText,
-    required VoidCallback onVisibilityToggle,
-  }) {
-    return Container(
-      height: 52.h,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(26.r),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
-        child: Row(
-          children: [
-            Icon(
-              Icons.lock_outlined,
-              color: Color(0xFFD0D0D0),
-              size: 18.sp,
-            ),
-            SizedBox(width: 8.w),
-            Expanded(
-              child: TextFormField(
-                controller: controller,
-                obscureText: obscureText,
-                validator: validator,
-                style: TextStyle(
-                  color: Color(0xFF333333),
-                  fontSize: 13.sp,
-                ),
-                decoration: InputDecoration(
-                  hintText: hintText,
-                  hintStyle: TextStyle(
-                    color: Color(0xFFCCCCCC),
-                    fontSize: 13.sp,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 12.h),
-                  isDense: true,
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: onVisibilityToggle,
-              child: Icon(
-                obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                color: Color(0xFFD0D0D0),
-                size: 18.sp,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // 移除未使用的密码字段构建方法
 
   Widget _buildRegisterButton() {
     return Padding(
@@ -399,25 +508,7 @@ class RegisterPage extends GetView<RegisterController> {
     );
   }
 
-  Widget _buildSmsRegisterLink() {
-    return GestureDetector(
-      onTap: () => Get.to(() => RegisterSmsPage(), binding: BindingsBuilder(() {
-        Get.put(RegisterController());
-      })),
-      child: Center(
-        child: Text(
-          '短信登录注册',
-          style: TextStyle(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF8B6FD9),
-            decoration: TextDecoration.underline,
-            decorationColor: Color(0xFF8B6FD9),
-          ),
-        ),
-      ),
-    );
-  }
+  // 移除切换到邮箱注册的链接
 
   Widget _buildLoginLink() {
     return Center(

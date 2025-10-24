@@ -129,56 +129,9 @@ class ApiService extends GetxService {
 
 
 
-  // 用户认证相关（统一走后端）
-  Future<UserModel?> login(String email, String password) async {
-    final response = await _client.post(
-      '$_baseUrl/auth/login',
-      {'email': email, 'password': password},
-      headers: {'Content-Type': 'application/json'},
-    );
-    if (response.statusCode == 200) {
-      final body = response.body;
-      final wrapper = (body is Map) ? body : {};
-      final data = wrapper['data'] ?? wrapper; // 兼容老格式
-      final token = (data is Map) ? data['token'] : null;
-      final userJson = (data is Map) ? data['user'] : null;
-      if (token != null && userJson is Map) {
-        final userMap = Map<String, dynamic>.from(userJson);
-        final user = UserModel.fromJson(userMap);
-        await _tokenManager.save(token, user.id);
-        return user;
-      }
-    }
-    throw Exception(response.body?['message'] ?? '登录失败');
-  }
+  // 移除邮箱密码登录接口，因为我们只支持手机号登录
 
-  Future<UserModel?> register(String email, String password, String name) async {
-    final response = await _client.post(
-      '$_baseUrl/auth/register',
-      {'email': email, 'password': password, 'name': name},
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    final sc = response.statusCode ?? 0;
-    if (sc == 200 || sc == 201) {
-      final body = response.body;
-      final wrapper = (body is Map) ? body : {};
-      final data = wrapper['data'] ?? wrapper; // 兼容老格式
-      final token = (data is Map) ? data['token'] : null;
-      final userJson = (data is Map) ? data['user'] : null;
-
-      if (userJson is Map) {
-        final userMap = Map<String, dynamic>.from(userJson);
-        final user = UserModel.fromJson(userMap);
-        if (token != null) {
-          await _tokenManager.save(token, user.id);
-        }
-        return user;
-      }
-    }
-
-    throw Exception(response.body?['message'] ?? response.statusText ?? '注册失败');
-  }
+  // 移除邮箱注册接口，因为我们只支持手机号注册
 
   Future<void> logout() async {
     await _tokenManager.clear();

@@ -31,39 +31,9 @@ class AuthService extends GetxService {
     }
   }
 
-  Future<bool> login(String email, String password) async {
-    try {
-      final user = await ApiService.to.login(email, password);
-      if (user != null) {
-        currentUser.value = user;
-        isLoggedIn.value = true;
-        _storage.write('user_id', user.id);
-        return true;
-      }
-      Get.snackbar('提示', ErrorMapper.hintFromCode('unknown_error'));
-      return false;
-    } catch (e) {
-      Get.snackbar('提示', ErrorMapper.hintFromException(e));
-      return false;
-    }
-  }
+  // 移除邮箱密码登录方法，因为我们只支持手机号登录
 
-  Future<bool> register(String email, String password, String name) async {
-    try {
-      final user = await ApiService.to.register(email, password, name);
-      if (user != null) {
-        currentUser.value = user;
-        isLoggedIn.value = true;
-        _storage.write('user_id', user.id);
-        return true;
-      }
-      Get.snackbar('提示', ErrorMapper.hintFromCode('unknown_error'));
-      return false;
-    } catch (e) {
-      Get.snackbar('提示', ErrorMapper.hintFromException(e));
-      return false;
-    }
-  }
+  // 移除邮箱注册方法，因为我们只支持手机号注册
 
   Future<void> logout() async {
     try {

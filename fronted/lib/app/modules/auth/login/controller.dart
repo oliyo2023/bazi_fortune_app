@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:async';
-import '../../../data/services/auth_service.dart';
 
 class LoginController extends GetxController {
   // 手机号登录相关
   final phoneController = TextEditingController();
   final otpController = TextEditingController();
   final countryCode = '+86'.obs;
-
-  // 原有邮箱密码登录（保留切换功能）
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
 
   // 状态控制
   final RxBool isLoading = false.obs;
@@ -20,9 +15,12 @@ class LoginController extends GetxController {
   final RxBool canResendOtp = false.obs;
   final RxInt countdownSeconds = 0.obs;
   final RxBool isOtpSent = false.obs;
+  
+  // 优化：自动聚焦手机号输入框
+  final FocusNode phoneFocusNode = FocusNode();
+  final FocusNode otpFocusNode = FocusNode();
 
   final GlobalKey<FormState> phoneFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> emailFormKey = GlobalKey<FormState>();
 
   Timer? _countdownTimer;
 
@@ -30,8 +28,8 @@ class LoginController extends GetxController {
   void onClose() {
     phoneController.dispose();
     otpController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
+    phoneFocusNode.dispose();
+    otpFocusNode.dispose();
     _countdownTimer?.cancel();
     super.onClose();
   }
@@ -40,13 +38,7 @@ class LoginController extends GetxController {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  void toggleLoginMethod() {
-    isPhoneLogin.value = !isPhoneLogin.value;
-    isOtpSent.value = false;
-    countdownSeconds.value = 0;
-    canResendOtp.value = false;
-    _countdownTimer?.cancel();
-  }
+  // 移除切换登录方式的方法，因为我们只保留手机号登录
 
   // 发送验证码
   Future<void> sendOtp() async {
@@ -96,24 +88,35 @@ class LoginController extends GetxController {
     });
   }
 
-  // 手机号+验证码登录
+  // 手机号+验证码登录 - 优化主要登录流程
   Future<void> loginWithPhone() async {
     if (!phoneFormKey.currentState!.validate()) return;
 
     // 验证码输入验证
     if (otpController.text.isEmpty) {
-      Get.snackbar('提示', '请输入验证码');
+      Get.snackbar('验证码', '请输入验证码',
+        backgroundColor: Color(0xFFFBE6E6),
+        colorText: Color(0xFFD32F2F),
+        icon: Icon(Icons.warning_amber, color: Color(0xFFD32F2F), size: 20),
+      );
       return;
     }
 
     if (otpController.text.length < 4) {
-      Get.snackbar('提示', '验证码至少4位');
+      Get.snackbar('验证码', '验证码至少4位',
+        backgroundColor: Color(0xFFFBE6E6),
+        colorText: Color(0xFFD32F2F),
+        icon: Icon(Icons.warning_amber, color: Color(0xFFD32F2F), size: 20),
+      );
       return;
     }
 
     isLoading.value = true;
 
     try {
+      // 实际的API调用应该在这里
+      // await AuthService.to.loginWithPhone(phoneController.text, otpController.text);
+      
       // 模拟API调用
       await Future.delayed(Duration(seconds: 2));
 
@@ -124,80 +127,36 @@ class LoginController extends GetxController {
         '欢迎回来！',
         backgroundColor: Colors.green,
         colorText: Colors.white,
+        icon: Icon(Icons.check_circle, color: Colors.white, size: 20),
       );
     } catch (e) {
       Get.snackbar(
         '登录失败',
-        '验证码错误或网络异常',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        '验证码错误或网络异常，请重试',
+        backgroundColor: Color(0xFFFBE6E6),
+        colorText: Color(0xFFD32F2F),
+        icon: Icon(Icons.error, color: Color(0xFFD32F2F), size: 20),
       );
     } finally {
       isLoading.value = false;
     }
   }
 
-  // 邮箱+密码登录（保留原功能）
-  Future<void> loginWithEmail() async {
-    if (!emailFormKey.currentState!.validate()) return;
+  // 移除邮箱密码登录方法
 
-    isLoading.value = true;
-
-    try {
-      final success = await AuthService.to.login(
-        emailController.text.trim(),
-        passwordController.text,
-      );
-
-      if (success) {
-        Get.offAllNamed('/');
-        Get.snackbar(
-          '登录成功',
-          '欢迎回来！',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
-      }
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  // 统一登录方法
+  // 简化登录方法，只支持手机号登录
   Future<void> login() async {
-    if (isPhoneLogin.value) {
-      await loginWithPhone();
-    } else {
-      await loginWithEmail();
-    }
+    await loginWithPhone();
   }
 
-  // 账号密码登录（兼容旧的loginWithEmail调用）
-  Future<void> loginWithAccountPassword() async {
-    if (!emailFormKey.currentState!.validate()) return;
-
-    isLoading.value = true;
-
-    try {
-      // 这里应该使用phoneController.text作为账号，passwordController.text作为密码
-      final success = await AuthService.to.login(
-        phoneController.text.trim(),
-        passwordController.text,
-      );
-
-      if (success) {
-        Get.offAllNamed('/');
-        Get.snackbar(
-          '登录成功',
-          '欢迎回来！',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
-      }
-    } finally {
-      isLoading.value = false;
-    }
+  // 优化：自动获取焦点到手机号输入框
+  void autoFocusPhoneInput() {
+    Future.delayed(Duration(milliseconds: 100), () {
+      phoneFocusNode.requestFocus();
+    });
   }
+
+  // 移除账号密码登录方法
 
   void goToRegister() {
     Get.toNamed('/register');
@@ -218,15 +177,7 @@ class LoginController extends GetxController {
     return null;
   }
 
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return '请输入邮箱';
-    }
-    if (!GetUtils.isEmail(value)) {
-      return '请输入有效的邮箱地址';
-    }
-    return null;
-  }
+  // 移除邮箱验证方法
 
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
@@ -242,8 +193,8 @@ class LoginController extends GetxController {
     if (value == null || value.isEmpty) {
       return '请输入验证码';
     }
-    if (value.length != 6) {
-      return '请输入6位验证码';
+    if (value.length < 4) {
+      return '验证码至少4位';
     }
     return null;
   }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'controller.dart';
-import 'account_password_login_view.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({super.key});
@@ -148,53 +147,67 @@ class LoginPage extends GetView<LoginController> {
         key: controller.phoneFormKey,
         child: Column(
           children: [
-            // 手机号输入行
+            // 手机号输入行 - 优化样式，更加突出
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
               child: Row(
                 children: [
-                  // 国家代码显示
-                  Container(
-                    width: 70.w,
-                    height: 38.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.r),
-                      border: Border.all(
-                        color: Color(0xFFE8E8E8),
-                        width: 1.w,
-                      ),
-                      color: Color(0xFFFAFAFA),
-                    ),
-                    child: Center(
-                      child: Obx(() => Text(
-                        controller.countryCode.value,
-                        style: TextStyle(
-                          color: Color(0xFF333333),
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w500,
+                  // 国家代码显示 - 增加点击选择功能
+                  GestureDetector(
+                    onTap: () {
+                      Get.snackbar('国家代码', '当前为中国 +86，暂不支持其他国家');
+                    },
+                    child: Container(
+                      width: 70.w,
+                      height: 44.h,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                          color: Color(0xFFE8E8E8),
+                          width: 1.w,
                         ),
-                      )),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Obx(() => Text(
+                          controller.countryCode.value,
+                          style: TextStyle(
+                            color: Color(0xFF333333),
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        )),
+                      ),
                     ),
                   ),
-                  SizedBox(width: 10.w),
-                  // 手机号输入框
+                  SizedBox(width: 12.w),
+                  // 手机号输入框 - 增大尺寸，更好体验
                   Expanded(
                     child: TextFormField(
                       controller: controller.phoneController,
+                      focusNode: controller.phoneFocusNode,
                       keyboardType: TextInputType.phone,
                       validator: controller.validatePhone,
                       style: TextStyle(
                         color: Color(0xFF333333),
-                        fontSize: 14.sp,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
                         hintText: '请输入手机号',
                         hintStyle: TextStyle(
-                          color: Color(0xFFCCCCCC),
-                          fontSize: 14.sp,
+                          color: Color(0xFF999999),
+                          fontSize: 15.sp,
                         ),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 8.h),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
                       ),
                     ),
                   ),
@@ -207,93 +220,135 @@ class LoginPage extends GetView<LoginController> {
               indent: 16.w,
               endIndent: 16.w,
             ),
-            // 验证码输入和发送按钮行
+            // 验证码输入和发送按钮行 - 优化布局
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
               child: Row(
                 children: [
-                  // 验证码输入框
+                  // 验证码输入框 - 增加输入体验优化
                   Expanded(
                     flex: 2,
                     child: Obx(() => controller.isOtpSent.value
                       ? Container(
-                          height: 38.h,
+                          height: 44.h,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.r),
+                            borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
                               color: Color(0xFFE8E8E8),
                               width: 1.w,
                             ),
-                            color: Color(0xFFFAFAFA),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: TextFormField(
                             controller: controller.otpController,
+                            focusNode: controller.otpFocusNode,
                             keyboardType: TextInputType.number,
                             maxLength: 6,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Color(0xFF333333),
-                              fontSize: 14.sp,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
-                              letterSpacing: 2,
+                              letterSpacing: 4,
                             ),
                             decoration: InputDecoration(
                               hintText: '验证码',
                               hintStyle: TextStyle(
-                                color: Color(0xFFCCCCCC),
-                                fontSize: 13.sp,
+                                color: Color(0xFF999999),
+                                fontSize: 14.sp,
                               ),
                               border: InputBorder.none,
                               counterText: '',
                               contentPadding: EdgeInsets.symmetric(
-                                horizontal: 10.w,
-                                vertical: 6.h,
+                                horizontal: 12.w,
+                                vertical: 12.h,
                               ),
                             ),
+                            onChanged: (value) {
+                              // 当输入6位验证码时自动聚焦到发送按钮
+                              if (value.length == 6) {
+                                Future.delayed(Duration(milliseconds: 100), () {
+                                  // 可以在这里添加自动登录逻辑
+                                });
+                              }
+                            },
                           ),
                         )
-                      : Container(
-                          height: 38.h,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.r),
-                            border: Border.all(
-                              color: Color(0xFFE8E8E8),
-                              width: 1.w,
+                      : GestureDetector(
+                          onTap: () {
+                            // 点击验证码输入框区域时自动发送验证码
+                            if (controller.phoneController.text.isNotEmpty) {
+                              controller.sendOtp();
+                            } else {
+                              // 如果手机号为空，聚焦到手机号输入框
+                              controller.phoneFocusNode.requestFocus();
+                            }
+                          },
+                          child: Container(
+                            height: 44.h,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                color: Color(0xFFE8E8E8),
+                                width: 1.w,
+                              ),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
                             ),
-                            color: Color(0xFFFAFAFA),
-                          ),
-                          child: Center(
-                            child: Text(
-                              '请先获取验证码',
-                              style: TextStyle(
-                                color: Color(0xFFCCCCCC),
-                                fontSize: 12.sp,
+                            child: Center(
+                              child: Text(
+                                '获取验证码',
+                                style: TextStyle(
+                                  color: Color(0xFF667EEA),
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
                         )),
                   ),
-                  SizedBox(width: 10.w),
-                  // 发送验证码按钮
+                  SizedBox(width: 12.w),
+                  // 发送验证码按钮 - 优化样式
                   Obx(() => controller.countdownSeconds.value > 0
                     ? Container(
                         width: 95.w,
-                        height: 38.h,
+                        height: 44.h,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: BorderRadius.circular(12.r),
                           color: Color(0xFFF5F5F5),
                           border: Border.all(
                             color: Color(0xFFE8E8E8),
                             width: 1.w,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Center(
                           child: Text(
                             '${controller.countdownSeconds.value}s',
                             style: TextStyle(
                               color: Color(0xFF999999),
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -302,22 +357,29 @@ class LoginPage extends GetView<LoginController> {
                         onTap: controller.sendOtp,
                         child: Container(
                           width: 95.w,
-                          height: 38.h,
+                          height: 44.h,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.r),
+                            borderRadius: BorderRadius.circular(12.r),
                             gradient: LinearGradient(
                               colors: [
                                 Color(0xFF667EEA),
                                 Color(0xFF764BA2),
                               ],
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xFF667EEA).withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Center(
                             child: Text(
                               '获取验证码',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 11.sp,
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -370,7 +432,7 @@ class LoginPage extends GetView<LoginController> {
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Obx(
         () => GestureDetector(
-          onTap: controller.isLoading.value ? null : controller.loginWithPhone,
+          onTap: controller.isLoading.value ? null : controller.login,
           child: Container(
             height: 50.h,
             decoration: BoxDecoration(
@@ -420,22 +482,7 @@ class LoginPage extends GetView<LoginController> {
       children: [
         SizedBox(height: 20.h),
 
-        // 账号密码登录链接
-        GestureDetector(
-          onTap: () => Get.to(() => AccountPasswordLoginPage(), binding: BindingsBuilder(() {
-            Get.put(LoginController());
-          })),
-          child: Text(
-            '账号密码登录',
-            style: TextStyle(
-              color: Color(0xFF667EEA),
-              fontWeight: FontWeight.bold,
-              fontSize: 13.sp,
-              decoration: TextDecoration.underline,
-              decorationColor: Color(0xFF667EEA),
-            ),
-          ),
-        ),
+        // 移除账号密码登录链接，因为我们只保留手机号登录
 
         SizedBox(height: 20.h),
 
