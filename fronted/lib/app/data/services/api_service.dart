@@ -10,7 +10,9 @@ import 'token_manager.dart';
 class ApiService extends GetxService {
   static ApiService get to => Get.find();
 
-  final String _baseUrl = 'http://localhost:8081/api/v1'; // 后端API地址（统一为 localhost）
+  final String _baseUrl =
+      'https://bazi-fortune-api-prod.oliyo.workers.dev'; // 生产环境
+  // 'http://localhost:8081/api/v1'; // 开发环境
   final TokenManager _tokenManager = TokenManager();
   final GetConnect _client = GetConnect();
   final Logger _logger = Logger();
@@ -47,7 +49,12 @@ class ApiService extends GetxService {
     };
   }
 
-  Future<Response> _dispatch(String method, String url, {dynamic body, Map<String, String>? headers}) {
+  Future<Response> _dispatch(
+    String method,
+    String url, {
+    dynamic body,
+    Map<String, String>? headers,
+  }) {
     switch (method.toUpperCase()) {
       case 'GET':
         return _client.get(url, headers: headers);
@@ -64,7 +71,12 @@ class ApiService extends GetxService {
     }
   }
 
-  Future<Response> _sendWithRetry(String method, String url, {dynamic body, Map<String, String>? headers}) async {
+  Future<Response> _sendWithRetry(
+    String method,
+    String url, {
+    dynamic body,
+    Map<String, String>? headers,
+  }) async {
     // 第一次请求
     Response res = await _dispatch(method, url, body: body, headers: headers);
     if (res.statusCode != 401) return res;
@@ -124,10 +136,6 @@ class ApiService extends GetxService {
       _refreshCompleter = null;
     }
   }
-
-
-
-
 
   // 移除邮箱密码登录接口，因为我们只支持手机号登录
 
@@ -238,7 +246,9 @@ class ApiService extends GetxService {
         final List<dynamic> data = response.body['data'];
         return data.map((json) => BaziModel.fromJson(json)).toList();
       } else {
-        throw Exception('获取历史记录失败: ${response.body?['message'] ?? response.statusText}');
+        throw Exception(
+          '获取历史记录失败: ${response.body?['message'] ?? response.statusText}',
+        );
       }
     } catch (e) {
       _logger.e('获取历史记录错误: $e');
@@ -282,7 +292,9 @@ class ApiService extends GetxService {
       if (response.statusCode == 201 && response.body != null) {
         return response.body['data']['id'];
       } else {
-        throw Exception('创建排盘记录失败: ${response.body?['message'] ?? response.statusText}');
+        throw Exception(
+          '创建排盘记录失败: ${response.body?['message'] ?? response.statusText}',
+        );
       }
     } catch (e) {
       _logger.e('创建排盘记录错误: $e');
@@ -312,7 +324,9 @@ class ApiService extends GetxService {
       );
 
       if (response.statusCode != 200) {
-        throw Exception('更新计算结果失败: ${response.body?['message'] ?? response.statusText}');
+        throw Exception(
+          '更新计算结果失败: ${response.body?['message'] ?? response.statusText}',
+        );
       }
     } catch (e) {
       _logger.e('更新计算结果错误: $e');
@@ -362,7 +376,8 @@ class ApiService extends GetxService {
         combinedJson['hour_pillar'] = baziResult['hour_pillar'];
 
         // Extract five_elements scores
-        final Map<String, dynamic> fiveElements = baziResult['five_elements'] ?? {};
+        final Map<String, dynamic> fiveElements =
+            baziResult['five_elements'] ?? {};
         combinedJson['wood_score'] = fiveElements['木'] ?? 0;
         combinedJson['fire_score'] = fiveElements['火'] ?? 0;
         combinedJson['earth_score'] = fiveElements['土'] ?? 0;
@@ -371,13 +386,17 @@ class ApiService extends GetxService {
 
         // Parse analysis data if available
         if (baziData['analysis'] != null && baziData['analysis'].isNotEmpty) {
-          final Map<String, dynamic> analysisMap = jsonDecode(baziData['analysis']);
+          final Map<String, dynamic> analysisMap = jsonDecode(
+            baziData['analysis'],
+          );
           combinedJson['ai_analysis'] = analysisMap['ai_analysis'];
           combinedJson['ai_analysis_en'] = analysisMap['ai_analysis_en'];
-          combinedJson['personality_traits'] = analysisMap['personality_traits'];
+          combinedJson['personality_traits'] =
+              analysisMap['personality_traits'];
           combinedJson['career_advice'] = analysisMap['career_advice'];
           combinedJson['health_advice'] = analysisMap['health_advice'];
-          combinedJson['relationship_advice'] = analysisMap['relationship_advice'];
+          combinedJson['relationship_advice'] =
+              analysisMap['relationship_advice'];
         }
 
         return BaziModel.fromJson(combinedJson);

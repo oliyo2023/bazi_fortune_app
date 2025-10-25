@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -12,41 +13,50 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
+  email     String?
   username  String
   password  String
-  role      Role     @default(USER)
+  role      String   @default("USER")
+  avatarUrl String?
+  phone     String   @unique
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
-  
-  baziData  BaziData[]
-  orders    Order[]
-  
+  updatedAt DateTime @updatedAt
+
+  baziData BaziData[]
+  orders   Order[]
+  master   Master?
+  Chat     Chat[]
+
   @@map("users")
 }
 
 model BaziData {
   id         String   @id @default(cuid())
   userId     String
-  inputData  Json     // 八字输入数据
-  resultData Json     // 八字计算结果
-  analysis   String?  // AI分析结果
+  inputData  String // JSON字符串，D1不支持Json类型
+  resultData String // JSON字符串，D1不支持Json类型
+  analysis   String? // AI分析结果
   createdAt  DateTime @default(now())
-  
-  user       User     @relation(fields: [userId], references: [id])
-  
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("bazi_data")
 }
 
 model Order {
-  id         String      @id @default(cuid())
-  userId     String
-  type       OrderType
-  amount     Decimal
-  status     OrderStatus @default(PENDING)
-  createdAt  DateTime    @default(now())
-  
-  user       User        @relation(fields: [userId], references: [id])
-  
+  id          String   @id @default(cuid())
+  userId      String
+  type        String // CONSULTATION, ANALYSIS, MEMBERSHIP
+  amount      Decimal
+  status      String   @default("PENDING") // PENDING, COMPLETED, CANCELLED
+  description String?
+  metadata    String? // JSON字符串
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@map("orders")
 }
 
@@ -59,40 +69,26 @@ model Master {
   rating      Decimal?
   available   Boolean  @default(true)
   createdAt   DateTime @default(now())
-  
-  user        User     @relation(fields: [userId], references: [id])
-  
+
+  user User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Chat Chat[]
+
   @@map("masters")
 }
 
 model Chat {
-  id        String   @id @default(cuid())
-  userId    String
-  masterId  String
-  messages  Json
-  status    String   @default("active")
-  createdAt DateTime @default(now())
-  
-  user      User     @relation(fields: [userId], references: [id])
-  master    Master   @relation(fields: [masterId], references: [id])
-  
+  id          String   @id @default(cuid())
+  userId      String
+  masterId    String
+  messages    String // JSON字符串
+  status      String   @default("active")
+  lastMessage String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  master Master @relation(fields: [masterId], references: [id], onDelete: Cascade)
+
   @@map("chats")
-}
-
-enum Role {
-  USER
-  MASTER
-  ADMIN
-}
-
-enum OrderType {
-  CONSULTATION
-  ANALYSIS
-  MEMBERSHIP
-}
-
-enum OrderStatus {
-  PENDING
-  COMPLETED
-  CANCELLED
 }

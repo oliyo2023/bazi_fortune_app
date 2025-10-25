@@ -1,24 +1,26 @@
 import { Hono } from "hono";
-import { verifyJWT, generateJWT, JWTPayload } from "../lib/auth";
-
-// 简单的内存存储用于演示
-const memoryStore = {
-  users: new Map<string, any>(),
-};
+import { getPrismaClient } from "../lib/db";
+import { generateJWT, verifyJWT, JWTPayload } from "../lib/auth";
 
 export const authRoutes = new Hono();
 
 // 注册
 authRoutes.post("/register", async (c) => {
   try {
-    const { email, username, password } = await c.req.json();
+    const { phone, username, password } = await c.req.json();
 
-    if (!email || !username || !password) {
+    if (!phone || !username || !password) {
       return c.json({ error: "Missing required fields" }, 400);
     }
 
+    const prisma = getPrismaClient(c.env);
+
     // 检查用户是否已存在
-    if (memoryStore.users.has(email)) {
+    const existingUser = await prisma.user.findUnique({
+      where: { phone },
+    });
+
+    if (existingUser) {
       return c.json({ error: "User already exists" }, 409);
     }
 
@@ -26,21 +28,26 @@ authRoutes.post("/register", async (c) => {
     const hashedPassword = await hashPassword(password);
 
     // 创建用户
-    const user = {
-      id: `user_${Date.now()}`,
-      email,
-      username,
-      role: "USER",
-      createdAt: new Date().toISOString(),
-    };
-
-    // 保存到内存
-    memoryStore.users.set(email, user);
+    const user = await prisma.user.create({
+      data: {
+        phone,
+        username,
+        password: hashedPassword,
+        role: "USER",
+      },
+      select: {
+        id: true,
+        phone: true,
+        username: true,
+        role: true,
+        createdAt: true,
+      },
+    });
 
     // 生成JWT
     const payload: JWTPayload = {
       userId: user.id,
-      email: user.email,
+      phone: user.phone,
       role: user.role,
     };
 
@@ -59,20 +66,25 @@ authRoutes.post("/register", async (c) => {
 // 登录
 authRoutes.post("/login", async (c) => {
   try {
-    const { email, password } = await c.req.json();
+    const { phone, password } = await c.req.json();
 
-    if (!email || !password) {
-      return c.json({ error: "Missing email or password" }, 400);
+    if (!phone || !password) {
+      return c.json({ error: "Missing phone or password" }, 400);
     }
 
+    const prisma = getPrismaClient(c.env);
+
     // 查找用户
-    const user = memoryStore.users.get(email);
+    const user = await prisma.user.findUnique({
+      where: { phone },
+    });
+
     if (!user) {
       return c.json({ error: "Invalid credentials" }, 401);
     }
 
-    // 验证密码（简单演示）
-    const isValidPassword = password === "demo123"; // 简化的密码验证
+    // 验证密码
+    const isValidPassword = await verifyPassword(password, user.password);
 
     if (!isValidPassword) {
       return c.json({ error: "Invalid credentials" }, 401);
@@ -81,7 +93,7 @@ authRoutes.post("/login", async (c) => {
     // 生成JWT
     const payload: JWTPayload = {
       userId: user.id,
-      email: user.email,
+      phone: user.phone,
       role: user.role,
     };
 
@@ -90,7 +102,7 @@ authRoutes.post("/login", async (c) => {
     return c.json({
       user: {
         id: user.id,
-        email: user.email,
+        phone: user.phone,
         username: user.username,
         role: user.role,
         createdAt: user.createdAt,
@@ -100,29 +112,6 @@ authRoutes.post("/login", async (c) => {
   } catch (error) {
     console.error("Login error:", error);
     return c.json({ error: "Login failed" }, 500);
-  }
-});
-
-// 获取用户信息
-authRoutes.get("/profile", async (c) => {
-  try {
-    const authorization = c.req.header("Authorization");
-    if (!authorization || !authorization.startsWith("Bearer ")) {
-      return c.json({ error: "Missing or invalid token" }, 401);
-    }
-
-    const token = authorization.substring(7);
-    const payload = await verifyJWT(token, c.env.JWT_SECRET);
-
-    const user = memoryStore.users.get(payload.email);
-    if (!user) {
-      return c.json({ error: "User not found" }, 404);
-    }
-
-    return c.json({ user });
-  } catch (error) {
-    console.error("Get profile error:", error);
-    return c.json({ error: "Failed to get profile" }, 500);
   }
 });
 
@@ -137,7 +126,13 @@ authRoutes.post("/refresh", async (c) => {
     const token = authorization.substring(7);
     const payload = await verifyJWT(token, c.env.JWT_SECRET);
 
-    const user = memoryStore.users.get(payload.email);
+    const prisma = getPrismaClient(c.env);
+
+    // 获取最新用户信息
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+    });
+
     if (!user) {
       return c.json({ error: "User not found" }, 404);
     }
@@ -145,7 +140,7 @@ authRoutes.post("/refresh", async (c) => {
     // 生成新的JWT
     const newPayload: JWTPayload = {
       userId: user.id,
-      email: user.email,
+      phone: user.phone,
       role: user.role,
     };
 
@@ -154,7 +149,7 @@ authRoutes.post("/refresh", async (c) => {
     return c.json({
       user: {
         id: user.id,
-        email: user.email,
+        phone: user.phone,
         username: user.username,
         role: user.role,
         createdAt: user.createdAt,
@@ -167,6 +162,41 @@ authRoutes.post("/refresh", async (c) => {
   }
 });
 
+// 获取用户信息
+authRoutes.get("/profile", async (c) => {
+  try {
+    const authorization = c.req.header("Authorization");
+    if (!authorization || !authorization.startsWith("Bearer ")) {
+      return c.json({ error: "Missing or invalid token" }, 401);
+    }
+
+    const token = authorization.substring(7);
+    const payload = await verifyJWT(token, c.env.JWT_SECRET);
+
+    const prisma = getPrismaClient(c.env);
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: {
+        id: true,
+        phone: true,
+        username: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      return c.json({ error: "User not found" }, 404);
+    }
+
+    return c.json({ user });
+  } catch (error) {
+    console.error("Get profile error:", error);
+    return c.json({ error: "Failed to get profile" }, 500);
+  }
+});
+
 // 密码哈希
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -175,7 +205,7 @@ async function hashPassword(password: string): Promise<string> {
 
   const key = await crypto.subtle.importKey(
     "raw",
-    encoder.encode("pepper"),
+    encoder.encode("pepper"), // 在实际应用中应使用环境变量
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"],
@@ -203,9 +233,7 @@ async function verifyPassword(
   try {
     const encoder = new TextEncoder();
     const combined = new Uint8Array(
-      ...atob(hashedPassword)
-        .split("")
-        .map((char) => char.charCodeAt(0)),
+      Array.from(atob(hashedPassword)).map((char) => char.charCodeAt(0)),
     );
 
     const salt = combined.slice(0, 16);
@@ -218,7 +246,7 @@ async function verifyPassword(
 
     const key = await crypto.subtle.importKey(
       "raw",
-      encoder.encode("pepper"),
+      encoder.encode("pepper"), // 与哈希时相同的值
       { name: "HMAC", hash: "SHA-256" },
       false,
       ["sign"],
@@ -226,6 +254,7 @@ async function verifyPassword(
 
     const signature = await crypto.subtle.sign("HMAC", key, saltedPassword);
 
+    // 比较哈希值
     if (signature.byteLength !== storedHash.length) {
       return false;
     }

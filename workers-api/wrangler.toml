@@ -2,9 +2,8 @@ name = "bazi-fortune-api"
 main = "src/index.ts"
 compatibility_date = "2023-06-20"
 
-# 环境变量配置
-[vars]
-JWT_SECRET = "your-jwt-secret-key-change-in-production"
+# 顶层配置（如果有全局需要的配置可以放这里）
+# 注意：环境特定的配置请放在对应的 [env.*] 块中
 
 # 生产环境配置
 [env.production]
@@ -15,30 +14,34 @@ DATABASE_URL = "postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supa
 JWT_SECRET = "[YOUR-JWT-SECRET]"
 DEEPSEEK_API_KEY = "[YOUR-DEEPSEEK-API-KEY]"
 OPENAI_API_KEY = "[YOUR-OPENAI-API-KEY]"
+API_URL = "https://bazi-fortune-api.your-domain.com"
+FRONTEND_URL = "https://bazi-fortune.your-domain.com"
 
 # KV存储（用于缓存）
 [[env.production.kv_namespaces]]
 binding = "CACHE"
-id = "[YOUR-KV-NAMESPACE-ID]"
-preview_id = "[YOUR-KV-PREVIEW-ID]"
-
-# D1数据库（可选，用于本地开发）
-[[d1_databases]]
-binding = "DB"
-database_name = "bazi-fortune-db"
-database_id = "local-database-id"
+id = "438b4a95509f4579bfb186b1a183cfe3"
+preview_id = "40adaa9ce49140afbc9622cdd464d4e2"
 
 # 开发环境配置
 [env.development]
 name = "bazi-fortune-api-dev"
 
 [env.development.vars]
-DATABASE_URL = "postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
 JWT_SECRET = "dev-jwt-secret"
 DEEPSEEK_API_KEY = "[YOUR-DEEPSEEK-API-KEY]"
 OPENAI_API_KEY = "[YOUR-OPENAI-API-KEY]"
+API_URL = "https://bazi-fortune-api-dev.oliyo.workers.dev"
+FRONTEND_URL = "https://bazi-fortune.oliyo.workers.dev"
 
+# KV存储（用于缓存）
 [[env.development.kv_namespaces]]
 binding = "CACHE"
-id = "[YOUR-KV-NAMESPACE-ID]"
-preview_id = "[YOUR-KV-PREVIEW-ID]"
+id = "438b4a95509f4579bfb186b1a183cfe3"
+preview_id = "40adaa9ce49140afbc9622cdd464d4e2"
+
+# D1数据库
+[[env.development.d1_databases]]
+binding = "DB"
+database_name = "bazi-fortune-db"
+database_id = "737f2742-f732-49b8-ab70-49e09c8e9767"

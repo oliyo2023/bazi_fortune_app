@@ -1,0 +1,8 @@
+<tool_call>edit_file
+<arg_key>path</arg_key>
+<arg_value>bazi_fortune_app/workers-api/src/lib/db.ts</arg_value>
+<arg_key>display_description</arg_key>
+<arg_value>更新db.ts以使用D1 schema</arg_value>
+<arg_key>mode</arg_key>
+<arg_value>edit</arg_value>
+</tool_call>
