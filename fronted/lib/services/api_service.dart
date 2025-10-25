@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 /// API 服务类 - 处理与 Worker API 的通信
 class ApiService {
   static const String _baseUrl =
-      'https://bazi-fortune-api-prod.oliyo.workers.dev';
+      'https://bazi-fortune-api-dev.oliyo.workers.dev';
 
   final GetStorage _storage = GetStorage();
 
@@ -91,26 +91,26 @@ class ApiService {
 
   /// 用户注册
   Future<Map<String, dynamic>> register({
-    required String email,
+    required String phone,
     required String username,
     required String password,
   }) async {
     return _request(
       '/api/v1/auth/register',
       method: 'POST',
-      body: {'email': email, 'username': username, 'password': password},
+      body: {'phone': phone, 'username': username, 'password': password},
     );
   }
 
   /// 用户登录
   Future<Map<String, dynamic>> login({
-    required String email,
+    required String phone,
     required String password,
   }) async {
     final response = await _request(
       '/api/v1/auth/login',
       method: 'POST',
-      body: {'email': email, 'password': password},
+      body: {'phone': phone, 'password': password},
     );
 
     // 保存 token

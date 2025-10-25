@@ -1,36 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:async';
+import '../../../data/services/auth_service.dart';
 
 class LoginController extends GetxController {
   // 手机号登录相关
   final phoneController = TextEditingController();
-  final otpController = TextEditingController();
+  final passwordController = TextEditingController();
   final countryCode = '+86'.obs;
 
   // 状态控制
   final RxBool isLoading = false.obs;
   final RxBool obscurePassword = true.obs;
   final RxBool isPhoneLogin = true.obs; // 默认手机号登录
-  final RxBool canResendOtp = false.obs;
-  final RxInt countdownSeconds = 0.obs;
-  final RxBool isOtpSent = false.obs;
-  
+
   // 优化：自动聚焦手机号输入框
   final FocusNode phoneFocusNode = FocusNode();
-  final FocusNode otpFocusNode = FocusNode();
+  final FocusNode passwordFocusNode = FocusNode();
 
   final GlobalKey<FormState> phoneFormKey = GlobalKey<FormState>();
-
-  Timer? _countdownTimer;
 
   @override
   void onClose() {
     phoneController.dispose();
-    otpController.dispose();
+    passwordController.dispose();
     phoneFocusNode.dispose();
-    otpFocusNode.dispose();
-    _countdownTimer?.cancel();
+    passwordFocusNode.dispose();
     super.onClose();
   }
 
@@ -40,61 +35,13 @@ class LoginController extends GetxController {
 
   // 移除切换登录方式的方法，因为我们只保留手机号登录
 
-  // 发送验证码
-  Future<void> sendOtp() async {
-    if (!phoneFormKey.currentState!.validate()) return;
-
-    isLoading.value = true;
-
-    try {
-      // 模拟发送验证码API调用
-      await Future.delayed(Duration(seconds: 1));
-
-      isOtpSent.value = true;
-      _startCountdown();
-
-      Get.snackbar(
-        '验证码已发送',
-        '验证码已发送至 ${countryCode.value} ${phoneController.text}',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        duration: Duration(seconds: 3),
-      );
-    } catch (e) {
-      Get.snackbar(
-        '发送失败',
-        '验证码发送失败，请重试',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  void _startCountdown() {
-    _countdownTimer?.cancel(); // 取消之前的计时器
-    countdownSeconds.value = 60;
-    canResendOtp.value = false;
-
-    _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (countdownSeconds.value > 1) {
-        countdownSeconds.value--;
-      } else {
-        countdownSeconds.value = 0;
-        timer.cancel();
-        canResendOtp.value = true;
-      }
-    });
-  }
-
-  // 手机号+验证码登录 - 优化主要登录流程
+  // 手机号+密码登录
   Future<void> loginWithPhone() async {
     if (!phoneFormKey.currentState!.validate()) return;
 
-    // 验证码输入验证
-    if (otpController.text.isEmpty) {
-      Get.snackbar('验证码', '请输入验证码',
+    // 密码输入验证
+    if (passwordController.text.isEmpty) {
+      Get.snackbar('密码', '请输入密码',
         backgroundColor: Color(0xFFFBE6E6),
         colorText: Color(0xFFD32F2F),
         icon: Icon(Icons.warning_amber, color: Color(0xFFD32F2F), size: 20),
@@ -102,8 +49,8 @@ class LoginController extends GetxController {
       return;
     }
 
-    if (otpController.text.length < 4) {
-      Get.snackbar('验证码', '验证码至少4位',
+    if (passwordController.text.length < 6) {
+      Get.snackbar('密码', '密码至少6位',
         backgroundColor: Color(0xFFFBE6E6),
         colorText: Color(0xFFD32F2F),
         icon: Icon(Icons.warning_amber, color: Color(0xFFD32F2F), size: 20),
@@ -114,13 +61,12 @@ class LoginController extends GetxController {
     isLoading.value = true;
 
     try {
-      // 实际的API调用应该在这里
-      // await AuthService.to.loginWithPhone(phoneController.text, otpController.text);
-      
-      // 模拟API调用
-      await Future.delayed(Duration(seconds: 2));
+      // 调用实际的API
+      await AuthService.to.loginWithPhone(
+        phone: phoneController.text,
+        password: passwordController.text,
+      );
 
-      // 假设登录成功
       Get.offAllNamed('/');
       Get.snackbar(
         '登录成功',
@@ -132,7 +78,7 @@ class LoginController extends GetxController {
     } catch (e) {
       Get.snackbar(
         '登录失败',
-        '验证码错误或网络异常，请重试',
+        e.toString(),
         backgroundColor: Color(0xFFFBE6E6),
         colorText: Color(0xFFD32F2F),
         icon: Icon(Icons.error, color: Color(0xFFD32F2F), size: 20),
@@ -141,8 +87,6 @@ class LoginController extends GetxController {
       isLoading.value = false;
     }
   }
-
-  // 移除邮箱密码登录方法
 
   // 简化登录方法，只支持手机号登录
   Future<void> login() async {
@@ -185,16 +129,6 @@ class LoginController extends GetxController {
     }
     if (value.length < 6) {
       return '密码至少6位';
-    }
-    return null;
-  }
-
-  String? validateOtp(String? value) {
-    if (value == null || value.isEmpty) {
-      return '请输入验证码';
-    }
-    if (value.length < 4) {
-      return '验证码至少4位';
     }
     return null;
   }

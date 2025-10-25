@@ -11,7 +11,7 @@ class ApiService extends GetxService {
   static ApiService get to => Get.find();
 
   final String _baseUrl =
-      'https://bazi-fortune-api-prod.oliyo.workers.dev'; // 生产环境
+      'https://bazi-fortune-api-dev.oliyo.workers.dev'; // 生产环境
   // 'http://localhost:8081/api/v1'; // 开发环境
   final TokenManager _tokenManager = TokenManager();
   final GetConnect _client = GetConnect();
@@ -137,9 +137,77 @@ class ApiService extends GetxService {
     }
   }
 
-  // 移除邮箱密码登录接口，因为我们只支持手机号登录
+  // 手机号注册接口
+  Future<UserModel> registerWithPhone({
+    required String phone,
+    required String username,
+    required String password,
+  }) async {
+    try {
+      final requestData = {
+        'phone': phone,
+        'username': username,
+        'password': password,
+      };
 
-  // 移除邮箱注册接口，因为我们只支持手机号注册
+      final response = await _sendWithRetry(
+        'POST',
+        '$_baseUrl/api/v1/auth/register',
+        body: requestData,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final body = response.body;
+        final userJson = body['user'];
+        final token = body['token'];
+
+        // 保存token
+        await _tokenManager.save(token, userJson['id']);
+
+        return UserModel.fromJson(userJson);
+      } else {
+        throw Exception('注册失败: ${response.body?['error'] ?? response.statusText}');
+      }
+    } catch (e) {
+      _logger.e('注册错误: $e');
+      throw Exception('注册失败: ${e.toString()}');
+    }
+  }
+
+  // 手机号登录接口
+  Future<UserModel> loginWithPhone({
+    required String phone,
+    required String password,
+  }) async {
+    try {
+      final requestData = {
+        'phone': phone,
+        'password': password,
+      };
+
+      final response = await _sendWithRetry(
+        'POST',
+        '$_baseUrl/api/v1/auth/login',
+        body: requestData,
+      );
+
+      if (response.statusCode == 200) {
+        final body = response.body;
+        final userJson = body['user'];
+        final token = body['token'];
+
+        // 保存token
+        await _tokenManager.save(token, userJson['id']);
+
+        return UserModel.fromJson(userJson);
+      } else {
+        throw Exception('登录失败: ${response.body?['error'] ?? response.statusText}');
+      }
+    } catch (e) {
+      _logger.e('登录错误: $e');
+      throw Exception('登录失败: ${e.toString()}');
+    }
+  }
 
   Future<void> logout() async {
     await _tokenManager.clear();

@@ -1,6 +1,7 @@
 class UserModel {
   final String id;
-  final String email;
+  final String? email;
+  final String phone;
   final String? name;
   final String? avatar;
   final String role;
@@ -9,7 +10,8 @@ class UserModel {
 
   UserModel({
     required this.id,
-    required this.email,
+    this.email,
+    required this.phone,
     this.name,
     this.avatar,
     required this.role,
@@ -20,10 +22,11 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] ?? '',
-      email: json['email'] ?? '',
-      name: json['name'],
+      email: json['email'],
+      phone: json['phone'] ?? json['email'] ?? '', // 兼容旧API返回email的情况
+      name: json['name'] ?? json['username'],
       avatar: json['avatar'],
-      role: json['role'] ?? 'user',
+      role: json['role'] ?? 'USER',
       createdAt: DateTime.tryParse(json['created_at'] ?? DateTime.now().toIso8601String()) ?? DateTime.now(),
       updatedAt: DateTime.tryParse(json['updated_at'] ?? DateTime.now().toIso8601String()) ?? DateTime.now(),
     );
@@ -33,6 +36,7 @@ class UserModel {
     return {
       'id': id,
       'email': email,
+      'phone': phone,
       'name': name,
       'avatar': avatar,
       'role': role,
