@@ -6,13 +6,12 @@ import 'package:logger/logger.dart';
 import '../models/user_model.dart';
 import '../models/bazi_model.dart';
 import 'token_manager.dart';
+import '../../core/config/api_config.dart';
 
 class ApiService extends GetxService {
   static ApiService get to => Get.find();
 
-  final String _baseUrl =
-      'https://bazi-fortune-api-dev.oliyo.workers.dev'; // 生产环境
-  // 'http://localhost:8081/api/v1'; // 开发环境
+  final String _baseUrl = ApiConfig.baseUrl;
   final TokenManager _tokenManager = TokenManager();
   final GetConnect _client = GetConnect();
   final Logger _logger = Logger();

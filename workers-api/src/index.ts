@@ -28,16 +28,23 @@ app.use("*", logger());
 app.use(
   "*",
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:*",
-      "https://localhost:*",
-      "https://your-app-domain.com",
-      "https://bazi.oliyo.com",
-      "https://bazi-fortune-api-dev.oliyo.workers.dev"
-    ],
+    origin: (origin, c) => {
+      // 允许所有localhost端口
+      if (origin && (origin.startsWith("http://localhost:") || origin.startsWith("https://localhost:"))) {
+        return origin;
+      }
+      // 允许特定的生产域名
+      const allowedOrigins = [
+        "http://localhost:3000",
+        "https://your-app-domain.com",
+        "https://bazi.oliyo.com",
+        "https://bazi-fortune-api-dev.oliyo.workers.dev"
+      ];
+      return allowedOrigins.includes(origin) ? origin : null;
+    },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   }),
 );
 

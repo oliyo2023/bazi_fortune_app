@@ -408,6 +408,7 @@ class _FeatureTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
           width: 44,
@@ -418,8 +419,16 @@ class _FeatureTile extends StatelessWidget {
           ),
           child: Icon(icon, color: color, size: 26),
         ),
-        const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontSize: 13)),
+        const SizedBox(height: 6),
+        Flexible(
+          child: Text(
+            label,
+            style: const TextStyle(fontSize: 12),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ],
     );
   }

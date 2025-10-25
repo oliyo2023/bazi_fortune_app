@@ -156,45 +156,52 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
 
     Widget buildHeader() {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Row(
           children: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(null),
-              child: Text('cancel'.tr, style: const TextStyle(color: Color(0xFF7C3AED))),
-            ),
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F3FF),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _tabChip('four_pillar_chart'.tr, 0),
-                  _tabChip('solar_birthday'.tr, 1),
-                  _tabChip('lunar_birthday'.tr, 2),
-                  _tabChip('input'.tr, 3),
-                ],
+            Expanded(
+              child: TextButton(
+                onPressed: () => Navigator.of(context).pop(null),
+                child: Text('cancel'.tr, style: const TextStyle(color: Color(0xFF7C3AED), fontSize: 14)),
               ),
             ),
-            const Spacer(),
-            TextButton(
-              onPressed: () {
-                // 如果是四柱页签，将小时对齐到时辰起始，分钟置0
-                DateTime out = _dt;
-                if (_tab == 0) {
-                  final h = _alignToShichenStartHour(_dt);
-                  out = DateTime(_dt.year, _dt.month, _dt.day, h, 0);
-                }
-                Navigator.of(context).pop(BaziTimePickResult(
-                  dateTime: out,
-                  isLunar: _tab == 2,
-                ));
-              },
-              child: Text('confirm'.tr, style: const TextStyle(color: Color(0xFF7C3AED))),
+            Expanded(
+              flex: 3,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F3FF),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 2,
+                  runSpacing: 2,
+                  children: [
+                    _tabChip('four_pillar_chart'.tr, 0),
+                    _tabChip('solar_birthday'.tr, 1),
+                    _tabChip('lunar_birthday'.tr, 2),
+                    _tabChip('input'.tr, 3),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: TextButton(
+                onPressed: () {
+                  // 如果是四柱页签，将小时对齐到时辰起始，分钟置0
+                  DateTime out = _dt;
+                  if (_tab == 0) {
+                    final h = _alignToShichenStartHour(_dt);
+                    out = DateTime(_dt.year, _dt.month, _dt.day, h, 0);
+                  }
+                  Navigator.of(context).pop(BaziTimePickResult(
+                    dateTime: out,
+                    isLunar: _tab == 2,
+                  ));
+                },
+                child: Text('confirm'.tr, style: const TextStyle(color: Color(0xFF7C3AED), fontSize: 14)),
+              ),
             ),
           ],
         ),
@@ -404,22 +411,23 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
   Widget _tabChip(String text, int index) {
     final active = _tab == index;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 2),
       child: GestureDetector(
         onTap: () => setState(() => _tab = index),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
           decoration: BoxDecoration(
             color: active ? const Color(0xFF7C3AED) : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             text,
             style: TextStyle(
               color: active ? Colors.white : const Color(0xFF7C3AED),
-              fontSize: 13,
+              fontSize: 11,
             ),
+            textAlign: TextAlign.center,
           ),
         ),
       ),
