@@ -28,7 +28,14 @@ app.use("*", logger());
 app.use(
   "*",
   cors({
-    origin: ["http://localhost:3000", "https://your-app-domain.com"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:*",
+      "https://localhost:*",
+      "https://your-app-domain.com",
+      "https://bazi.oliyo.com",
+      "https://bazi-fortune-api-dev.oliyo.workers.dev"
+    ],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
   }),
