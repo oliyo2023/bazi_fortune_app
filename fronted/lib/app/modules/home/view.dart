@@ -182,62 +182,72 @@ class HomePage extends GetView<HomeController> {
                 ],
               ),
               Divider(height: 24),
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade500,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'suitable'.tr,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+              GestureDetector(
+                onTap: () => _navigateToAlmanacDetail(0),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade500,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'suitable'.tr,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '嫁娶 祭祀 塑绘 开光 出行 解除',
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.grey.shade800),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Obx(
+                        () => Text(
+                          controller.suitableItems.join(' '),
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Colors.grey.shade800),
+                        ),
+                      ),
                     ),
-                  ),
-                  Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-                ],
+                    Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                  ],
+                ),
               ),
               SizedBox(height: 8),
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade500,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'unsuitable'.tr,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+              GestureDetector(
+                onTap: () => _navigateToAlmanacDetail(1),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade500,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'unsuitable'.tr,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '伐木 行丧 作灶 作梁 安葬',
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.grey.shade800),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Obx(
+                        () => Text(
+                          controller.unsuitableItems.join(' '),
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Colors.grey.shade800),
+                        ),
+                      ),
                     ),
-                  ),
-                  Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-                ],
+                    Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                  ],
+                ),
               ),
             ],
           ),
@@ -516,5 +526,14 @@ class HomePage extends GetView<HomeController> {
     );
   }
 
-
+  void _navigateToAlmanacDetail(int type) {
+    Get.toNamed(
+      Routes.almanacListDetail,
+      arguments: {
+        'type': type,
+        'items': type == 0 ? controller.suitableItems : controller.unsuitableItems,
+        'title': type == 0 ? '宜' : '忌',
+      },
+    );
+  }
 }

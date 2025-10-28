@@ -17,6 +17,43 @@ class HomeController extends GetxController {
   final RxString yearZodiac = '蛇年'.obs;
   final RxInt weekOfYear = 0.obs;
 
+  // 宜忌列表
+  final RxList<String> suitableItems = <String>[
+    '嫁娶',
+    '纳采',
+    '订盟',
+    '祭祀',
+    '祈福',
+    '开光',
+    '出行',
+    '理发',
+    '作灶',
+    '出火',
+    '拆卸',
+    '修造',
+    '动土',
+    '进人口',
+    '入宅',
+    '移徙',
+    '安床',
+    '挂匾',
+    '栽种',
+    '纳畜',
+    '破土',
+    '安葬',
+    '入殓',
+    '除服',
+    '成服',
+  ].obs;
+
+  final RxList<String> unsuitableItems = <String>[
+    '开市',
+    '掘井',
+    '开渠',
+    '造桥',
+    '造船',
+  ].obs;
+
   // 排盘输入数据
   final RxInt selectedGender = 0.obs; // 0 for 男, 1 for 女
   final RxInt selectedChartType = 0.obs; // 0 for 四柱盘, 1 for 紫微盘, etc.
