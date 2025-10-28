@@ -173,14 +173,15 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
                   color: const Color(0xFFF5F3FF),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 2,
-                  runSpacing: 2,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _tabChip('four_pillar_chart'.tr, 0),
+                    const SizedBox(width: 4),
                     _tabChip('solar_birthday'.tr, 1),
+                    const SizedBox(width: 4),
                     _tabChip('lunar_birthday'.tr, 2),
+                    const SizedBox(width: 4),
                     _tabChip('input'.tr, 3),
                   ],
                 ),
