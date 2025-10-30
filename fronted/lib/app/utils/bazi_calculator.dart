@@ -85,7 +85,7 @@ class BaziCalculator {
   static String _getHourElement(int hour) {
     // 子(水) 丑(土) 寅(木) 卯(木) 辰(土) 巳(火)
     // 午(火) 未(土) 申(金) 酉(金) 戌(土) 亥(水)
-    final elements = ['水', '土', '木', '木', '土', '火', '火', '土', '金', '金', '土', '水'];
+    final elements = ['水', '土', '木', '土', '火', '火', '土', '金', '金', '土', '水'];
     
     int index;
     if (hour == 23) {

@@ -52,13 +52,11 @@ class AlmanacDetailController extends GetxController {
     // 更新顶部信息
     monthTitle.value = '${lunar.getMonthInChinese()}月 ${lunar.getDayInChinese()}';
     
-    // 临时硬编码节日，待后续完善
-    String festivalNames = '';
-    if (date.month == 10 && date.day == 9) {
-      festivalNames = ' 重阳节';
-    }
+    // 使用官方API获取节气
+    final currentJieQi = lunar.getJieQi();
+    final jieQiName = currentJieQi.isNotEmpty ? currentJieQi : '';
     
-    lunarLine.value = '公历 ${lunar.getYear()}年${lunar.getMonth()}月${lunar.getDay()}日 农历 ${lunar.getYearInGanZhi()}${lunar.getYearShengXiao()}年 ${lunar.getMonthInGanZhi()}月${lunar.getDayInGanZhi()}日 ${lunar.getWeekInChinese()}$festivalNames';
+    lunarLine.value = '公历 ${lunar.getYear()}年${lunar.getMonth()}月${lunar.getDay()}日 农历 ${lunar.getYearInGanZhi()}${lunar.getYearShengXiao()}年 ${lunar.getMonthInGanZhi()}月${lunar.getDayInGanZhi()}日 ${lunar.getWeekInChinese()} $jieQiName';
 
     // 更新宜忌
     yiList.value = lunar.getDayYi().join(' ');

@@ -102,13 +102,81 @@ class HomeController extends GetxController {
     lunarDate.value = '${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}';
     yearZodiac.value = '${lunar.getYearShengXiao()}年';
 
-    // 获取节气信息
-    final jieQi = lunar.getJieQi();
-    if (jieQi.isNotEmpty) {
-      solarTerm.value = jieQi;
-    } else {
-      solarTerm.value = '无节气';
+    // 获取节气信息 - 使用更完整的方法
+    final currentJieQi = _getCurrentJieQi(lunar);
+    solarTerm.value = currentJieQi;
+  }
+
+  /// 获取当前节气信息
+  String _getCurrentJieQi(Lunar lunar) {
+    try {
+      // 尝试获取当前节气
+      final jieQi = lunar.getJieQi();
+      if (jieQi.isNotEmpty) {
+        return jieQi;
+      }
+      
+      // 如果当前没有节气，获取最近的节气
+      final currentJieQiList = _getNearbyJieQi(lunar);
+      if (currentJieQiList.isNotEmpty) {
+        return currentJieQiList.first;
+      }
+      
+      // 如果都没有，返回当前月份的节气信息
+      return _getMonthJieQi(lunar);
+    } catch (e) {
+      // 出错时返回默认值
+      return '节气查询中';
     }
+  }
+
+  /// 获取附近的节气
+  List<String> _getNearbyJieQi(Lunar lunar) {
+    final nearbyJieQi = <String>[];
+    
+    // 检查前后几天的节气
+    for (int i = -3; i <= 3; i++) {
+      final checkDate = DateTime(
+        lunar.getSolar().getYear(),
+        lunar.getSolar().getMonth(),
+        lunar.getSolar().getDay() + i
+      );
+      final checkLunar = Lunar.fromDate(checkDate);
+      final jieQi = checkLunar.getJieQi();
+      if (jieQi.isNotEmpty) {
+        nearbyJieQi.add(jieQi);
+      }
+    }
+    
+    return nearbyJieQi;
+  }
+
+  /// 获取月份对应的节气
+  String _getMonthJieQi(Lunar lunar) {
+    final month = lunar.getSolar().getMonth();
+    
+    // 二十四节气对应月份
+    final monthJieQi = {
+      1: ['小寒', '大寒'],
+      2: ['立春', '雨水'],
+      3: ['惊蛰', '春分'],
+      4: ['清明', '谷雨'],
+      5: ['立夏', '小满'],
+      6: ['芒种', '夏至'],
+      7: ['小暑', '大暑'],
+      8: ['立秋', '处暑'],
+      9: ['白露', '秋分'],
+      10: ['寒露', '霜降'],
+      11: ['立冬', '小雪'],
+      12: ['大雪', '冬至'],
+    };
+    
+    final jieQiList = monthJieQi[month] ?? [];
+    if (jieQiList.isNotEmpty) {
+      return '${jieQiList.join('、')}节气月';
+    }
+    
+    return '无节气';
   }
 
   void selectGender(int index) {
