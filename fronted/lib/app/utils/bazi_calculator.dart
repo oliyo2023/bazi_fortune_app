@@ -240,12 +240,11 @@ class BaziCalculator {
   /// 获取建议的用神五行
   static List<String> getRecommendedElements(Map<String, int> fiveElements) {
     final strongest = getStrongestElement(fiveElements);
-    final weakest = getWeakestElement(fiveElements);
     
     // 简化的用神推荐逻辑
     final recommendations = <String>[];
     
-    // 根据最强和最弱的五行推荐平衡的元素
+    // 根据最强的五行推荐平衡的元素
     switch (strongest) {
       case '木':
         recommendations.addAll(['金', '火']);

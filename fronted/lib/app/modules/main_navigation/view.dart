@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../home/view.dart';
 import '../profile/view.dart';
 import '../messages/view.dart';
+import '../astrology/views/astrology_list_view.dart';
 import 'controller.dart';
 
 class MainNavigationPage extends GetView<MainNavigationController> {
@@ -58,7 +59,8 @@ class MainNavigationPage extends GetView<MainNavigationController> {
       case 0:
         return HomePage();
       case 1:
-        return _buildComingSoonPage('fortune'.tr, Icons.show_chart);
+        // 导航到星运列表页面
+        return const AstrologyListPage();
       case 2:
         return _buildComingSoonPage('masters_consultation'.tr, Icons.people);
       case 3:

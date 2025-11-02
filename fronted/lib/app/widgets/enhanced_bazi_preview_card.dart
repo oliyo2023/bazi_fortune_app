@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../utils/bazi_calculator.dart';
 
 /// 增强的八字预览卡片 - 展示lunar库的强大功能

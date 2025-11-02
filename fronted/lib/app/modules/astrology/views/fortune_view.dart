@@ -370,19 +370,19 @@ class FortuneView extends GetView<FortuneController> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 整体运势评分
-        _buildOverallScore(currentFortune!),
+        _buildOverallScore(currentFortune),
         SizedBox(height: 20.h),
         
         // 生活领域评分
-        _buildLifeAreas(currentFortune!),
+        _buildLifeAreas(currentFortune),
         SizedBox(height: 20.h),
         
         // 关键行运
-        _buildKeyTransits(currentFortune!),
+        _buildKeyTransits(currentFortune),
         SizedBox(height: 20.h),
         
         // 建议和提醒
-        _buildAdvice(currentFortune!),
+        _buildAdvice(currentFortune),
       ],
     );
   }
@@ -441,7 +441,7 @@ class FortuneView extends GetView<FortuneController> {
           LinearProgressIndicator(
             value: fortune.overallScore,
             backgroundColor: Color(0xFFE0E0E0),
-            valueColor: controller.getScoreColor(fortune.overallScore),
+            valueColor: AlwaysStoppedAnimation<Color>(controller.getScoreColor(fortune.overallScore)),
             minHeight: 8.h,
           ),
           SizedBox(height: 8.h),
@@ -450,9 +450,9 @@ class FortuneView extends GetView<FortuneController> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildScoreItem('低', 0.0, 0.33),
-              _buildScoreItem('中', 0.33, 0.66),
-              _buildScoreItem('高', 0.66, 1.0),
+              _buildScoreItem('低', 0.0, 0.33, fortune.overallScore),
+              _buildScoreItem('中', 0.33, 0.66, fortune.overallScore),
+              _buildScoreItem('高', 0.66, 1.0, fortune.overallScore),
             ],
           ),
         ],
@@ -461,8 +461,8 @@ class FortuneView extends GetView<FortuneController> {
   }
 
   // 构建评分项
-  Widget _buildScoreItem(String label, double start, double end) {
-    final isSelected = controller.overallScore.value >= start && controller.overallScore.value < end;
+  Widget _buildScoreItem(String label, double start, double end, double score) {
+    final isSelected = score >= start && score < end;
     return Column(
       children: [
         Text(
@@ -560,7 +560,7 @@ class FortuneView extends GetView<FortuneController> {
           LinearProgressIndicator(
             value: score,
             backgroundColor: Color(0xFFE0E0E0),
-            valueColor: controller.getScoreColor(score),
+            valueColor: AlwaysStoppedAnimation<Color>(controller.getScoreColor(score)),
             minHeight: 6.h,
           ),
           SizedBox(height: 4.h),
@@ -691,7 +691,7 @@ class FortuneView extends GetView<FortuneController> {
                 child: LinearProgressIndicator(
                   value: transit.intensity,
                   backgroundColor: Color(0xFFE0E0E0),
-                  valueColor: controller.getScoreColor(transit.intensity),
+                  valueColor: AlwaysStoppedAnimation<Color>(controller.getScoreColor(transit.intensity)),
                   minHeight: 4.h,
                 ),
               ),

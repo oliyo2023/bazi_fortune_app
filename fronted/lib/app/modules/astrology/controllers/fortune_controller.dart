@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/services/astrology_service.dart';
 import '../models/astrology_model.dart' as astro;
@@ -95,11 +96,9 @@ class FortuneController extends GetxController {
       isLoading.value = true;
       selectedFortuneType.value = type;
 
-      astro.FortuneData? fortuneData;
-
       switch (type) {
         case 'today':
-          fortuneData = await _astrologyService.getTodayFortune(
+          final todayData = await _astrologyService.getTodayFortune(
             year: birthYear.value,
             month: birthMonth.value,
             day: birthDay.value,
@@ -107,10 +106,10 @@ class FortuneController extends GetxController {
             minute: birthMinute.value,
             city: birthCity.value,
           );
-          todayFortune.value = fortuneData;
+          todayFortune.value = todayData as astro.FortuneData?;
           break;
         case 'tomorrow':
-          fortuneData = await _astrologyService.getTomorrowFortune(
+          final tomorrowData = await _astrologyService.getTomorrowFortune(
             year: birthYear.value,
             month: birthMonth.value,
             day: birthDay.value,
@@ -118,10 +117,10 @@ class FortuneController extends GetxController {
             minute: birthMinute.value,
             city: birthCity.value,
           );
-          tomorrowFortune.value = fortuneData;
+          tomorrowFortune.value = tomorrowData as astro.FortuneData?;
           break;
         case 'week':
-          fortuneData = await _astrologyService.getWeekFortune(
+          final weekData = await _astrologyService.getWeekFortune(
             year: birthYear.value,
             month: birthMonth.value,
             day: birthDay.value,
@@ -129,10 +128,10 @@ class FortuneController extends GetxController {
             minute: birthMinute.value,
             city: birthCity.value,
           );
-          weekFortune.value = fortuneData;
+          weekFortune.value = weekData as astro.FortuneData?;
           break;
         case 'month':
-          fortuneData = await _astrologyService.getMonthFortune(
+          final monthData = await _astrologyService.getMonthFortune(
             year: birthYear.value,
             month: birthMonth.value,
             day: birthDay.value,
@@ -140,7 +139,7 @@ class FortuneController extends GetxController {
             minute: birthMinute.value,
             city: birthCity.value,
           );
-          monthFortune.value = fortuneData;
+          monthFortune.value = monthData as astro.FortuneData?;
           break;
       }
     } catch (e) {
@@ -177,15 +176,15 @@ class FortuneController extends GetxController {
   }
 
   // 获取运势评分颜色
-  String getScoreColor(double score) {
+  Color getScoreColor(double score) {
     if (score >= 0.8) {
-      return '#4CAF50'; // 绿色 - 极佳
+      return Color(0xFF4CAF50); // 绿色 - 极佳
     } else if (score >= 0.6) {
-      return '#8BC34A'; // 浅绿 - 积极
+      return Color(0xFF8BC34A); // 浅绿 - 积极
     } else if (score >= 0.4) {
-      return '#FF9800'; // 橙色 - 平稳
+      return Color(0xFFFF9800); // 橙色 - 平稳
     } else {
-      return '#F44336'; // 红色 - 需谨慎
+      return Color(0xFFF44336); // 红色 - 需谨慎
     }
   }
 
@@ -279,10 +278,10 @@ class FortuneController extends GetxController {
           ),
         ]);
 
-        todayFortune.value = futures[0];
-        tomorrowFortune.value = futures[1];
-        weekFortune.value = futures[2];
-        monthFortune.value = futures[3];
+        todayFortune.value = futures[0] as astro.FortuneData?;
+        tomorrowFortune.value = futures[1] as astro.FortuneData?;
+        weekFortune.value = futures[2] as astro.FortuneData?;
+        monthFortune.value = futures[3] as astro.FortuneData?;
         
         Get.snackbar('成功', '运势数据已更新');
       } catch (e) {

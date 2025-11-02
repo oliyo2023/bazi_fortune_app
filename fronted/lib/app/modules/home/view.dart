@@ -520,7 +520,7 @@ class HomePage extends GetView<HomeController> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         _buildQuickActionButton(icon: Icons.people_alt, label: 'chart_compatibility'.tr),
-        _buildQuickActionButton(icon: Icons.calendar_today, label: 'instant_chart'.tr),
+        _buildQuickActionButton(icon: Icons.auto_awesome, label: '星座运势', onTap: () => Get.toNamed(Routes.astrology)),
         _buildQuickActionButton(icon: Icons.history, label: 'chart_history'.tr),
         _buildQuickActionButton(icon: Icons.extension, label: '五子棋', onTap: () => Get.toNamed(Routes.gomoku)),
       ],

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -38,13 +37,6 @@ class AstrologyService extends GetxService {
     });
   }
 
-  Map<String, String> _authHeaders() {
-    final t = _tokenManager.token;
-    return {
-      'Content-Type': 'application/json',
-      if (t != null) 'Authorization': 'Bearer $t',
-    };
-  }
 
   Future<Response> _dispatch(
     String method,

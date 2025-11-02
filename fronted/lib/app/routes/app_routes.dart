@@ -18,6 +18,7 @@ abstract class Routes {
   static const astrologyChart = _Paths.astrologyChart;
   static const astrologyInterpretation = _Paths.astrologyInterpretation;
   static const astrologyDetail = _Paths.astrologyDetail;
+  static const fortune = _Paths.fortune;
   static const almanacListDetail = _Paths.almanacListDetail;
 }
 
@@ -36,5 +37,6 @@ abstract class _Paths {
   static const astrologyChart = '/astrology-chart';
   static const astrologyInterpretation = '/astrology-interpretation';
   static const astrologyDetail = '/astrology-detail';
+  static const fortune = '/fortune';
   static const almanacListDetail = '/almanac-list-detail';
 }

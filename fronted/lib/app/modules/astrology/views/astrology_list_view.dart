@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../controllers/astrology_controller.dart';
+import '../../../routes/app_pages.dart';
 
 class AstrologyListPage extends GetView<AstrologyController> {
   const AstrologyListPage({super.key});
@@ -36,6 +37,11 @@ class AstrologyListPage extends GetView<AstrologyController> {
                     children: [
                       // 快速创建占星图表
                       _buildQuickCreateCard(),
+                      
+                      SizedBox(height: 24.h),
+                      
+                      // 星运功能卡片
+                      _buildFortuneCard(),
                       
                       SizedBox(height: 24.h),
                       
@@ -131,6 +137,64 @@ class AstrologyListPage extends GetView<AstrologyController> {
             SizedBox(height: 8.h),
             Text(
               '快速创建新的占星图表',
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: Colors.white.withValues(alpha: 0.9),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 星运功能卡片
+  Widget _buildFortuneCard() {
+    return GestureDetector(
+      onTap: () {
+        // 导航到星运页面
+        Get.toNamed('/fortune');
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.r),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF667EEA),
+              Color(0xFF764BA2),
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Color(0xFF667EEA).withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.auto_awesome,
+              color: Colors.white,
+              size: 32.sp,
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              '星座运势',
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              '查看今日、明日、本周、本月运势',
               style: TextStyle(
                 fontSize: 13.sp,
                 color: Colors.white.withValues(alpha: 0.9),

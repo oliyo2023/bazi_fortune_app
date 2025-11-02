@@ -25,6 +25,7 @@ import '../modules/astrology/views/astrology_list_view.dart';
 import '../modules/astrology/views/astrology_chart_view.dart';
 import '../modules/astrology/views/astrology_interpretation_view.dart';
 import '../modules/astrology/views/astrology_detail_view.dart';
+import '../modules/astrology/views/fortune_view.dart';
 import '../modules/almanac_list_detail/bindings/almanac_list_detail_binding.dart';
 import '../modules/almanac_list_detail/view.dart';
 
@@ -102,6 +103,11 @@ class AppPages {
     GetPage(
       name: _Paths.astrologyDetail,
       page: () => const AstrologyDetailPage(),
+      binding: AstrologyBinding(),
+    ),
+    GetPage(
+      name: _Paths.fortune,
+      page: () => FortuneView(),
       binding: AstrologyBinding(),
     ),
     GetPage(
