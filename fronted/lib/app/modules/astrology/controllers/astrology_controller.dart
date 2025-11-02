@@ -82,7 +82,12 @@ class AstrologyController extends GetxController {
       sunSign: sunSign,
       moonSign: moonSign,
       risingSign: risingSign,
-      houses: houses,
+      houses: houses.map((h) => House(
+        number: h.house,
+        sign: h.sign,
+        position: 0.0,
+      )).toList(),
+      createdAt: DateTime.now(),
     );
   }
 
@@ -167,8 +172,8 @@ class AstrologyController extends GetxController {
     if (astrologyChart.value == null) return '';
     
     final houseData = astrologyChart.value!.houses
-        .firstWhere((h) => h.house == house, orElse: () => astrologyChart.value!.houses[0]);
+        .firstWhere((h) => h.number == house, orElse: () => astrologyChart.value!.houses[0]);
     
-    return '${houseData.sign} - ${houseData.interpretation}';
+    return '${houseData.sign} - ${houseData.sign}';
   }
 }

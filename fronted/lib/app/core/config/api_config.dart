@@ -55,4 +55,22 @@ class ApiEndpoints {
   static const String baziDetail = '/api/v1/bazi/detail';
   static const String aiAnalyze = '/api/v1/ai/analyze';
   static const String health = '/health';
+  
+  // 星运相关端点
+  static const String astrologyChart = '/api/v1/astrology/chart';
+  static const String astrologyReport = '/api/v1/astrology/report';
+  static const String astrologyTransits = '/api/v1/astrology/transits';
+  static const String astrologyProgressions = '/api/v1/astrology/progressions';
+  static const String astrologyAspectPatterns = '/api/v1/astrology/aspect-patterns';
+  static const String astrologySynastry = '/api/v1/astrology/synastry';
+  static const String astrologySolarReturn = '/api/v1/astrology/solar-return';
+  static const String astrologySigns = '/api/v1/astrology/signs';
+  static const String astrologyPlanets = '/api/v1/astrology/planets';
+  static const String astrologyHouseSystems = '/api/v1/astrology/house-systems';
+  
+  // 运势相关端点
+  static const String fortuneToday = '/api/v1/astrology/fortune/today';
+  static const String fortuneTomorrow = '/api/v1/astrology/fortune/tomorrow';
+  static const String fortuneWeek = '/api/v1/astrology/fortune/week';
+  static const String fortuneMonth = '/api/v1/astrology/fortune/month';
 }

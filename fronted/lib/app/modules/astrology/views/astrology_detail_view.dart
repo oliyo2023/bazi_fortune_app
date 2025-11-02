@@ -448,7 +448,7 @@ class AstrologyDetailPage extends GetView<AstrologyController> {
                     Padding(
                       padding: EdgeInsets.only(left: 40.w),
                       child: Text(
-                        house.interpretation,
+                        house.sign,
                         style: TextStyle(
                           fontSize: 11.sp,
                           color: Color(0xFF999999),

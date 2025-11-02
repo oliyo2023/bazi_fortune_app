@@ -373,7 +373,7 @@ class AstrologyChartPage extends GetView<AstrologyController> {
           ),
           SizedBox(height: 8.h),
           Text(
-            houseData.interpretation,
+            houseData.sign,
             style: TextStyle(
               fontSize: 12.sp,
               color: Color(0xFF666666),

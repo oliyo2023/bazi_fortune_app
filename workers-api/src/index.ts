@@ -11,6 +11,7 @@ import { chatRoutes } from "./routes/chats";
 import { paymentsRoutes } from "./routes/payments";
 import { usersRoutes } from "./routes/users";
 import { websocketRoutes } from "./routes/websocket";
+import { astrologyRoutes } from "./routes/astrology";
 import { Env, Variables } from "./lib/auth";
 import { cache, userCache, baziCache } from "./middleware/cache";
 import {
@@ -98,6 +99,7 @@ app.route("/api/v1/chats", chatRoutes);
 app.route("/api/v1/payments", paymentsRoutes);
 app.route("/api/v1/users", usersRoutes);
 app.route("/api/v1/ws", websocketRoutes);
+app.route("/api/v1/astrology", astrologyRoutes);
 
 // 特定路由的限流和缓存
 app.post("/api/v1/auth/login", loginRateLimit);
