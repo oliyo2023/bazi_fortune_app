@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../data/services/auth_service.dart' as auth;
 
 class TestApiPage extends StatefulWidget {
+  const TestApiPage({super.key});
+
   @override
   _TestApiPageState createState() => _TestApiPageState();
 }
@@ -136,22 +138,22 @@ class _TestApiPageState extends State<TestApiPage> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _register,
-                      child: Text('注册'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         padding: EdgeInsets.symmetric(vertical: 15),
                       ),
+                      child: Text('注册'),
                     ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _login,
-                      child: Text('登录'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         padding: EdgeInsets.symmetric(vertical: 15),
                       ),
+                      child: Text('登录'),
                     ),
                   ),
                 ],

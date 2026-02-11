@@ -16,10 +16,7 @@ class RegisterPage extends GetView<RegisterController> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFE6E9F8),
-              Color(0xFFFDFBFF),
-            ],
+            colors: [Color(0xFFE6E9F8), Color(0xFFFDFBFF)],
           ),
         ),
         child: Stack(
@@ -62,7 +59,7 @@ class RegisterPage extends GetView<RegisterController> {
         height: 300.h,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Color(0xFF667EEA).withOpacity(0.1),
+          color: Color(0xFF667EEA).withValues(alpha: 0.1),
         ),
       ),
     );
@@ -81,17 +78,13 @@ class RegisterPage extends GetView<RegisterController> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF667EEA).withOpacity(0.3),
+                color: Color(0xFF667EEA).withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: Offset(0, 10),
               ),
             ],
           ),
-          child: Icon(
-            Icons.auto_awesome,
-            color: Colors.white,
-            size: 40.sp,
-          ),
+          child: Icon(Icons.auto_awesome, color: Colors.white, size: 40.sp),
         ),
         SizedBox(height: 20.h),
         Text(
@@ -105,10 +98,7 @@ class RegisterPage extends GetView<RegisterController> {
         SizedBox(height: 8.h),
         Text(
           '开启您的八字算命之旅',
-          style: TextStyle(
-            fontSize: 16.sp,
-            color: Color(0xFF6B7280),
-          ),
+          style: TextStyle(fontSize: 16.sp, color: Color(0xFF6B7280)),
         ),
       ],
     );
@@ -147,10 +137,7 @@ class RegisterPage extends GetView<RegisterController> {
               height: 50.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: Color(0xFFE8E8E8),
-                  width: 1.w,
-                ),
+                border: Border.all(color: Color(0xFFE8E8E8), width: 1.w),
                 color: Colors.white,
               ),
               child: TextFormField(
@@ -168,8 +155,15 @@ class RegisterPage extends GetView<RegisterController> {
                     fontSize: 15.sp,
                   ),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                  prefixIcon: Icon(Icons.person, color: Color(0xFF999999), size: 20),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 12.h,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.person,
+                    color: Color(0xFF999999),
+                    size: 20,
+                  ),
                 ),
                 validator: controller.validateName,
               ),
@@ -180,10 +174,7 @@ class RegisterPage extends GetView<RegisterController> {
               height: 50.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: Color(0xFFE8E8E8),
-                  width: 1.w,
-                ),
+                border: Border.all(color: Color(0xFFE8E8E8), width: 1.w),
                 color: Colors.white,
               ),
               child: Row(
@@ -198,11 +189,7 @@ class RegisterPage extends GetView<RegisterController> {
                     ),
                   ),
                   SizedBox(width: 8.w),
-                  Container(
-                    width: 1.w,
-                    height: 24.h,
-                    color: Color(0xFFE8E8E8),
-                  ),
+                  Container(width: 1.w, height: 24.h, color: Color(0xFFE8E8E8)),
                   SizedBox(width: 12.w),
                   Expanded(
                     child: TextFormField(
@@ -220,7 +207,10 @@ class RegisterPage extends GetView<RegisterController> {
                           fontSize: 15.sp,
                         ),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 12.h,
+                        ),
                       ),
                       validator: controller.validatePhone,
                     ),
@@ -234,41 +224,49 @@ class RegisterPage extends GetView<RegisterController> {
               height: 50.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: Color(0xFFE8E8E8),
-                  width: 1.w,
-                ),
+                border: Border.all(color: Color(0xFFE8E8E8), width: 1.w),
                 color: Colors.white,
               ),
-              child: Obx(() => TextFormField(
-                controller: controller.passwordController,
-                obscureText: controller.obscurePassword.value,
-                keyboardType: TextInputType.visiblePassword,
-                style: TextStyle(
-                  color: Color(0xFF333333),
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: InputDecoration(
-                  hintText: '请输入密码',
-                  hintStyle: TextStyle(
-                    color: Color(0xFF999999),
+              child: Obx(
+                () => TextFormField(
+                  controller: controller.passwordController,
+                  obscureText: controller.obscurePassword.value,
+                  keyboardType: TextInputType.visiblePassword,
+                  style: TextStyle(
+                    color: Color(0xFF333333),
                     fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
                   ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                  prefixIcon: Icon(Icons.lock, color: Color(0xFF999999), size: 20),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      controller.obscurePassword.value ? Icons.visibility_off : Icons.visibility,
+                  decoration: InputDecoration(
+                    hintText: '请输入密码',
+                    hintStyle: TextStyle(
+                      color: Color(0xFF999999),
+                      fontSize: 15.sp,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 12.h,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.lock,
                       color: Color(0xFF999999),
                       size: 20,
                     ),
-                    onPressed: controller.togglePasswordVisibility,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        controller.obscurePassword.value
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Color(0xFF999999),
+                        size: 20,
+                      ),
+                      onPressed: controller.togglePasswordVisibility,
+                    ),
                   ),
+                  validator: controller.validatePassword,
                 ),
-                validator: controller.validatePassword,
-              )),
+              ),
             ),
             SizedBox(height: 16.h),
             // 确认密码输入框
@@ -276,41 +274,49 @@ class RegisterPage extends GetView<RegisterController> {
               height: 50.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: Color(0xFFE8E8E8),
-                  width: 1.w,
-                ),
+                border: Border.all(color: Color(0xFFE8E8E8), width: 1.w),
                 color: Colors.white,
               ),
-              child: Obx(() => TextFormField(
-                controller: controller.confirmPasswordController,
-                obscureText: controller.obscureConfirmPassword.value,
-                keyboardType: TextInputType.visiblePassword,
-                style: TextStyle(
-                  color: Color(0xFF333333),
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: InputDecoration(
-                  hintText: '请确认密码',
-                  hintStyle: TextStyle(
-                    color: Color(0xFF999999),
+              child: Obx(
+                () => TextFormField(
+                  controller: controller.confirmPasswordController,
+                  obscureText: controller.obscureConfirmPassword.value,
+                  keyboardType: TextInputType.visiblePassword,
+                  style: TextStyle(
+                    color: Color(0xFF333333),
                     fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
                   ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                  prefixIcon: Icon(Icons.lock_outline, color: Color(0xFF999999), size: 20),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      controller.obscureConfirmPassword.value ? Icons.visibility_off : Icons.visibility,
+                  decoration: InputDecoration(
+                    hintText: '请确认密码',
+                    hintStyle: TextStyle(
+                      color: Color(0xFF999999),
+                      fontSize: 15.sp,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 12.h,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.lock_outline,
                       color: Color(0xFF999999),
                       size: 20,
                     ),
-                    onPressed: controller.toggleConfirmPasswordVisibility,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        controller.obscureConfirmPassword.value
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Color(0xFF999999),
+                        size: 20,
+                      ),
+                      onPressed: controller.toggleConfirmPasswordVisibility,
+                    ),
                   ),
+                  validator: controller.validateConfirmPassword,
                 ),
-                validator: controller.validateConfirmPassword,
-              )),
+              ),
             ),
           ],
         ),
@@ -319,34 +325,33 @@ class RegisterPage extends GetView<RegisterController> {
   }
 
   Widget _buildRegisterButton() {
-    return Obx(() => ElevatedButton(
-      onPressed: controller.isLoading.value ? null : controller.register,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFF667EEA),
-        foregroundColor: Colors.white,
-        minimumSize: Size(double.infinity, 50.h),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
+    return Obx(
+      () => ElevatedButton(
+        onPressed: controller.isLoading.value ? null : controller.register,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Color(0xFF667EEA),
+          foregroundColor: Colors.white,
+          minimumSize: Size(double.infinity, 50.h),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          elevation: 0,
         ),
-        elevation: 0,
+        child: controller.isLoading.value
+            ? SizedBox(
+                width: 20.w,
+                height: 20.h,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : Text(
+                '注册',
+                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+              ),
       ),
-      child: controller.isLoading.value
-          ? SizedBox(
-              width: 20.w,
-              height: 20.h,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2,
-              ),
-            )
-          : Text(
-              '注册',
-              style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-    ));
+    );
   }
 
   Widget _buildLoginLink() {
@@ -355,10 +360,7 @@ class RegisterPage extends GetView<RegisterController> {
       children: [
         Text(
           '已有账号？',
-          style: TextStyle(
-            color: Color(0xFF6B7280),
-            fontSize: 14.sp,
-          ),
+          style: TextStyle(color: Color(0xFF6B7280), fontSize: 14.sp),
         ),
         TextButton(
           onPressed: controller.goToLogin,

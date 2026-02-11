@@ -8,11 +8,11 @@ class EnhancedBaziPreviewCard extends StatelessWidget {
   final bool isLunarCalendar;
 
   const EnhancedBaziPreviewCard({
-    Key? key,
+    super.key,
     required this.birthDate,
     required this.birthTime,
     this.isLunarCalendar = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

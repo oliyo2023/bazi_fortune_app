@@ -5,6 +5,8 @@ import '../controllers/fortune_controller.dart';
 import '../models/astrology_model.dart' as astro;
 
 class FortuneView extends GetView<FortuneController> {
+  const FortuneView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,11 +32,11 @@ class FortuneView extends GetView<FortuneController> {
             // 出生信息输入区域
             _buildBirthInfoSection(),
             SizedBox(height: 20.h),
-            
+
             // 运势类型选择
             _buildFortuneTypeSelector(),
             SizedBox(height: 20.h),
-            
+
             // 运势内容显示
             Obx(() => _buildFortuneContent()),
           ],
@@ -52,7 +54,7 @@ class FortuneView extends GetView<FortuneController> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, 2),
           ),
@@ -70,7 +72,7 @@ class FortuneView extends GetView<FortuneController> {
             ),
           ),
           SizedBox(height: 12.h),
-          
+
           // 日期时间输入
           Row(
             children: [
@@ -84,14 +86,22 @@ class FortuneView extends GetView<FortuneController> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.r),
-                      borderSide: BorderSide(color: Color(0xFF667EEA), width: 2),
+                      borderSide: BorderSide(
+                        color: Color(0xFF667EEA),
+                        width: 2,
+                      ),
                     ),
-                    prefixIcon: Icon(Icons.calendar_today, color: Color(0xFF667EEA)),
+                    prefixIcon: Icon(
+                      Icons.calendar_today,
+                      color: Color(0xFF667EEA),
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
                     final year = int.tryParse(value);
-                    if (year != null) controller.updateBirthData(year: year);
+                    if (year != null) {
+                      controller.updateBirthData(year: year);
+                    }
                   },
                 ),
               ),
@@ -106,14 +116,22 @@ class FortuneView extends GetView<FortuneController> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.r),
-                      borderSide: BorderSide(color: Color(0xFF667EEA), width: 2),
+                      borderSide: BorderSide(
+                        color: Color(0xFF667EEA),
+                        width: 2,
+                      ),
                     ),
-                    prefixIcon: Icon(Icons.calendar_month, color: Color(0xFF667EEA)),
+                    prefixIcon: Icon(
+                      Icons.calendar_month,
+                      color: Color(0xFF667EEA),
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
                     final month = int.tryParse(value);
-                    if (month != null) controller.updateBirthData(month: month);
+                    if (month != null) {
+                      controller.updateBirthData(month: month);
+                    }
                   },
                 ),
               ),
@@ -128,21 +146,29 @@ class FortuneView extends GetView<FortuneController> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.r),
-                      borderSide: BorderSide(color: Color(0xFF667EEA), width: 2),
+                      borderSide: BorderSide(
+                        color: Color(0xFF667EEA),
+                        width: 2,
+                      ),
                     ),
-                    prefixIcon: Icon(Icons.calendar_today, color: Color(0xFF667EEA)),
+                    prefixIcon: Icon(
+                      Icons.calendar_today,
+                      color: Color(0xFF667EEA),
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
                     final day = int.tryParse(value);
-                    if (day != null) controller.updateBirthData(day: day);
+                    if (day != null) {
+                      controller.updateBirthData(day: day);
+                    }
                   },
                 ),
               ),
             ],
           ),
           SizedBox(height: 12.h),
-          
+
           // 时间输入
           Row(
             children: [
@@ -156,14 +182,22 @@ class FortuneView extends GetView<FortuneController> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.r),
-                      borderSide: BorderSide(color: Color(0xFF667EEA), width: 2),
+                      borderSide: BorderSide(
+                        color: Color(0xFF667EEA),
+                        width: 2,
+                      ),
                     ),
-                    prefixIcon: Icon(Icons.access_time, color: Color(0xFF667EEA)),
+                    prefixIcon: Icon(
+                      Icons.access_time,
+                      color: Color(0xFF667EEA),
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
                     final hour = int.tryParse(value);
-                    if (hour != null) controller.updateBirthData(hour: hour);
+                    if (hour != null) {
+                      controller.updateBirthData(hour: hour);
+                    }
                   },
                 ),
               ),
@@ -178,21 +212,29 @@ class FortuneView extends GetView<FortuneController> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.r),
-                      borderSide: BorderSide(color: Color(0xFF667EEA), width: 2),
+                      borderSide: BorderSide(
+                        color: Color(0xFF667EEA),
+                        width: 2,
+                      ),
                     ),
-                    prefixIcon: Icon(Icons.access_time, color: Color(0xFF667EEA)),
+                    prefixIcon: Icon(
+                      Icons.access_time,
+                      color: Color(0xFF667EEA),
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
                     final minute = int.tryParse(value);
-                    if (minute != null) controller.updateBirthData(minute: minute);
+                    if (minute != null) {
+                      controller.updateBirthData(minute: minute);
+                    }
                   },
                 ),
               ),
             ],
           ),
           SizedBox(height: 12.h),
-          
+
           // 城市输入
           TextField(
             decoration: InputDecoration(
@@ -208,7 +250,9 @@ class FortuneView extends GetView<FortuneController> {
               prefixIcon: Icon(Icons.location_city, color: Color(0xFF667EEA)),
             ),
             onChanged: (value) {
-              if (value.isNotEmpty) controller.updateBirthData(city: value);
+              if (value.isNotEmpty) {
+                controller.updateBirthData(city: value);
+              }
             },
           ),
         ],
@@ -225,7 +269,7 @@ class FortuneView extends GetView<FortuneController> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, 2),
           ),
@@ -243,40 +287,48 @@ class FortuneView extends GetView<FortuneController> {
             ),
           ),
           SizedBox(height: 12.h),
-          
+
           // 运势类型按钮
           Row(
             children: [
               Expanded(
-                child: Obx(() => _buildFortuneTypeButton(
-                  '今日',
-                  'today',
-                  controller.selectedFortuneType.value == 'today',
-                )),
+                child: Obx(
+                  () => _buildFortuneTypeButton(
+                    '今日',
+                    'today',
+                    controller.selectedFortuneType.value == 'today',
+                  ),
+                ),
               ),
               SizedBox(width: 8.w),
               Expanded(
-                child: Obx(() => _buildFortuneTypeButton(
-                  '明日',
-                  'tomorrow',
-                  controller.selectedFortuneType.value == 'tomorrow',
-                )),
+                child: Obx(
+                  () => _buildFortuneTypeButton(
+                    '明日',
+                    'tomorrow',
+                    controller.selectedFortuneType.value == 'tomorrow',
+                  ),
+                ),
               ),
               SizedBox(width: 8.w),
               Expanded(
-                child: Obx(() => _buildFortuneTypeButton(
-                  '本周',
-                  'week',
-                  controller.selectedFortuneType.value == 'week',
-                )),
+                child: Obx(
+                  () => _buildFortuneTypeButton(
+                    '本周',
+                    'week',
+                    controller.selectedFortuneType.value == 'week',
+                  ),
+                ),
               ),
               SizedBox(width: 8.w),
               Expanded(
-                child: Obx(() => _buildFortuneTypeButton(
-                  '本月',
-                  'month',
-                  controller.selectedFortuneType.value == 'month',
-                )),
+                child: Obx(
+                  () => _buildFortuneTypeButton(
+                    '本月',
+                    'month',
+                    controller.selectedFortuneType.value == 'month',
+                  ),
+                ),
               ),
             ],
           ),
@@ -330,7 +382,7 @@ class FortuneView extends GetView<FortuneController> {
   // 构建运势内容
   Widget _buildFortuneContent() {
     final currentFortune = controller.currentFortune;
-    
+
     if (currentFortune == null) {
       return Container(
         padding: EdgeInsets.all(32.w),
@@ -339,7 +391,7 @@ class FortuneView extends GetView<FortuneController> {
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: Offset(0, 2),
             ),
@@ -347,19 +399,12 @@ class FortuneView extends GetView<FortuneController> {
         ),
         child: Column(
           children: [
-            Icon(
-              Icons.auto_awesome,
-              size: 48.w,
-              color: Color(0xFF667EEA),
-            ),
+            Icon(Icons.auto_awesome, size: 48.w, color: Color(0xFF667EEA)),
             SizedBox(height: 16.h),
             Text(
               '请选择运势类型查看详细内容',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: Color(0xFF666666),
-              ),
+              style: TextStyle(fontSize: 16.sp, color: Color(0xFF666666)),
             ),
           ],
         ),
@@ -372,15 +417,15 @@ class FortuneView extends GetView<FortuneController> {
         // 整体运势评分
         _buildOverallScore(currentFortune),
         SizedBox(height: 20.h),
-        
+
         // 生活领域评分
         _buildLifeAreas(currentFortune),
         SizedBox(height: 20.h),
-        
+
         // 关键行运
         _buildKeyTransits(currentFortune),
         SizedBox(height: 20.h),
-        
+
         // 建议和提醒
         _buildAdvice(currentFortune),
       ],
@@ -396,7 +441,7 @@ class FortuneView extends GetView<FortuneController> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, 2),
           ),
@@ -436,16 +481,18 @@ class FortuneView extends GetView<FortuneController> {
             ],
           ),
           SizedBox(height: 12.h),
-          
+
           // 评分进度条
           LinearProgressIndicator(
             value: fortune.overallScore,
             backgroundColor: Color(0xFFE0E0E0),
-            valueColor: AlwaysStoppedAnimation<Color>(controller.getScoreColor(fortune.overallScore)),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              controller.getScoreColor(fortune.overallScore),
+            ),
             minHeight: 8.h,
           ),
           SizedBox(height: 8.h),
-          
+
           // 评分数字
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -486,7 +533,7 @@ class FortuneView extends GetView<FortuneController> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, 2),
           ),
@@ -504,21 +551,29 @@ class FortuneView extends GetView<FortuneController> {
             ),
           ),
           SizedBox(height: 16.h),
-          
+
           // 生活领域项目
           Row(
             children: [
-              Expanded(child: _buildLifeAreaItem('career', fortune.lifeAreas.career)),
+              Expanded(
+                child: _buildLifeAreaItem('career', fortune.lifeAreas.career),
+              ),
               SizedBox(width: 12.w),
-              Expanded(child: _buildLifeAreaItem('love', fortune.lifeAreas.love)),
+              Expanded(
+                child: _buildLifeAreaItem('love', fortune.lifeAreas.love),
+              ),
             ],
           ),
           SizedBox(height: 12.h),
           Row(
             children: [
-              Expanded(child: _buildLifeAreaItem('health', fortune.lifeAreas.health)),
+              Expanded(
+                child: _buildLifeAreaItem('health', fortune.lifeAreas.health),
+              ),
               SizedBox(width: 12.w),
-              Expanded(child: _buildLifeAreaItem('wealth', fortune.lifeAreas.wealth)),
+              Expanded(
+                child: _buildLifeAreaItem('wealth', fortune.lifeAreas.wealth),
+              ),
             ],
           ),
         ],
@@ -555,16 +610,18 @@ class FortuneView extends GetView<FortuneController> {
             ],
           ),
           SizedBox(height: 8.h),
-          
+
           // 评分进度条
           LinearProgressIndicator(
             value: score,
             backgroundColor: Color(0xFFE0E0E0),
-            valueColor: AlwaysStoppedAnimation<Color>(controller.getScoreColor(score)),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              controller.getScoreColor(score),
+            ),
             minHeight: 6.h,
           ),
           SizedBox(height: 4.h),
-          
+
           // 评分
           Text(
             '${(score * 100).toInt()}%',
@@ -592,7 +649,7 @@ class FortuneView extends GetView<FortuneController> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, 2),
           ),
@@ -610,7 +667,7 @@ class FortuneView extends GetView<FortuneController> {
             ),
           ),
           SizedBox(height: 16.h),
-          
+
           // 行运列表
           ...fortune.keyTransits.map((transit) => _buildTransitItem(transit)),
         ],
@@ -675,23 +732,22 @@ class FortuneView extends GetView<FortuneController> {
             ],
           ),
           SizedBox(height: 8.h),
-          
+
           // 强度指示器
           Row(
             children: [
               Text(
                 '强度',
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: Color(0xFF999999),
-                ),
+                style: TextStyle(fontSize: 12.sp, color: Color(0xFF999999)),
               ),
               SizedBox(width: 8.w),
               Expanded(
                 child: LinearProgressIndicator(
                   value: transit.intensity,
                   backgroundColor: Color(0xFFE0E0E0),
-                  valueColor: AlwaysStoppedAnimation<Color>(controller.getScoreColor(transit.intensity)),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    controller.getScoreColor(transit.intensity),
+                  ),
                   minHeight: 4.h,
                 ),
               ),
@@ -720,7 +776,7 @@ class FortuneView extends GetView<FortuneController> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: Offset(0, 2),
           ),
@@ -731,11 +787,7 @@ class FortuneView extends GetView<FortuneController> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.lightbulb,
-                color: Color(0xFF667EEA),
-                size: 20.w,
-              ),
+              Icon(Icons.lightbulb, color: Color(0xFF667EEA), size: 20.w),
               SizedBox(width: 8.w),
               Text(
                 '建议与提醒',

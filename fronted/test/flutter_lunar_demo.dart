@@ -1,13 +1,15 @@
 // Flutter lunar库集成演示测试
 import 'package:flutter/material.dart';
 import 'package:lunar/lunar.dart';
-import '../lib/app/utils/bazi_calculator.dart';
+import 'package:bazi_fortune_app/app/utils/bazi_calculator.dart';
 
 void main() {
   runApp(LunarDemoApp());
 }
 
 class LunarDemoApp extends StatelessWidget {
+  const LunarDemoApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,6 +24,8 @@ class LunarDemoApp extends StatelessWidget {
 }
 
 class LunarDemoPage extends StatefulWidget {
+  const LunarDemoPage({super.key});
+
   @override
   _LunarDemoPageState createState() => _LunarDemoPageState();
 }

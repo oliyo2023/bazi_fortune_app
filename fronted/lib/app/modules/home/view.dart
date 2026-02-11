@@ -48,7 +48,6 @@ class HomePage extends GetView<HomeController> {
           ),
         ),
       ),
-
     );
   }
 
@@ -149,11 +148,7 @@ class HomePage extends GetView<HomeController> {
                         colors: [Color(0xFF8A65F0), Color(0xFF6B46C1)],
                       ),
                     ),
-                    child: Icon(
-                      Icons.wb_sunny,
-                      size: 24,
-                      color: Colors.white,
-                    ),
+                    child: Icon(Icons.wb_sunny, size: 24, color: Colors.white),
                   ),
                 ],
               ),
@@ -187,7 +182,10 @@ class HomePage extends GetView<HomeController> {
                 child: Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.green.shade500,
                         borderRadius: BorderRadius.circular(20),
@@ -221,7 +219,10 @@ class HomePage extends GetView<HomeController> {
                 child: Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.red.shade500,
                         borderRadius: BorderRadius.circular(20),
@@ -258,7 +259,13 @@ class HomePage extends GetView<HomeController> {
 
   // 排盘类型切换
   Widget _buildChartTypeTabs() {
-    final chartTypes = ['four_pillar_chart'.tr, 'ziwei_chart'.tr, 'qimen_chart'.tr, 'liuyao_chart'.tr, 'meihua_chart'.tr];
+    final chartTypes = [
+      'four_pillar_chart'.tr,
+      'ziwei_chart'.tr,
+      'qimen_chart'.tr,
+      'liuyao_chart'.tr,
+      'meihua_chart'.tr,
+    ];
     return SizedBox(
       height: 40,
       child: ListView.builder(
@@ -317,7 +324,10 @@ class HomePage extends GetView<HomeController> {
             // 性别选择（优化尺寸，使页面更精致）
             Row(
               children: [
-                Text('${'gender'.tr}:', style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                Text(
+                  '${'gender'.tr}:',
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                ),
                 SizedBox(width: 16),
                 Obx(() {
                   final sel = controller.selectedGender.value;
@@ -326,12 +336,19 @@ class HomePage extends GetView<HomeController> {
                     return GestureDetector(
                       onTap: () => controller.selectGender(index),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
-                          color: active ? const Color(0xFFEDE7FF) : Colors.white,
+                          color: active
+                              ? const Color(0xFFEDE7FF)
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(18),
                           border: Border.all(
-                            color: active ? const Color(0xFF8A65F0) : Colors.grey.shade300,
+                            color: active
+                                ? const Color(0xFF8A65F0)
+                                : Colors.grey.shade300,
                             width: 1.2,
                           ),
                         ),
@@ -343,21 +360,23 @@ class HomePage extends GetView<HomeController> {
                               height: 20,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: active ? const Color(0xFF8A65F0) : Colors.grey.shade300,
+                                color: active
+                                    ? const Color(0xFF8A65F0)
+                                    : Colors.grey.shade300,
                               ),
-                              child: Icon(
-                                icon,
-                                color: Colors.white,
-                                size: 14,
-                              ),
+                              child: Icon(icon, color: Colors.white, size: 14),
                             ),
                             const SizedBox(width: 4),
                             Text(
                               label,
                               style: TextStyle(
                                 fontSize: 12,
-                                fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-                                color: active ? const Color(0xFF8A65F0) : Colors.black87,
+                                fontWeight: active
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                color: active
+                                    ? const Color(0xFF8A65F0)
+                                    : Colors.black87,
                               ),
                             ),
                           ],
@@ -383,7 +402,10 @@ class HomePage extends GetView<HomeController> {
               onTap: () => controller.pickBirthDateTime(context),
               child: Row(
                 children: [
-                  Text('${'birth_info'.tr}:', style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                  Text(
+                    '${'birth_info'.tr}:',
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                  ),
                   SizedBox(width: 16),
                   Expanded(
                     child: Obx(() {
@@ -393,7 +415,8 @@ class HomePage extends GetView<HomeController> {
                         text = 'please_select_birth'.tr;
                       } else {
                         // 直接格式化日期时间字符串，不使用trParams
-                        text = '${dt.year}年${dt.month}月${dt.day}日${dt.hour.toString().padLeft(2, '0')}时${dt.minute.toString().padLeft(2, '0')}分';
+                        text =
+                            '${dt.year}年${dt.month}月${dt.day}日${dt.hour.toString().padLeft(2, '0')}时${dt.minute.toString().padLeft(2, '0')}分';
                       }
                       return Text(
                         text,
@@ -414,7 +437,10 @@ class HomePage extends GetView<HomeController> {
               onTap: () => controller.pickRegion(context),
               child: Row(
                 children: [
-                  Text('${'birth_region'.tr}:', style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                  Text(
+                    '${'birth_region'.tr}:',
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                  ),
                   SizedBox(width: 16),
                   Expanded(
                     child: Obx(() {
@@ -430,16 +456,22 @@ class HomePage extends GetView<HomeController> {
                     }),
                   ),
                   const SizedBox(width: 12),
-                  Text('${'true_solar_time'.tr}:', style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                  Text(
+                    '${'true_solar_time'.tr}:',
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                  ),
                   const SizedBox(width: 8),
-                  Obx(() => Checkbox(
-                        value: controller.trueSolarTime.value,
-                        onChanged: (v) => controller.trueSolarTime.value = v ?? false,
-                        shape: const CircleBorder(),
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        visualDensity: VisualDensity.compact,
-                        activeColor: Color(0xFF8A65F0),
-                      )),
+                  Obx(
+                    () => Checkbox(
+                      value: controller.trueSolarTime.value,
+                      onChanged: (v) =>
+                          controller.trueSolarTime.value = v ?? false,
+                      shape: const CircleBorder(),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                      activeColor: Color(0xFF8A65F0),
+                    ),
+                  ),
                   const SizedBox(width: 8),
                   Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
                 ],
@@ -449,7 +481,10 @@ class HomePage extends GetView<HomeController> {
             // 姓名输入 + 保存开关 + 分组
             Row(
               children: [
-                Text('${'name'.tr}:', style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                Text(
+                  '${'name'.tr}:',
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                ),
                 SizedBox(width: 16),
                 Expanded(
                   child: TextField(
@@ -464,50 +499,77 @@ class HomePage extends GetView<HomeController> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text('save'.tr, style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                Text(
+                  'save'.tr,
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                ),
                 const SizedBox(width: 6),
-                Obx(() => Switch(
-                      value: controller.saveRecord.value,
-                      onChanged: (v) => controller.saveRecord.value = v,
-                      activeThumbColor: Color(0xFF8A65F0),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    )),
+                Obx(
+                  () => Switch(
+                    value: controller.saveRecord.value,
+                    onChanged: (v) => controller.saveRecord.value = v,
+                    activeThumbColor: Color(0xFF8A65F0),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
                 const SizedBox(width: 8),
-                Obx(() => PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      onSelected: (v) => controller.groupName.value = v,
-                      itemBuilder: (ctx) => [
-                        PopupMenuItem(value: 'ungrouped', child: Text('ungrouped'.tr)),
-                        PopupMenuItem(value: 'family', child: Text('family'.tr)),
-                        PopupMenuItem(value: 'friends', child: Text('friends'.tr)),
-                      ],
-                      child: Row(
-                        children: [
-                          Text(controller.groupName.value,
-                              style: const TextStyle(color: Color(0xFF8A65F0), fontSize: 14)),
-                          const Icon(Icons.arrow_drop_down, color: Color(0xFF8A65F0), size: 20),
-                        ],
+                Obx(
+                  () => PopupMenuButton<String>(
+                    padding: EdgeInsets.zero,
+                    onSelected: (v) => controller.groupName.value = v,
+                    itemBuilder: (ctx) => [
+                      PopupMenuItem(
+                        value: 'ungrouped',
+                        child: Text('ungrouped'.tr),
                       ),
-                    )),
+                      PopupMenuItem(value: 'family', child: Text('family'.tr)),
+                      PopupMenuItem(
+                        value: 'friends',
+                        child: Text('friends'.tr),
+                      ),
+                    ],
+                    child: Row(
+                      children: [
+                        Text(
+                          controller.groupName.value,
+                          style: const TextStyle(
+                            color: Color(0xFF8A65F0),
+                            fontSize: 14,
+                          ),
+                        ),
+                        const Icon(
+                          Icons.arrow_drop_down,
+                          color: Color(0xFF8A65F0),
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
             SizedBox(height: 20),
             // 马上排盘按钮（提交，不跳转）
-            Obx(() => ElevatedButton(
-                  onPressed:
-                      controller.submitting.value ? null : controller.submitBazi,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF8A65F0),
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
+            Obx(
+              () => ElevatedButton(
+                onPressed: controller.submitting.value
+                    ? null
+                    : controller.submitBazi,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF8A65F0),
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
                   ),
-                  child: Text(
-                    controller.submitting.value ? 'submitting'.tr : 'submit_chart'.tr,
-                    style: const TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                )),
+                ),
+                child: Text(
+                  controller.submitting.value
+                      ? 'submitting'.tr
+                      : 'submit_chart'.tr,
+                  style: const TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -519,10 +581,16 @@ class HomePage extends GetView<HomeController> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildQuickActionButton(icon: Icons.people_alt, label: 'chart_compatibility'.tr),
-        _buildQuickActionButton(icon: Icons.auto_awesome, label: '星座运势', onTap: () => Get.toNamed(Routes.astrology)),
+        _buildQuickActionButton(
+          icon: Icons.people_alt,
+          label: 'chart_compatibility'.tr,
+        ),
+        _buildQuickActionButton(
+          icon: Icons.auto_awesome,
+          label: '星座运势',
+          onTap: () => Get.toNamed(Routes.astrology),
+        ),
         _buildQuickActionButton(icon: Icons.history, label: 'chart_history'.tr),
-        _buildQuickActionButton(icon: Icons.extension, label: '五子棋', onTap: () => Get.toNamed(Routes.gomoku)),
       ],
     );
   }
@@ -549,7 +617,9 @@ class HomePage extends GetView<HomeController> {
       Routes.almanacListDetail,
       arguments: {
         'type': type,
-        'items': type == 0 ? controller.suitableItems : controller.unsuitableItems,
+        'items': type == 0
+            ? controller.suitableItems
+            : controller.unsuitableItems,
         'title': type == 0 ? '宜' : '忌',
       },
     );
