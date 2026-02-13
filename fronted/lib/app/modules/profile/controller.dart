@@ -13,13 +13,17 @@ class ProfileController extends GetxController {
   final RxString yiZhu = '30'.obs;
   final RxString favorites = '0'.obs;
 
+  // 测试模式：不请求网络
+  static const bool testMode = true;
+
   @override
   void onInit() {
     super.onInit();
     // 请求基础权限（Android：存储等）
     PermissionUtil.requestEssential();
 
-    if (AuthService.to.isAuthenticated) {
+    // 测试模式下跳过网络请求
+    if (!testMode && AuthService.to.isAuthenticated) {
       loadBaziHistory();
     }
   }

@@ -212,6 +212,86 @@ class ApiService extends GetxService {
     await _tokenManager.clear();
   }
 
+  /// 发送短信验证码
+  /// [phone] 手机号
+  /// [purpose] 用途：login, register, reset_password
+  /// 返回验证码有效期（秒）
+  Future<int> sendSmsCode({
+    required String phone,
+    String purpose = 'login',
+  }) async {
+    try {
+      final requestData = {
+        'phone': phone,
+        'purpose': purpose,
+      };
+
+      final response = await _sendWithRetry(
+        'POST',
+        '$_baseUrl/api/v1/auth/send-sms',
+        body: requestData,
+      );
+
+      if (response.statusCode == 200) {
+        final body = response.body;
+        return body['expires_in'] ?? 300;
+      } else if (response.statusCode == 429) {
+        // 请求过于频繁
+        throw Exception('请求过于频繁，请稍后再试');
+      } else {
+        throw Exception('发送验证码失败: ${response.body?['message'] ?? response.statusText}');
+      }
+    } catch (e) {
+      _logger.e('发送验证码错误: $e');
+      throw Exception('发送验证码失败: ${e.toString()}');
+    }
+  }
+
+  /// 使用短信验证码登录/注册
+  /// [phone] 手机号
+  /// [code] 6位验证码
+  /// 返回登录结果，包含用户信息和是否新用户标识
+  Future<Map<String, dynamic>> loginWithSms({
+    required String phone,
+    required String code,
+  }) async {
+    try {
+      final requestData = {
+        'phone': phone,
+        'code': code,
+      };
+
+      final response = await _sendWithRetry(
+        'POST',
+        '$_baseUrl/api/v1/auth/login-with-sms',
+        body: requestData,
+      );
+
+      if (response.statusCode == 200) {
+        final body = response.body;
+        final userJson = body['user'];
+        final token = body['token'];
+        final isNew = body['is_new'] ?? false;
+
+        // 保存token
+        if (token != null && userJson != null) {
+          await _tokenManager.save(token, userJson['id']);
+        }
+
+        return {
+          'user': UserModel.fromJson(userJson),
+          'token': token,
+          'is_new': isNew,
+        };
+      } else {
+        throw Exception('登录失败: ${response.body?['message'] ?? response.statusText}');
+      }
+    } catch (e) {
+      _logger.e('验证码登录错误: $e');
+      throw Exception('登录失败: ${e.toString()}');
+    }
+  }
+
   Future<UserModel?> getCurrentUser() async {
     final uid = _tokenManager.userId;
     if (uid == null) return null;

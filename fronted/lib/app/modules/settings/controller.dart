@@ -43,17 +43,17 @@ class SettingsController extends GetxController {
   void logout() {
     Get.dialog(
       AlertDialog(
-        title: const Text('退出登录'),
-        content: const Text('确定要退出登录吗？'),
+        title: Text('logout'.tr),
+        content: Text('logout_confirm'.tr),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('取消')),
+          TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
           TextButton(
             onPressed: () {
               Get.back();
               Get.find<AuthService>().logout();
               Get.offAllNamed('/login');
             },
-            child: const Text('确定'),
+            child: Text('confirm'.tr),
           ),
         ],
       ),

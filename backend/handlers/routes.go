@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bazi_fortune_app/backend/config"
+	"bazi_fortune_app/backend/services"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -12,6 +13,7 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	// 添加全局中间件
 	r.Use(CORSMiddleware())
 	r.Use(LoggerMiddleware())
+	r.Use(I18nMiddleware())
 	r.Use(ErrorHandlerMiddleware())
 
 	// 静态资源改到 main.go 用 go:embed 挂载，避免工作目录问题
@@ -22,6 +24,10 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	aiHandler := NewAIHandler(cfg)
 	almanacHandler := NewAlmanacHandler(db, cfg)
 
+	// 创建短信服务（使用模拟服务，生产环境可替换为真实短信服务）
+	smsService := services.NewMockSmsService()
+	smsHandler := NewSmsHandler(db, smsService, cfg)
+
 	// API版本分组
 	v1 := r.Group("/api/v1")
 	{
@@ -30,6 +36,8 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		{
 			auth.POST("/register", authHandler.Register)
 			auth.POST("/login", authHandler.Login)
+			auth.POST("/send-sms", smsHandler.SendSmsCode)        // 发送短信验证码
+			auth.POST("/login-with-sms", smsHandler.LoginWithSms) // 短信验证码登录
 		}
 
 		// 需要认证的路由组
@@ -89,9 +97,11 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 			"version": "1.0.0",
 			"endpoints": gin.H{
 				"auth": gin.H{
-					"POST /api/v1/auth/register":   "用户注册",
-					"POST /api/v1/auth/login":      "用户登录",
-					"GET /api/v1/auth/profile/:id": "获取用户资料",
+					"POST /api/v1/auth/register":       "用户注册",
+					"POST /api/v1/auth/login":          "用户登录",
+					"POST /api/v1/auth/send-sms":       "发送短信验证码",
+					"POST /api/v1/auth/login-with-sms": "短信验证码登录",
+					"GET /api/v1/auth/profile/:id":     "获取用户资料",
 				},
 				"bazi": gin.H{
 					"POST /api/v1/bazi/calculate":       "计算八字",

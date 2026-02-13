@@ -13,6 +13,7 @@ type User struct {
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
 	Username  string    `gorm:"type:varchar(255);uniqueIndex" json:"username"` // 暂时允许null，后续可以添加数据填充
 	Email     string    `gorm:"type:varchar(255);uniqueIndex" json:"email"`    // 暂时允许null，后续可以添加数据填充
+	Phone     string    `gorm:"type:varchar(20);uniqueIndex" json:"phone"`     // 手机号
 	Password  string    `gorm:"type:varchar(255)" json:"-"`                    // bcrypt 哈希
 	Role      UserRole  `gorm:"type:varchar(50);not null;default:'user'" json:"role"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`

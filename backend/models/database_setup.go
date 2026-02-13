@@ -92,19 +92,33 @@ func (ds *DatabaseSetup) FullDatabaseSetup() error {
 	return nil
 }
 
-// ValidateDatabase 验证数据库设置（MySQL 兼容）
+// ValidateDatabase 验证数据库设置（SQLite/MySQL 兼容）
 func (ds *DatabaseSetup) ValidateDatabase() error {
-	// 检查表是否存在（包含 almanac_detail）
-	tables := []string{"users", "masters", "bazi_data", "chats", "messages", "orders", "earnings", "almanac_detail"}
+	// 检查表是否存在
+	tables := []string{"users", "masters", "bazi_data", "chats", "messages", "orders", "earnings", "almanac_detail", "verification_codes"}
+
+	// 检测数据库类型
+	dbType := ds.DB.Dialector.Name()
+
 	for _, table := range tables {
 		var exists bool
-		if err := ds.DB.Raw("SELECT COUNT(*) > 0 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?", table).Scan(&exists).Error; err != nil {
+		var err error
+
+		if dbType == "sqlite" {
+			// SQLite 使用 sqlite_master 表
+			err = ds.DB.Raw("SELECT COUNT(*) > 0 FROM sqlite_master WHERE type='table' AND name=?", table).Scan(&exists).Error
+		} else {
+			// MySQL 使用 information_schema.tables 表
+			err = ds.DB.Raw("SELECT COUNT(*) > 0 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?", table).Scan(&exists).Error
+		}
+
+		if err != nil {
 			return fmt.Errorf("failed to check table %s: %w", table, err)
 		}
 		if !exists {
 			return fmt.Errorf("table %s does not exist", table)
 		}
 	}
-	log.Printf("✅ Database validation passed - %d tables (index check skipped for MySQL)\n", len(tables))
+	log.Printf("✅ Database validation passed - %d tables\n", len(tables))
 	return nil
 }

@@ -27,10 +27,10 @@ class LunarDemoPage extends StatefulWidget {
   const LunarDemoPage({super.key});
 
   @override
-  _LunarDemoPageState createState() => _LunarDemoPageState();
+  State<LunarDemoPage> createState() => LunarDemoPageState();
 }
 
-class _LunarDemoPageState extends State<LunarDemoPage> {
+class LunarDemoPageState extends State<LunarDemoPage> {
   DateTime selectedDate = DateTime(1990, 8, 15);
   TimeOfDay selectedTime = TimeOfDay(hour: 14, minute: 30);
   String result = '';
@@ -68,12 +68,14 @@ class _LunarDemoPageState extends State<LunarDemoPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-            
+
             // 日期选择
             Row(
               children: [
                 Expanded(
-                  child: Text('日期: ${selectedDate.year}-${selectedDate.month}-${selectedDate.day}'),
+                  child: Text(
+                    '日期: ${selectedDate.year}-${selectedDate.month}-${selectedDate.day}',
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () => _selectDate(),
@@ -81,14 +83,16 @@ class _LunarDemoPageState extends State<LunarDemoPage> {
                 ),
               ],
             ),
-            
+
             SizedBox(height: 12),
-            
+
             // 时间选择
             Row(
               children: [
                 Expanded(
-                  child: Text('时间: ${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}'),
+                  child: Text(
+                    '时间: ${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}',
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () => _selectTime(),
@@ -96,14 +100,11 @@ class _LunarDemoPageState extends State<LunarDemoPage> {
                 ),
               ],
             ),
-            
+
             SizedBox(height: 16),
-            
+
             // 测试按钮
-            ElevatedButton(
-              onPressed: _runDemo,
-              child: Text('运行演示'),
-            ),
+            ElevatedButton(onPressed: _runDemo, child: Text('运行演示')),
           ],
         ),
       ),
@@ -139,7 +140,7 @@ class _LunarDemoPageState extends State<LunarDemoPage> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-    
+
     if (picked != null) {
       setState(() {
         selectedDate = picked;
@@ -152,7 +153,7 @@ class _LunarDemoPageState extends State<LunarDemoPage> {
       context: context,
       initialTime: selectedTime,
     );
-    
+
     if (picked != null) {
       setState(() {
         selectedTime = picked;
@@ -166,16 +167,17 @@ class _LunarDemoPageState extends State<LunarDemoPage> {
         // 1. 使用lunar库进行基本转换
         final lunar = Lunar.fromDate(selectedDate);
         final solar = lunar.getSolar();
-        
+
         // 2. 使用我们的计算工具
         final baziData = BaziCalculator.calculateBazi(
           selectedDate,
           selectedTime.hour,
           birthMinute: selectedTime.minute,
         );
-        
+
         // 3. 展示结果
-        result = '''
+        result =
+            '''
 🌟 Flutter lunar库集成演示结果：
 
 📅 基本信息：

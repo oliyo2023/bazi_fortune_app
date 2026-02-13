@@ -6,10 +6,10 @@ class TestApiPage extends StatefulWidget {
   const TestApiPage({super.key});
 
   @override
-  _TestApiPageState createState() => _TestApiPageState();
+  State<TestApiPage> createState() => TestApiPageState();
 }
 
-class _TestApiPageState extends State<TestApiPage> {
+class TestApiPageState extends State<TestApiPage> {
   final _phoneController = TextEditingController(text: '13800138006');
   final _usernameController = TextEditingController(text: 'testuser6');
   final _passwordController = TextEditingController(text: '123456');
@@ -39,7 +39,8 @@ class _TestApiPageState extends State<TestApiPage> {
       );
 
       setState(() {
-        _result = '注册成功！\n用户: ${user.name}\n手机号: ${user.phone}\n角色: ${user.role}';
+        _result =
+            '注册成功！\n用户: ${user.name}\n手机号: ${user.phone}\n角色: ${user.role}';
       });
       _showSnackBar('注册成功！');
     } catch (e) {
@@ -67,7 +68,8 @@ class _TestApiPageState extends State<TestApiPage> {
       );
 
       setState(() {
-        _result = '登录成功！\n用户: ${user.name}\n手机号: ${user.phone}\n角色: ${user.role}';
+        _result =
+            '登录成功！\n用户: ${user.name}\n手机号: ${user.phone}\n角色: ${user.role}';
       });
       _showSnackBar('登录成功！');
     } catch (e) {
@@ -85,10 +87,7 @@ class _TestApiPageState extends State<TestApiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('API测试'),
-        backgroundColor: Colors.blue,
-      ),
+      appBar: AppBar(title: Text('API测试'), backgroundColor: Colors.blue),
       body: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -167,10 +166,7 @@ class _TestApiPageState extends State<TestApiPage> {
                   color: Colors.grey[100],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
-                  _result,
-                  style: TextStyle(fontSize: 14),
-                ),
+                child: Text(_result, style: TextStyle(fontSize: 14)),
               ),
           ],
         ),

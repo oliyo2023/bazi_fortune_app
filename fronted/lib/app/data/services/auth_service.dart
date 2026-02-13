@@ -13,10 +13,16 @@ class AuthService extends GetxService {
   final Rx<UserModel?> currentUser = Rx<UserModel?>(null);
   final RxBool isLoggedIn = false.obs;
 
+  // 测试模式：不请求网络
+  static const bool testMode = true;
+
   @override
   void onInit() {
     super.onInit();
-    _checkLoginStatus();
+    // 测试模式下跳过网络请求
+    if (!testMode) {
+      _checkLoginStatus();
+    }
   }
 
   Future<void> _checkLoginStatus() async {

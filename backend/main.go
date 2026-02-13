@@ -67,6 +67,7 @@ func main() {
 		&models.Earning{},
 		&models.BaziData{},
 		&models.AlmanacDetail{},
+		&models.VerificationCode{},
 	); err != nil {
 		log.Fatalf("Failed to automigrate: %v", err)
 	}
@@ -111,7 +112,8 @@ func main() {
 
 	log.Printf("Server starting on port %s...", port)
 	log.Println("Before r.Run")
-	if err := r.Run(":" + port); err != nil {
+	// 监听所有接口，允许外部访问
+	if err := r.Run("0.0.0.0:" + port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }

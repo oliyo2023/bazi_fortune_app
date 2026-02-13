@@ -31,13 +31,6 @@ type AnalyzeRequest struct {
 	Language string `json:"language"` // zh, en
 }
 
-// AnalyzeResponse AI分析响应
-type AnalyzeResponse struct {
-	Success  bool   `json:"success"`
-	Message  string `json:"message"`
-	Analysis string `json:"analysis,omitempty"`
-}
-
 // DeepSeekRequest DeepSeek API请求结构
 type DeepSeekRequest struct {
 	Model    string    `json:"model"`
@@ -64,82 +57,62 @@ type Choice struct {
 func (h *AIHandler) Analyze(c *gin.Context) {
 	var req AnalyzeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, AnalyzeResponse{
-			Success: false,
-			Message: "Invalid request format: " + err.Error(),
-		})
+		JSONLocalizedErrorWithData(c, "invalid_request", err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	lang := GetLanguage(c)
 
 	// 解析八字ID
 	baziID, err := uuid.Parse(req.BaziID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, AnalyzeResponse{
-			Success: false,
-			Message: "Invalid bazi ID format",
-		})
+		JSONLocalizedError(c, "invalid_birthday_format", http.StatusBadRequest)
 		return
 	}
 
 	// 查询八字记录
 	var baziData models.BaziData
 	if err := models.GetDB().First(&baziData, "id = ?", baziID).Error; err != nil {
-		c.JSON(http.StatusNotFound, AnalyzeResponse{
-			Success: false,
-			Message: "Bazi record not found",
-		})
+		JSONLocalizedError(c, "no_data_found", http.StatusNotFound)
 		return
 	}
 
 	// 获取八字输入和结果数据
 	input, err := baziData.GetInputData()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, AnalyzeResponse{
-			Success: false,
-			Message: "Failed to parse input data",
-		})
+		JSONLocalizedError(c, "data_validation_failed", http.StatusInternalServerError)
 		return
 	}
 
 	result, err := baziData.GetResultData()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, AnalyzeResponse{
-			Success: false,
-			Message: "Failed to parse result data",
-		})
+		JSONLocalizedError(c, "data_validation_failed", http.StatusInternalServerError)
 		return
 	}
 
-	// 设置默认语言
+	// 设置默认语言为请求语言或上下文语言
 	if req.Language == "" {
-		req.Language = "zh"
+		req.Language = lang
 	}
 
 	// 调用DeepSeek API进行分析
 	analysis, err := h.callDeepSeekAPI(input, result, req.Language)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, AnalyzeResponse{
-			Success: false,
-			Message: "Failed to analyze with AI: " + err.Error(),
-		})
+		JSONLocalizedErrorWithData(c, "ai_service_unavailable", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// 更新八字记录的分析结果
 	baziData.Analysis = &analysis
 	if err := models.GetDB().Save(&baziData).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, AnalyzeResponse{
-			Success: false,
-			Message: "Failed to save analysis result",
-		})
+		JSONLocalizedError(c, "data_updated", http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, AnalyzeResponse{
-		Success:  true,
-		Message:  "AI analysis completed",
-		Analysis: analysis,
-	})
+	JSONLocalizedSuccess(c, "operation_successful", gin.H{
+		"analysis": analysis,
+		"language": req.Language,
+	}, http.StatusOK)
 }
 
 // callDeepSeekAPI 调用DeepSeek API

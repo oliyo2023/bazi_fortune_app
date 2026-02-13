@@ -64,7 +64,18 @@ class AstrologyListPage extends GetView<AstrologyController> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Get.back(),
+            onTap: () {
+              // 使用 try-catch 避免 GetX snackbar controller 初始化问题
+              try {
+                if (Get.isSnackbarOpen == true) {
+                  Get.closeCurrentSnackbar();
+                }
+                Get.back();
+              } catch (e) {
+                // 如果 Get.back() 失败，尝试使用 Navigator
+                Navigator.of(Get.context!).pop();
+              }
+            },
             child: Icon(
               Icons.arrow_back_ios,
               color: Color(0xFF333333),

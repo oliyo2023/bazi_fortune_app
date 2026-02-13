@@ -155,9 +155,12 @@ class HomePage extends GetView<HomeController> {
               SizedBox(height: 8),
               Row(
                 children: [
-                  Text(
-                    '${controller.yearZodiac.value} ${controller.solarDate.value}',
-                    style: TextStyle(color: Colors.grey.shade700),
+                  Flexible(
+                    child: Text(
+                      '${controller.yearZodiac.value} ${controller.solarDate.value}',
+                      style: TextStyle(color: Colors.grey.shade700),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   SizedBox(width: 8),
                   Text(

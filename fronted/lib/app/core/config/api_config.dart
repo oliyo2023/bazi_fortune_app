@@ -11,8 +11,10 @@ class ApiConfig {
       if (isWeb) {
         return 'http://localhost:8788';
       }
-      // 移动端开发环境使用公共域名
-      return 'https://bzdev.oliyo.com';
+      // 移动端开发环境使用本地后端服务
+      // Android 模拟器使用 10.0.2.2 访问宿主机
+      // 真机或 iOS 模拟器使用 localhost
+      return 'http://10.0.2.2:8081';
     }
 
     // 生产环境
