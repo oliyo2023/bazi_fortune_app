@@ -104,18 +104,31 @@ class AboutPage extends GetView<SettingsController> {
   }
 
   Widget _updateItem() {
-    return InkWell(
-      onTap: () {
-        // TODO: 触发版本检查逻辑
-        Get.snackbar('提示', '已是最新版');
-      },
-      child: _row(
-        '版本更新',
-        const Text(
-          '升级为最新版',
-          style: TextStyle(fontSize: 14, color: Color(0xFF27A6FF)),
+    return Obx(() {
+      final isChecking = controller.isCheckingUpdate.value;
+      final hasUpdate = controller.updateAvailable.value;
+      
+      return InkWell(
+        onTap: isChecking ? null : () {
+          controller.checkForUpdate();
+        },
+        child: _row(
+          '版本更新',
+          isChecking
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(
+                  hasUpdate ? '点击更新' : '升级为最新版',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: hasUpdate ? const Color(0xFFFF6B35) : const Color(0xFF27A6FF),
+                  ),
+                ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

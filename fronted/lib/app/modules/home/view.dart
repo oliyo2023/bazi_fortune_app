@@ -60,7 +60,7 @@ class HomePage extends GetView<HomeController> {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(13),
+            color: Colors.black.withValues(alpha: 13 / 255),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),
@@ -118,7 +118,7 @@ class HomePage extends GetView<HomeController> {
   Widget _buildAlmanacCard() {
     return Card(
       elevation: 2,
-      color: Colors.white.withAlpha(204), // 加点透明度，更有层次感
+      color: Colors.white.withValues(alpha: 204 / 255), // 加点透明度，更有层次感
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         padding: EdgeInsets.all(16),
@@ -436,49 +436,52 @@ class HomePage extends GetView<HomeController> {
             ),
             Divider(height: 30),
             // 出生地区
-            InkWell(
-              onTap: () => controller.pickRegion(context),
-              child: Row(
-                children: [
-                  Text(
-                    '${'birth_region'.tr}:',
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Obx(() {
-                      final region = controller.birthRegion.value;
-                      final has = region.isNotEmpty;
-                      return Text(
+            Row(
+              children: [
+                Text(
+                  '${'birth_region'.tr}:',
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Obx(() {
+                    final region = controller.birthRegion.value;
+                    final has = region.isNotEmpty;
+                    return GestureDetector(
+                      onTap: () => controller.pickRegion(context),
+                      child: Text(
                         has ? region : 'click_to_select'.tr,
                         style: TextStyle(
                           fontSize: 14,
                           color: has ? Colors.black87 : Colors.grey,
                         ),
-                      );
-                    }),
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
+            Divider(height: 30),
+            // 真太阳时开关
+            Row(
+              children: [
+                Text(
+                  '${'true_solar_time'.tr}:',
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                ),
+                const Spacer(),
+                Obx(
+                  () => Checkbox(
+                    value: controller.trueSolarTime.value,
+                    onChanged: (v) =>
+                        controller.trueSolarTime.value = v ?? false,
+                    shape: const CircleBorder(),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                    activeColor: Color(0xFF8A65F0),
                   ),
-                  const SizedBox(width: 12),
-                  Text(
-                    '${'true_solar_time'.tr}:',
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
-                  ),
-                  const SizedBox(width: 8),
-                  Obx(
-                    () => Checkbox(
-                      value: controller.trueSolarTime.value,
-                      onChanged: (v) =>
-                          controller.trueSolarTime.value = v ?? false,
-                      shape: const CircleBorder(),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: VisualDensity.compact,
-                      activeColor: Color(0xFF8A65F0),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-                ],
-              ),
+                ),
+              ],
             ),
             Divider(height: 30),
             // 姓名输入 + 保存开关 + 分组
@@ -587,13 +590,26 @@ class HomePage extends GetView<HomeController> {
         _buildQuickActionButton(
           icon: Icons.people_alt,
           label: 'chart_compatibility'.tr,
+          onTap: () => Get.snackbar(
+            '提示',
+            '合盘功能即将上线',
+            snackPosition: SnackPosition.BOTTOM,
+          ),
         ),
         _buildQuickActionButton(
           icon: Icons.auto_awesome,
           label: '星座运势',
           onTap: () => Get.toNamed(Routes.astrology),
         ),
-        _buildQuickActionButton(icon: Icons.history, label: 'chart_history'.tr),
+        _buildQuickActionButton(
+          icon: Icons.history,
+          label: 'chart_history'.tr,
+          onTap: () => Get.snackbar(
+            '提示',
+            '排盘记录功能即将上线',
+            snackPosition: SnackPosition.BOTTOM,
+          ),
+        ),
       ],
     );
   }
