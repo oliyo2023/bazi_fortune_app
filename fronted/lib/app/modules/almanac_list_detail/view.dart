@@ -16,7 +16,7 @@ class AlmanacListDetailPage extends GetView<AlmanacListDetailController> {
         }),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         elevation: 0,
         backgroundColor: Colors.white,
@@ -191,7 +191,9 @@ class AlmanacListDetailPage extends GetView<AlmanacListDetailController> {
                   ),
                 ),
                 Icon(
-                  controller.type.value == 0 ? Icons.check_circle : Icons.cancel,
+                  controller.type.value == 0
+                      ? Icons.check_circle
+                      : Icons.cancel,
                   color: controller.type.value == 0
                       ? Color(0xFF4CAF50)
                       : Color(0xFFF44336),

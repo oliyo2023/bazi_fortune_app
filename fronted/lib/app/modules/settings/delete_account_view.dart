@@ -7,7 +7,11 @@ class DeleteAccountPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final divider = const Divider(height: 1, thickness: 0.5, color: Color(0xFFEDEDED));
+    final divider = const Divider(
+      height: 1,
+      thickness: 0.5,
+      color: Color(0xFFEDEDED),
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -15,13 +19,20 @@ class DeleteAccountPage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
-          onPressed: () => Get.back(),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black87,
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         centerTitle: true,
         title: const Text(
           '注销账号',
-          style: TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: Color(0xFF1A1A1A),
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
       body: Column(
@@ -37,12 +48,20 @@ class DeleteAccountPage extends StatelessWidget {
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.error_outline, color: Color(0xFFE53935), size: 26),
+                  child: Icon(
+                    Icons.error_outline,
+                    color: Color(0xFFE53935),
+                    size: 26,
+                  ),
                 ),
                 SizedBox(height: 10),
                 Text(
                   '开始注销前，请先确认以下内容',
-                  style: TextStyle(fontSize: 15, color: Color(0xFF1F1F1F), fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Color(0xFF1F1F1F),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 SizedBox(height: 4),
                 Text(
@@ -57,25 +76,16 @@ class DeleteAccountPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 const SizedBox(height: 16),
-                _requirementItem(
-                  '当前账号无任何剩余资产',
-                  '当前账号无剩余待使用优惠券或未使用的钱包余额',
-                ),
+                _requirementItem('当前账号无任何剩余资产', '当前账号无剩余待使用优惠券或未使用的钱包余额'),
                 divider,
-                _requirementItem(
-                  '当前账号无未完成的订单',
-                  '无未完成的咨询、付费订单或服务',
-                ),
+                _requirementItem('当前账号无未完成的订单', '无未完成的咨询、付费订单或服务'),
                 divider,
                 _requirementItem(
                   '当前账号无任何违规行为',
                   '包括但不限于有未处处理的投诉/举报，因违规行为造成的系统惩罚或其他争议未完结的行为',
                 ),
                 divider,
-                _requirementItem(
-                  '当前账号无其他异常',
-                  '指30天内无异常登录行为或当前账号非被限制或暂停状态',
-                ),
+                _requirementItem('当前账号无其他异常', '指30天内无异常登录行为或当前账号非被限制或暂停状态'),
                 const SizedBox(height: 24),
               ],
             ),
@@ -106,7 +116,10 @@ class DeleteAccountPage extends StatelessWidget {
               RichText(
                 text: TextSpan(
                   text: '如需任何帮助，请联系',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFFB3B3B3)),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFFB3B3B3),
+                  ),
                   children: [
                     WidgetSpan(
                       alignment: PlaceholderAlignment.middle,
@@ -166,12 +179,20 @@ class DeleteAccountPage extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontSize: 15, color: Color(0xFF1F1F1F), fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Color(0xFF1F1F1F),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   subTitle,
-                  style: const TextStyle(fontSize: 13, color: Color(0xFF999999), height: 1.5),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF999999),
+                    height: 1.5,
+                  ),
                 ),
               ],
             ),

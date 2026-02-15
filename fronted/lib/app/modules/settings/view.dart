@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'controller.dart';
 import '../../core/values/app_colors.dart';
+import '../../core/values/app_urls.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/language_switcher.dart';
 import 'about_view.dart';
@@ -14,19 +15,30 @@ class SettingsPage extends GetView<SettingsController> {
 
   @override
   Widget build(BuildContext context) {
-    final divider = const Divider(height: 1, thickness: 0.5, color: Color(0xFFEDEDED));
+    final divider = const Divider(
+      height: 1,
+      thickness: 0.5,
+      color: Color(0xFFEDEDED),
+    );
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
-          onPressed: () => Get.back(),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black87,
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'settings'.tr,
-          style: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            color: Color(0xFF1A1A1A),
+            fontWeight: FontWeight.w600,
+          ),
         ),
         centerTitle: true,
       ),
@@ -39,23 +51,25 @@ class SettingsPage extends GetView<SettingsController> {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
-               _buildLanguageItem(),
-               divider,
-               _buildPlainItem(
-                 title: 'category_selection'.tr,
-                 onTap: () {
-                   Get.to(const CategorySelectPage());
-                 },
-               ),
-               divider,
-               Obx(() => _buildPlainItem(
-                     title: 'edit_identity'.tr,
-                     rightText: controller.userRole.value,
-                     onTap: () {
-                       // TODO: 跳转到身份修改页
-                     },
-                   )),
-               divider,
+                _buildLanguageItem(),
+                divider,
+                _buildPlainItem(
+                  title: 'category_selection'.tr,
+                  onTap: () {
+                    Get.to(const CategorySelectPage());
+                  },
+                ),
+                divider,
+                Obx(
+                  () => _buildPlainItem(
+                    title: 'edit_identity'.tr,
+                    rightText: controller.userRole.value,
+                    onTap: () {
+                      // TODO: 跳转到身份修改页
+                    },
+                  ),
+                ),
+                divider,
                 _buildPlainItem(
                   title: 'about_us'.tr,
                   onTap: () {
@@ -66,20 +80,24 @@ class SettingsPage extends GetView<SettingsController> {
                 _buildPlainItem(
                   title: 'user_agreement'.tr,
                   onTap: () {
-                    Get.to(() => WebviewPage(
-                      title: 'user_agreement'.tr,
-                      url: 'https://www.baidu.com',
-                    ));
+                    Get.to(
+                      () => WebviewPage(
+                        title: 'user_agreement'.tr,
+                        url: AppUrls.userAgreement,
+                      ),
+                    );
                   },
                 ),
                 divider,
                 _buildPlainItem(
                   title: 'privacy_policy'.tr,
                   onTap: () {
-                    Get.to(() => WebviewPage(
-                      title: 'privacy_policy'.tr,
-                      url: 'https://www.oschina.net',
-                    ));
+                    Get.to(
+                      () => WebviewPage(
+                        title: 'privacy_policy'.tr,
+                        url: AppUrls.privacyPolicy,
+                      ),
+                    );
                   },
                 ),
                 divider,
@@ -135,10 +153,17 @@ class SettingsPage extends GetView<SettingsController> {
                 padding: const EdgeInsets.only(right: 6),
                 child: Text(
                   rightText,
-                  style: const TextStyle(fontSize: 14, color: Color(0xFFB3B3B3)),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFFB3B3B3),
+                  ),
                 ),
               ),
-            const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFFBDBDBD)),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Color(0xFFBDBDBD),
+            ),
           ],
         ),
       ),

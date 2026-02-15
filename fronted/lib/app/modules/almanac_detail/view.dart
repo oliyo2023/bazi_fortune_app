@@ -59,7 +59,7 @@ class AlmanacDetailPage extends GetView<AlmanacDetailController> {
         title: const Text('老黄历-易百查'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         backgroundColor: Colors.white,
         elevation: 0,

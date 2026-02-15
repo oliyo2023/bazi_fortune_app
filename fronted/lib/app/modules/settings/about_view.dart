@@ -14,11 +14,21 @@ class AboutPage extends GetView<SettingsController> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
-          onPressed: () => Get.back(),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black87,
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         centerTitle: true,
-        title: const Text('关于我们', style: TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w600)),
+        title: const Text(
+          '关于我们',
+          style: TextStyle(
+            color: Color(0xFF1A1A1A),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -41,23 +51,31 @@ class AboutPage extends GetView<SettingsController> {
           ),
           const SizedBox(height: 10),
           // 版本号
-          Obx(() => Center(
-                child: Text(
-                  '版本号：${controller.appVersion.value}',
-                  style: const TextStyle(fontSize: 14, color: Color(0xFF999999)),
-                ),
-              )),
+          Obx(
+            () => Center(
+              child: Text(
+                '版本号：${controller.appVersion.value}',
+                style: const TextStyle(fontSize: 14, color: Color(0xFF999999)),
+              ),
+            ),
+          ),
           const SizedBox(height: 12),
           // 公司介绍
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Color(0xFFF0F0F0), width: 8)),
+              border: Border(
+                bottom: BorderSide(color: Color(0xFFF0F0F0), width: 8),
+              ),
             ),
             child: const Text(
               '北京流年观科技有限公司成立于2022年4月19日，平台定位：流年观智库AI互动问答平台，公司主要为广大易学爱好者提供排盘工具、题库练习、查阅知识宝典以及学习过程中遇到的问题解答服务。',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, height: 1.6, color: Color(0xFF666666)),
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.6,
+                color: Color(0xFF666666),
+              ),
             ),
           ),
           // 信息项
@@ -71,7 +89,10 @@ class AboutPage extends GetView<SettingsController> {
           const SizedBox(height: 60),
           // 版权
           const Center(
-            child: Text('版权所有', style: TextStyle(color: Color(0xFFB3B3B3), fontSize: 12)),
+            child: Text(
+              '版权所有',
+              style: TextStyle(color: Color(0xFFB3B3B3), fontSize: 12),
+            ),
           ),
           const SizedBox(height: 16),
         ],
@@ -79,7 +100,8 @@ class AboutPage extends GetView<SettingsController> {
     );
   }
 
-  Widget _divider() => const Divider(height: 1, thickness: 0.5, color: Color(0xFFEDEDED));
+  Widget _divider() =>
+      const Divider(height: 1, thickness: 0.5, color: Color(0xFFEDEDED));
 
   Widget _row(String left, Widget right) {
     return Container(
@@ -88,7 +110,10 @@ class AboutPage extends GetView<SettingsController> {
       child: Row(
         children: [
           Expanded(
-            child: Text(left, style: const TextStyle(fontSize: 16, color: Color(0xFF1F1F1F))),
+            child: Text(
+              left,
+              style: const TextStyle(fontSize: 16, color: Color(0xFF1F1F1F)),
+            ),
           ),
           right,
         ],
@@ -99,7 +124,10 @@ class AboutPage extends GetView<SettingsController> {
   Widget _infoItem(String left, String right) {
     return _row(
       left,
-      Text(right, style: const TextStyle(fontSize: 14, color: Color(0xFF666666))),
+      Text(
+        right,
+        style: const TextStyle(fontSize: 14, color: Color(0xFF666666)),
+      ),
     );
   }
 
@@ -107,11 +135,13 @@ class AboutPage extends GetView<SettingsController> {
     return Obx(() {
       final isChecking = controller.isCheckingUpdate.value;
       final hasUpdate = controller.updateAvailable.value;
-      
+
       return InkWell(
-        onTap: isChecking ? null : () {
-          controller.checkForUpdate();
-        },
+        onTap: isChecking
+            ? null
+            : () {
+                controller.checkForUpdate();
+              },
         child: _row(
           '版本更新',
           isChecking
@@ -124,7 +154,9 @@ class AboutPage extends GetView<SettingsController> {
                   hasUpdate ? '点击更新' : '升级为最新版',
                   style: TextStyle(
                     fontSize: 14,
-                    color: hasUpdate ? const Color(0xFFFF6B35) : const Color(0xFF27A6FF),
+                    color: hasUpdate
+                        ? const Color(0xFFFF6B35)
+                        : const Color(0xFF27A6FF),
                   ),
                 ),
         ),

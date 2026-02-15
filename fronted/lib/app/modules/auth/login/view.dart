@@ -18,6 +18,26 @@ class LoginPage extends GetView<LoginController> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: LoginColors.textPrimary,
+            size: 22.w,
+          ),
+          onPressed: () {
+            if (controller.currentStep.value == 2) {
+              controller.goToPreviousStep();
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
+        ),
+      ),
+      extendBodyBehindAppBar: true,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -25,10 +45,7 @@ class LoginPage extends GetView<LoginController> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              LoginColors.backgroundStart,
-              LoginColors.backgroundEnd,
-            ],
+            colors: [LoginColors.backgroundStart, LoginColors.backgroundEnd],
           ),
         ),
         child: SafeArea(
@@ -94,10 +111,7 @@ class LoginPage extends GetView<LoginController> {
       type: StaggeredAnimationType.fade,
       child: Text(
         '洞察命运，指引人生',
-        style: TextStyle(
-          fontSize: 16.sp,
-          color: LoginColors.textSecondary,
-        ),
+        style: TextStyle(fontSize: 16.sp, color: LoginColors.textSecondary),
       ),
     );
   }
@@ -158,10 +172,7 @@ class LoginPage extends GetView<LoginController> {
           SizedBox(height: 8.h),
           Text(
             '请输入手机号获取验证码',
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: LoginColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 14.sp, color: LoginColors.textSecondary),
           ),
           SizedBox(height: 24.h),
           // 手机号输入框
@@ -193,27 +204,14 @@ class LoginPage extends GetView<LoginController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 返回按钮和标题
-          Row(
-            children: [
-              GestureDetector(
-                onTap: controller.goToPreviousStep,
-                child: Icon(
-                  Icons.arrow_back_ios,
-                  size: 20.sp,
-                  color: LoginColors.textSecondary,
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Text(
-                '输入验证码',
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                  color: LoginColors.textPrimary,
-                ),
-              ),
-            ],
+          // 标题
+          Text(
+            '输入验证码',
+            style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+              color: LoginColors.textPrimary,
+            ),
           ),
           SizedBox(height: 8.h),
           // 显示手机号
@@ -238,27 +236,31 @@ class LoginPage extends GetView<LoginController> {
           ),
           SizedBox(height: 24.h),
           // 验证码输入框
-          Obx(() => OtpInputField(
-                key: controller.otpFieldKey,
-                length: 4,
-                boxWidth: 48.w,
-                boxHeight: 56.h,
-                boxSpacing: 6.w,
-                hasError: controller.hasError.value,
-                onChanged: controller.onOtpChanged,
-                onCompleted: controller.onOtpCompleted,
-              )),
+          Obx(
+            () => OtpInputField(
+              key: controller.otpFieldKey,
+              length: 4,
+              boxWidth: 48.w,
+              boxHeight: 56.h,
+              boxSpacing: 6.w,
+              hasError: controller.hasError.value,
+              onChanged: controller.onOtpChanged,
+              onCompleted: controller.onOtpCompleted,
+            ),
+          ),
           SizedBox(height: 16.h),
           // 重新发送验证码
           Obx(() => _buildResendCodeButton()),
           SizedBox(height: 24.h),
           // 登录按钮
-          Obx(() => AnimatedLoginButton(
-                text: '登录',
-                state: controller.buttonState.value,
-                onPressed: controller.login,
-                height: 50.h,
-              )),
+          Obx(
+            () => AnimatedLoginButton(
+              text: '登录',
+              state: controller.buttonState.value,
+              onPressed: controller.login,
+              height: 50.h,
+            ),
+          ),
         ],
       ),
     );
@@ -283,11 +285,7 @@ class LoginPage extends GetView<LoginController> {
             ),
           ),
           SizedBox(width: 8.w),
-          Container(
-            width: 1.w,
-            height: 24.h,
-            color: LoginColors.otpBoxBorder,
-          ),
+          Container(width: 1.w, height: 24.h, color: LoginColors.otpBoxBorder),
           SizedBox(width: 12.w),
           Expanded(
             child: TextField(
@@ -376,10 +374,7 @@ class LoginPage extends GetView<LoginController> {
       children: [
         Text(
           '没有收到验证码？',
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: LoginColors.textSecondary,
-          ),
+          style: TextStyle(fontSize: 14.sp, color: LoginColors.textSecondary),
         ),
         GestureDetector(
           onTap: (countdown == 0 && !isSending)
@@ -421,10 +416,7 @@ class LoginPage extends GetView<LoginController> {
         children: [
           Text(
             '还没有账号？',
-            style: TextStyle(
-              color: LoginColors.textSecondary,
-              fontSize: 14.sp,
-            ),
+            style: TextStyle(color: LoginColors.textSecondary, fontSize: 14.sp),
           ),
           TextButton(
             onPressed: controller.goToRegister,

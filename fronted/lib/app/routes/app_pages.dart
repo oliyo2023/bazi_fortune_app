@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../modules/splash/splash_page.dart';
 import '../modules/main_navigation/bindings/main_navigation_binding.dart';
 import '../modules/main_navigation/view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -30,9 +31,10 @@ import '../modules/almanac_list_detail/view.dart';
 part 'app_routes.dart';
 
 class AppPages {
-  static const initial = Routes.main;
+  static const initial = Routes.splash;
 
   static final routes = [
+    GetPage(name: _Paths.splash, page: () => const SplashPage()),
     GetPage(
       name: _Paths.main,
       page: () => MainNavigationPage(),

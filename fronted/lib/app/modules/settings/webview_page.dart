@@ -28,7 +28,10 @@ class _WebviewPageState extends State<WebviewPage> {
     _initialUri = Uri.parse(widget.url);
     if (Platform.isAndroid || Platform.isIOS) {
       _pullToRefreshController = PullToRefreshController(
-        settings: PullToRefreshSettings(color: Colors.white, backgroundColor: Colors.black54),
+        settings: PullToRefreshSettings(
+          color: Colors.white,
+          backgroundColor: Colors.black54,
+        ),
         onRefresh: () async {
           _hasError = false;
           _isLoading = true;
@@ -48,7 +51,6 @@ class _WebviewPageState extends State<WebviewPage> {
     } else {
       _pullToRefreshController = null;
     }
-
   }
 
   @override
@@ -62,7 +64,10 @@ class _WebviewPageState extends State<WebviewPage> {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
-  NavigationActionPolicy _navigationPolicy(InAppWebViewController controller, NavigationAction action) {
+  NavigationActionPolicy _navigationPolicy(
+    InAppWebViewController controller,
+    NavigationAction action,
+  ) {
     final uri = action.request.url;
     if (uri == null) return NavigationActionPolicy.CANCEL;
 
@@ -100,13 +105,20 @@ class _WebviewPageState extends State<WebviewPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
-          onPressed: () => Get.back(),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black87,
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         centerTitle: true,
         title: Text(
           widget.title,
-          style: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            color: Color(0xFF1A1A1A),
+            fontWeight: FontWeight.w600,
+          ),
         ),
         actions: [
           // 进度中的小圈
@@ -114,7 +126,8 @@ class _WebviewPageState extends State<WebviewPage> {
             const Padding(
               padding: EdgeInsets.only(right: 12),
               child: SizedBox(
-                width: 18, height: 18,
+                width: 18,
+                height: 18,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
@@ -168,9 +181,16 @@ class _WebviewPageState extends State<WebviewPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.error_outline, color: Color(0xFFE53935), size: 32),
+                  const Icon(
+                    Icons.error_outline,
+                    color: Color(0xFFE53935),
+                    size: 32,
+                  ),
                   const SizedBox(height: 8),
-                  const Text('加载失败，请检查网络后重试', style: TextStyle(color: Color(0xFF999999))),
+                  const Text(
+                    '加载失败，请检查网络后重试',
+                    style: TextStyle(color: Color(0xFF999999)),
+                  ),
                   const SizedBox(height: 12),
                   OutlinedButton(
                     onPressed: () async {

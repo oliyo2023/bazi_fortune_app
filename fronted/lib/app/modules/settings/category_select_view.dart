@@ -12,9 +12,22 @@ class CategorySelectPage extends StatefulWidget {
 class _CategorySelectPageState extends State<CategorySelectPage> {
   // 可选项
   final List<String> categories = const [
-    '紫微斗数','四柱','堪舆','奇门遁甲','梅花易数','六爻',
-    '手相面相','大六壬','数字能量','七政四余','金口诀','塔罗',
-    '占星','国学文化','太乙神数','姓名学',
+    '紫微斗数',
+    '四柱',
+    '堪舆',
+    '奇门遁甲',
+    '梅花易数',
+    '六爻',
+    '手相面相',
+    '大六壬',
+    '数字能量',
+    '七政四余',
+    '金口诀',
+    '塔罗',
+    '占星',
+    '国学文化',
+    '太乙神数',
+    '姓名学',
   ];
 
   // 已选（按选择顺序记录）
@@ -44,12 +57,21 @@ class _CategorySelectPageState extends State<CategorySelectPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
-          onPressed: () => Get.back(),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black87,
+            size: 20,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         centerTitle: true,
-        title: const Text('选择你感兴趣的分类',
-            style: TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w600)),
+        title: const Text(
+          '选择你感兴趣的分类',
+          style: TextStyle(
+            color: Color(0xFF1A1A1A),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -77,7 +99,8 @@ class _CategorySelectPageState extends State<CategorySelectPage> {
                 runSpacing: 12,
                 children: categories.map((c) {
                   final isSelected = selected.contains(c);
-                  final isPrimary = isSelected && selected.isNotEmpty && selected.first == c;
+                  final isPrimary =
+                      isSelected && selected.isNotEmpty && selected.first == c;
                   return _chip(
                     label: c,
                     selected: isSelected,
@@ -123,7 +146,11 @@ class _CategorySelectPageState extends State<CategorySelectPage> {
                     ),
                     child: const Text(
                       '确定',
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -135,9 +162,16 @@ class _CategorySelectPageState extends State<CategorySelectPage> {
     );
   }
 
-  Widget _chip({required String label, required bool selected, bool primary = false, VoidCallback? onTap}) {
+  Widget _chip({
+    required String label,
+    required bool selected,
+    bool primary = false,
+    VoidCallback? onTap,
+  }) {
     final borderColor = selected ? AppColors.primary : const Color(0xFFE0E0E0);
-    final bgColor = selected ? AppColors.primary.withValues(alpha: 0.12) : Colors.white;
+    final bgColor = selected
+        ? AppColors.primary.withValues(alpha: 0.12)
+        : Colors.white;
     final textColor = selected ? AppColors.primary : const Color(0xFF333333);
 
     return GestureDetector(
@@ -154,7 +188,11 @@ class _CategorySelectPageState extends State<CategorySelectPage> {
             ),
             child: Text(
               label,
-              style: TextStyle(fontSize: 14, color: textColor, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 14,
+                color: textColor,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           if (primary)
@@ -169,7 +207,10 @@ class _CategorySelectPageState extends State<CategorySelectPage> {
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: const Text('1', style: TextStyle(color: Colors.white, fontSize: 11)),
+                child: const Text(
+                  '1',
+                  style: TextStyle(color: Colors.white, fontSize: 11),
+                ),
               ),
             ),
         ],

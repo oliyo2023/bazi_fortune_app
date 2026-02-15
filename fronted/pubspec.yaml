@@ -17,12 +17,11 @@ dependencies:
   intl: ^0.20.2
   lunar: ^1.0.0
   http: ^1.2.2
-  webview_flutter: ^4.7.0
+  # webview_flutter: ^4.7.0  # 未使用，已移除
   url_launcher: ^6.3.0
   flutter_inappwebview: ^6.0.0
   city_pickers: ^1.2.3
-  wasm: ^0.1.0+1
-  # 新增依赖
+  # wasm: ^0.1.0+1  # 未使用且已discontinue，已移除
   flutter_screenutil: ^5.9.0
   flutter_otp_text_field: ^1.1.1
   logger: ^2.0.2

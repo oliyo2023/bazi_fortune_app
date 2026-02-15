@@ -5,7 +5,7 @@ import 'package:lunar/lunar.dart';
 
 class BaziTimePickResult {
   final DateTime dateTime; // 返回公历 DateTime（用于后端）
-  final bool isLunar;      // 是否按农历选择的
+  final bool isLunar; // 是否按农历选择的
   BaziTimePickResult({required this.dateTime, required this.isLunar});
 }
 
@@ -55,8 +55,34 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
   bool _isLunar = false;
 
   // 时辰
-  static const List<String> _zhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  static const List<int> _zhiStartHour = [23,1,3,5,7,9,11,13,15,17,19,21];
+  static const List<String> _zhi = [
+    '子',
+    '丑',
+    '寅',
+    '卯',
+    '辰',
+    '巳',
+    '午',
+    '未',
+    '申',
+    '酉',
+    '戌',
+    '亥',
+  ];
+  static const List<int> _zhiStartHour = [
+    23,
+    1,
+    3,
+    5,
+    7,
+    9,
+    11,
+    13,
+    15,
+    17,
+    19,
+    21,
+  ];
 
   @override
   void initState() {
@@ -118,7 +144,10 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final years = List<int>.generate(widget.endYear - widget.startYear + 1, (i) => widget.startYear + i);
+    final years = List<int>.generate(
+      widget.endYear - widget.startYear + 1,
+      (i) => widget.startYear + i,
+    );
     final months = List<int>.generate(12, (i) => i + 1);
     final days = _daysInMonth(_dt.year, _dt.month);
     final hours = List<int>.generate(24, (i) => i);
@@ -141,14 +170,18 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
         width: width,
         height: 200,
         child: CupertinoPicker(
-          scrollController: FixedExtentScrollController(initialItem: initialIndex),
+          scrollController: FixedExtentScrollController(
+            initialItem: initialIndex,
+          ),
           itemExtent: 36,
           magnification: 1.05,
           useMagnifier: true,
           onSelectedItemChanged: onSelected,
           children: items.map((e) {
             final text = label != null ? label(e) : e.toString();
-            return Center(child: Text(text, style: const TextStyle(fontSize: 16)));
+            return Center(
+              child: Text(text, style: const TextStyle(fontSize: 16)),
+            );
           }).toList(),
         ),
       );
@@ -162,7 +195,13 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
             Expanded(
               child: TextButton(
                 onPressed: () => Navigator.of(context).pop(null),
-                child: Text('cancel'.tr, style: const TextStyle(color: Color(0xFF7C3AED), fontSize: 14)),
+                child: Text(
+                  'cancel'.tr,
+                  style: const TextStyle(
+                    color: Color(0xFF7C3AED),
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ),
             Expanded(
@@ -176,13 +215,13 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _tabChip('four_pillar_chart'.tr, 0),
+                    Flexible(child: _tabChip('four_pillar_chart'.tr, 0)),
                     const SizedBox(width: 4),
-                    _tabChip('solar_birthday'.tr, 1),
+                    Flexible(child: _tabChip('solar_birthday'.tr, 1)),
                     const SizedBox(width: 4),
-                    _tabChip('lunar_birthday'.tr, 2),
+                    Flexible(child: _tabChip('lunar_birthday'.tr, 2)),
                     const SizedBox(width: 4),
-                    _tabChip('input'.tr, 3),
+                    Flexible(child: _tabChip('input'.tr, 3)),
                   ],
                 ),
               ),
@@ -196,12 +235,17 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
                     final h = _alignToShichenStartHour(_dt);
                     out = DateTime(_dt.year, _dt.month, _dt.day, h, 0);
                   }
-                  Navigator.of(context).pop(BaziTimePickResult(
-                    dateTime: out,
-                    isLunar: _tab == 2,
-                  ));
+                  Navigator.of(
+                    context,
+                  ).pop(BaziTimePickResult(dateTime: out, isLunar: _tab == 2));
                 },
-                child: Text('confirm'.tr, style: const TextStyle(color: Color(0xFF7C3AED), fontSize: 14)),
+                child: Text(
+                  'confirm'.tr,
+                  style: const TextStyle(
+                    color: Color(0xFF7C3AED),
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ),
           ],
@@ -211,65 +255,120 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
 
     Widget buildSolarWheels({bool lunarLabel = false}) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            buildWheel<int>(
-              items: years,
-              initialIndex: yearIndex,
-              width: 90,
-              label: (y) => lunarLabel ? _lunarYearLabel(DateTime(y, _dt.month, _dt.day)) : '$y年',
-              onSelected: (i) {
-                setState(() {
-                  final newYear = years[i];
-                  final newDay = _dt.day.clamp(1, DateTime(newYear, _dt.month + 1, 0).day);
-                  _dt = DateTime(newYear, _dt.month, newDay, _dt.hour, _dt.minute);
-                });
-              },
+            Flexible(
+              child: buildWheel<int>(
+                items: years,
+                initialIndex: yearIndex,
+                width: 70,
+                label: (y) => lunarLabel
+                    ? _lunarYearLabel(DateTime(y, _dt.month, _dt.day))
+                    : '$y年',
+                onSelected: (i) {
+                  setState(() {
+                    final newYear = years[i];
+                    final newDay = _dt.day.clamp(
+                      1,
+                      DateTime(newYear, _dt.month + 1, 0).day,
+                    );
+                    _dt = DateTime(
+                      newYear,
+                      _dt.month,
+                      newDay,
+                      _dt.hour,
+                      _dt.minute,
+                    );
+                  });
+                },
+              ),
             ),
-            buildWheel<int>(
-              items: months,
-              initialIndex: monthIndex,
-              label: (m) => lunarLabel ? _lunarMonthLabel(DateTime(_dt.year, m, _dt.day)) : '$m月',
-              onSelected: (i) {
-                setState(() {
-                  final newMonth = months[i];
-                  final newDay = _dt.day.clamp(1, DateTime(_dt.year, newMonth + 1, 0).day);
-                  _dt = DateTime(_dt.year, newMonth, newDay, _dt.hour, _dt.minute);
-                });
-              },
+            Flexible(
+              child: buildWheel<int>(
+                items: months,
+                initialIndex: monthIndex,
+                width: 50,
+                label: (m) => lunarLabel
+                    ? _lunarMonthLabel(DateTime(_dt.year, m, _dt.day))
+                    : '$m月',
+                onSelected: (i) {
+                  setState(() {
+                    final newMonth = months[i];
+                    final newDay = _dt.day.clamp(
+                      1,
+                      DateTime(_dt.year, newMonth + 1, 0).day,
+                    );
+                    _dt = DateTime(
+                      _dt.year,
+                      newMonth,
+                      newDay,
+                      _dt.hour,
+                      _dt.minute,
+                    );
+                  });
+                },
+              ),
             ),
-            buildWheel<int>(
-              items: days,
-              initialIndex: dayIndex,
-              label: (d) => lunarLabel ? _lunarDayLabel(DateTime(_dt.year, _dt.month, d)) : '$d日',
-              onSelected: (i) {
-                setState(() {
-                  final newDay = days[i];
-                  _dt = DateTime(_dt.year, _dt.month, newDay, _dt.hour, _dt.minute);
-                });
-              },
+            Flexible(
+              child: buildWheel<int>(
+                items: days,
+                initialIndex: dayIndex,
+                width: 50,
+                label: (d) => lunarLabel
+                    ? _lunarDayLabel(DateTime(_dt.year, _dt.month, d))
+                    : '$d日',
+                onSelected: (i) {
+                  setState(() {
+                    final newDay = days[i];
+                    _dt = DateTime(
+                      _dt.year,
+                      _dt.month,
+                      newDay,
+                      _dt.hour,
+                      _dt.minute,
+                    );
+                  });
+                },
+              ),
             ),
-            buildWheel<int>(
-              items: hours,
-              initialIndex: hourIndex,
-              label: (h) => '${h.toString().padLeft(2, '0')}时',
-              onSelected: (i) {
-                setState(() {
-                  _dt = DateTime(_dt.year, _dt.month, _dt.day, hours[i], _dt.minute);
-                });
-              },
+            Flexible(
+              child: buildWheel<int>(
+                items: hours,
+                initialIndex: hourIndex,
+                width: 50,
+                label: (h) => '${h.toString().padLeft(2, '0')}时',
+                onSelected: (i) {
+                  setState(() {
+                    _dt = DateTime(
+                      _dt.year,
+                      _dt.month,
+                      _dt.day,
+                      hours[i],
+                      _dt.minute,
+                    );
+                  });
+                },
+              ),
             ),
-            buildWheel<int>(
-              items: minutes,
-              initialIndex: minuteIndex,
-              label: (m) => '${m.toString().padLeft(2, '0')}分',
-              onSelected: (i) {
-                setState(() {
-                  _dt = DateTime(_dt.year, _dt.month, _dt.day, _dt.hour, minutes[i]);
-                });
-              },
+            Flexible(
+              child: buildWheel<int>(
+                items: minutes,
+                initialIndex: minuteIndex,
+                width: 50,
+                label: (m) => '${m.toString().padLeft(2, '0')}分',
+                onSelected: (i) {
+                  setState(() {
+                    _dt = DateTime(
+                      _dt.year,
+                      _dt.month,
+                      _dt.day,
+                      _dt.hour,
+                      minutes[i],
+                    );
+                  });
+                },
+              ),
             ),
           ],
         ),
@@ -294,7 +393,10 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
 
     Widget buildFourPillarsWheels() {
       // 简化：年/月/日用公历滚轮，时用12地支；分钟固定0
-      final years = List<int>.generate(widget.endYear - widget.startYear + 1, (i) => widget.startYear + i);
+      final years = List<int>.generate(
+        widget.endYear - widget.startYear + 1,
+        (i) => widget.startYear + i,
+      );
       final months = List<int>.generate(12, (i) => i + 1);
       final days = _daysInMonth(_dt.year, _dt.month);
       int yearIndex = _dt.year - widget.startYear;
@@ -313,76 +415,98 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
           width: width,
           height: 200,
           child: CupertinoPicker(
-            scrollController: FixedExtentScrollController(initialItem: initialIndex),
+            scrollController: FixedExtentScrollController(
+              initialItem: initialIndex,
+            ),
             itemExtent: 36,
             magnification: 1.05,
             useMagnifier: true,
             onSelectedItemChanged: onSelected,
             children: items.map((e) {
               final text = label != null ? label(e) : e.toString();
-              return Center(child: Text(text, style: const TextStyle(fontSize: 16)));
+              return Center(
+                child: Text(text, style: const TextStyle(fontSize: 16)),
+              );
             }).toList(),
           ),
         );
       }
 
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            buildWheelSimple<int>(
-              items: years,
-              initialIndex: yearIndex,
-              width: 90,
-              label: (y) => '$y年',
-              onSelected: (i) {
-                setState(() {
-                  final newYear = years[i];
-                  final newDay = _dt.day.clamp(1, DateTime(newYear, _dt.month + 1, 0).day);
-                  _dt = DateTime(newYear, _dt.month, newDay, _dt.hour, 0);
-                });
-              },
+            Flexible(
+              child: buildWheelSimple<int>(
+                items: years,
+                initialIndex: yearIndex,
+                width: 70,
+                label: (y) => '$y年',
+                onSelected: (i) {
+                  setState(() {
+                    final newYear = years[i];
+                    final newDay = _dt.day.clamp(
+                      1,
+                      DateTime(newYear, _dt.month + 1, 0).day,
+                    );
+                    _dt = DateTime(newYear, _dt.month, newDay, _dt.hour, 0);
+                  });
+                },
+              ),
             ),
-            buildWheelSimple<int>(
-              items: months,
-              initialIndex: monthIndex,
-              label: (m) => '$m月',
-              onSelected: (i) {
-                setState(() {
-                  final newMonth = months[i];
-                  final newDay = _dt.day.clamp(1, DateTime(_dt.year, newMonth + 1, 0).day);
-                  _dt = DateTime(_dt.year, newMonth, newDay, _dt.hour, 0);
-                });
-              },
+            Flexible(
+              child: buildWheelSimple<int>(
+                items: months,
+                initialIndex: monthIndex,
+                width: 50,
+                label: (m) => '$m月',
+                onSelected: (i) {
+                  setState(() {
+                    final newMonth = months[i];
+                    final newDay = _dt.day.clamp(
+                      1,
+                      DateTime(_dt.year, newMonth + 1, 0).day,
+                    );
+                    _dt = DateTime(_dt.year, newMonth, newDay, _dt.hour, 0);
+                  });
+                },
+              ),
             ),
-            buildWheelSimple<int>(
-              items: days,
-              initialIndex: dayIndex,
-              label: (d) => '$d日',
-              onSelected: (i) {
-                setState(() {
-                  final newDay = days[i];
-                  _dt = DateTime(_dt.year, _dt.month, newDay, _dt.hour, 0);
-                });
-              },
+            Flexible(
+              child: buildWheelSimple<int>(
+                items: days,
+                initialIndex: dayIndex,
+                width: 50,
+                label: (d) => '$d日',
+                onSelected: (i) {
+                  setState(() {
+                    final newDay = days[i];
+                    _dt = DateTime(_dt.year, _dt.month, newDay, _dt.hour, 0);
+                  });
+                },
+              ),
             ),
-            buildWheelSimple<String>(
-              items: _zhi,
-              initialIndex: zIndex,
-              width: 70,
-              label: (z) => '$z时',
-              onSelected: (i) {
-                setState(() {
-                  final h = _zhiStartHour[i];
-                  _dt = DateTime(_dt.year, _dt.month, _dt.day, h, 0);
-                });
-              },
+            Flexible(
+              child: buildWheelSimple<String>(
+                items: _zhi,
+                initialIndex: zIndex,
+                width: 50,
+                label: (z) => '$z时',
+                onSelected: (i) {
+                  setState(() {
+                    final h = _zhiStartHour[i];
+                    _dt = DateTime(_dt.year, _dt.month, _dt.day, h, 0);
+                  });
+                },
+              ),
             ),
             SizedBox(
-              width: 70,
+              width: 50,
               child: Center(
-                child: Text('00分', style: const TextStyle(fontSize: 16, color: Colors.grey)),
+                child: Text(
+                  '00分',
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                ),
               ),
             ),
           ],
@@ -396,7 +520,14 @@ class _BaziTimePickerSheetState extends State<_BaziTimePickerSheet> {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 8),
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.black12, borderRadius: BorderRadius.circular(2))),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.black12,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
           buildHeader(),
           const Divider(height: 1),
           if (_tab == 1) buildSolarWheels(lunarLabel: false),
