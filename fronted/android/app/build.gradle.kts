@@ -84,11 +84,6 @@ android {
     }
 }
 
-dependencies {
-    // Fix R8 missing classes for Flutter deferred components (Play Store split install)
-    implementation("com.google.android.play:core:1.10.3")
-}
-
 flutter {
     source = "../.."
 }

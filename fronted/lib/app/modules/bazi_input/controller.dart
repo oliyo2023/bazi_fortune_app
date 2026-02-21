@@ -166,6 +166,16 @@ class BaziInputController extends GetxController {
       // 回填结果
       await ApiService.to.updateBaziResult(id, result);
 
+      // calculate 接口会落库临时记录，这里清理掉，避免历史出现重复记录。
+      if (result.id.isNotEmpty && result.id != id) {
+        try {
+          await ApiService.to.deleteBaziRecord(result.id);
+        } catch (_) {}
+      }
+
+      // 使用最终记录重新读取详情，确保结果页与后续 AI 解读绑定同一条数据。
+      final finalResult = await ApiService.to.getBaziDetail(id) ?? result;
+
       // 刷新“历史记录”页数据（如果控制器已注册则触发刷新）
       if (Get.isRegistered<ProfileController>()) {
         try {
@@ -175,7 +185,7 @@ class BaziInputController extends GetxController {
 
       // 跳转结果页
       Get.toNamed('/result', arguments: {
-        'bazi': result,
+        'bazi': finalResult,
         'name': nameController.text.trim(),
       });
 

@@ -5,6 +5,7 @@ class MainNavigationController extends GetxController {
   final RxInt currentIndex = 0.obs;
   // 消息未读角标
   final RxInt messageUnread = 27.obs;
+  DateTime? _lastBackPressedAt;
   
   void changeTab(int index) {
     // 未登录点击“我的”时直接跳转登录
@@ -35,5 +36,28 @@ class MainNavigationController extends GetxController {
   
   void goToProfile() {
     currentIndex.value = 4;
+  }
+
+  Future<bool> onWillPop() async {
+    // 非首页时，返回键先回到首页而不是退出应用
+    if (currentIndex.value != 0) {
+      currentIndex.value = 0;
+      return false;
+    }
+
+    final now = DateTime.now();
+    if (_lastBackPressedAt == null ||
+        now.difference(_lastBackPressedAt!) > const Duration(seconds: 2)) {
+      _lastBackPressedAt = now;
+      Get.snackbar(
+        '提示',
+        '再按一次退出应用',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+      );
+      return false;
+    }
+
+    return true;
   }
 }

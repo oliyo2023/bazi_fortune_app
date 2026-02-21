@@ -11,44 +11,47 @@ class MainNavigationPage extends GetView<MainNavigationController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Obx(() => _getPage(controller.currentIndex.value)),
-      bottomNavigationBar: Obx(
-        () => BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          currentIndex: controller.currentIndex.value,
-          onTap: controller.changeTab,
-          selectedItemColor: Color(0xFF8A65F0),
-          unselectedItemColor: Colors.grey,
-          selectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-          unselectedLabelStyle: TextStyle(fontSize: 12),
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'home'.tr,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.show_chart_outlined),
-              activeIcon: Icon(Icons.show_chart),
-              label: 'fortune'.tr,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.people_outline),
-              activeIcon: Icon(Icons.people),
-              label: 'masters_consultation'.tr,
-            ),
-            BottomNavigationBarItem(
-              icon: _messageIcon(false),
-              activeIcon: _messageIcon(true),
-              label: 'messages'.tr,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'profile'.tr,
-            ),
-          ],
+    return WillPopScope(
+      onWillPop: controller.onWillPop,
+      child: Scaffold(
+        body: Obx(() => _getPage(controller.currentIndex.value)),
+        bottomNavigationBar: Obx(
+          () => BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            currentIndex: controller.currentIndex.value,
+            onTap: controller.changeTab,
+            selectedItemColor: Color(0xFF8A65F0),
+            unselectedItemColor: Colors.grey,
+            selectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            unselectedLabelStyle: TextStyle(fontSize: 12),
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                activeIcon: Icon(Icons.home),
+                label: 'home'.tr,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.show_chart_outlined),
+                activeIcon: Icon(Icons.show_chart),
+                label: 'fortune'.tr,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.people_outline),
+                activeIcon: Icon(Icons.people),
+                label: 'masters_consultation'.tr,
+              ),
+              BottomNavigationBarItem(
+                icon: _messageIcon(false),
+                activeIcon: _messageIcon(true),
+                label: 'messages'.tr,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline),
+                activeIcon: Icon(Icons.person),
+                label: 'profile'.tr,
+              ),
+            ],
+          ),
         ),
       ),
     );

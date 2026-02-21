@@ -619,6 +619,27 @@ class ApiService extends GetxService {
     }
   }
 
+  Future<void> deleteBaziRecord(String id) async {
+    try {
+      final response = await _sendWithRetry(
+        'DELETE',
+        '$_baseUrl/api/v1/bazi/$id',
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(_extractMessage(response.body, fallback: '删除排盘记录失败'));
+      }
+
+      final body = _asMap(response.body);
+      if (_asInt(body['code'], fallback: -1) != 0) {
+        throw Exception(_extractMessage(body, fallback: '删除排盘记录失败'));
+      }
+    } catch (e) {
+      _logger.e('删除排盘记录错误: $e');
+      throw Exception('删除排盘记录失败: ${e.toString().replaceFirst('Exception: ', '')}');
+    }
+  }
+
   Future<BaziModel?> getBaziDetail(String baziId) async {
     try {
       final response = await _sendWithRetry(
