@@ -135,9 +135,12 @@ class AboutPage extends GetView<SettingsController> {
     return Obx(() {
       final isChecking = controller.isCheckingUpdate.value;
       final hasUpdate = controller.updateAvailable.value;
+      final isDownloading = controller.isDownloading.value;
+      final progress = controller.updateProgress.value;
+      final latestVer = controller.latestVersion.value;
 
       return InkWell(
-        onTap: isChecking
+        onTap: (isChecking || isDownloading)
             ? null
             : () {
                 controller.checkForUpdate();
@@ -150,15 +153,54 @@ class AboutPage extends GetView<SettingsController> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(
-                  hasUpdate ? '点击更新' : '升级为最新版',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: hasUpdate
-                        ? const Color(0xFFFF6B35)
-                        : const Color(0xFF27A6FF),
-                  ),
-                ),
+              : isDownloading
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 60,
+                          child: LinearProgressIndicator(value: progress),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${(progress * 100).toInt()}%',
+                          style: const TextStyle(fontSize: 12, color: Color(0xFF666666)),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (hasUpdate) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF6B35),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              '新版本 $latestVer',
+                              style: const TextStyle(fontSize: 10, color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            '点击更新',
+                            style: TextStyle(fontSize: 14, color: Color(0xFFFF6B35)),
+                          ),
+                        ] else
+                          const Text(
+                            '升级为最新版',
+                            style: TextStyle(fontSize: 14, color: Color(0xFF27A6FF)),
+                          ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.chevron_right,
+                          size: 16,
+                          color: Color(0xFFCCCCCC),
+                        ),
+                      ],
+                    ),
         ),
       );
     });

@@ -38,9 +38,8 @@ class LoginController extends GetxController {
   // 手机号输入框焦点
   final FocusNode phoneFocusNode = FocusNode();
 
-  // 测试模式：不请求网络，直接进入第二步验证界面
-  // 设置为 true 可以跳过网络请求，直接测试两步界面
-  static const bool testMode = true;
+  // 主链路默认直连后端
+  static const bool testMode = false;
 
   @override
   void onInit() {
@@ -186,8 +185,8 @@ class LoginController extends GetxController {
     }
 
     // 验证验证码
-    if (code.length != 4) {
-      _showError('请输入4位验证码');
+    if (code.length != 6) {
+      _showError('请输入6位验证码');
       _shakeOtpField();
       return;
     }

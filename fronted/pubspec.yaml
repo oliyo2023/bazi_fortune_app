@@ -25,6 +25,7 @@ dependencies:
   flutter_screenutil: ^5.9.0
   flutter_otp_text_field: ^1.1.1
   logger: ^2.0.2
+  in_app_update: ^4.2.3
 
 dev_dependencies:
   flutter_test:

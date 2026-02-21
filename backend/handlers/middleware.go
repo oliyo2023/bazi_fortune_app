@@ -32,17 +32,27 @@ func CORSMiddleware() gin.HandlerFunc {
 // AuthMiddleware 认证中间件（简化版本）
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// 已由 JwtAuthMiddleware 验证通过时，直接放行。
+		if uid := c.GetString("user_id"); uid != "" {
+			c.Set("userID", uid)
+			if role := c.GetString("role"); role != "" {
+				c.Set("userRole", role)
+			}
+			c.Next()
+			return
+		}
+
 		// 获取Authorization头
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			JSONError(c, 40001, "Authorization header required", http.StatusUnauthorized)
+			JSONError(c, 40001, "unauthorized", http.StatusUnauthorized)
 			c.Abort()
 			return
 		}
 
 		// 检查Bearer token格式
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			JSONError(c, 40001, "Invalid authorization format", http.StatusUnauthorized)
+			JSONError(c, 40001, "invalid_token", http.StatusUnauthorized)
 			c.Abort()
 			return
 		}
@@ -50,14 +60,14 @@ func AuthMiddleware() gin.HandlerFunc {
 		// 提取token
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		if token == "" {
-			JSONError(c, 40001, "Token required", http.StatusUnauthorized)
+			JSONError(c, 40001, "invalid_token", http.StatusUnauthorized)
 			c.Abort()
 			return
 		}
 
 		// 简化的token验证（实际项目中应使用JWT验证）
 		if !strings.HasPrefix(token, "token_") {
-			JSONError(c, 40001, "Invalid token", http.StatusUnauthorized)
+			JSONError(c, 40001, "invalid_token", http.StatusUnauthorized)
 			c.Abort()
 			return
 		}

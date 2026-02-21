@@ -1,31 +1,21 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 /// API配置文件
 class ApiConfig {
   /// API基础URL配置
   /// 根据环境自动选择合适的API地址
   static String get baseUrl {
-    // 开发环境
     if (isDebugMode) {
-      // Web开发环境可以使用本地API
       if (isWeb) {
-        return 'http://localhost:8788';
+        return 'http://localhost:8081';
       }
-      // 移动端开发环境使用本地后端服务
-      // Android 模拟器使用 10.0.2.2 访问宿主机
-      // 真机或 iOS 模拟器使用 localhost
       return 'http://10.0.2.2:8081';
     }
 
-    // 生产环境
     return 'https://bzdev.oliyo.com';
   }
 
-  /// 是否为Web平台
-  static bool get isWeb => identical(0, 0.0);
-
-  /// 是否为Android平台
-  static bool get isAndroid => !isWeb && Platform.isAndroid;
+  static bool get isWeb => kIsWeb;
 
   /// 是否为调试模式
   static bool get isDebugMode {

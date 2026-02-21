@@ -1,0 +1,1102 @@
+openapi: 3.0.3
+info:
+  title: Bazi Fortune App API (Go Primary)
+  version: 1.0.0
+  description: |
+    Frozen API contract for the primary Go backend.
+    Freeze date: 2026-02-20.
+    Primary route source: backend/handlers/routes.go.
+  x-contract-status: frozen
+  x-freeze-date: "2026-02-20"
+servers:
+  - url: http://localhost:8080
+    description: Local development
+  - url: https://api.example.com
+    description: Production placeholder
+tags:
+  - name: Auth
+  - name: Bazi
+  - name: AI
+  - name: Almanac
+paths:
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register with email/password
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "200":
+          description: Registration success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeEnvelopeAuthUser"
+        "400":
+          $ref: "#/components/responses/CodeError400"
+        "500":
+          $ref: "#/components/responses/CodeError500"
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with email/password
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeEnvelopeAuthTokenUser"
+        "400":
+          $ref: "#/components/responses/CodeError400"
+        "401":
+          $ref: "#/components/responses/CodeError401"
+        "500":
+          $ref: "#/components/responses/CodeError500"
+
+  /api/v1/auth/send-sms:
+    post:
+      tags: [Auth]
+      summary: Send SMS verification code
+      operationId: sendSms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendSmsRequest"
+      responses:
+        "200":
+          description: SMS code sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeEnvelopeSmsSend"
+        "400":
+          $ref: "#/components/responses/CodeError400"
+        "429":
+          $ref: "#/components/responses/CodeError429"
+        "500":
+          $ref: "#/components/responses/CodeError500"
+
+  /api/v1/auth/login-with-sms:
+    post:
+      tags: [Auth]
+      summary: Login with phone and verification code
+      operationId: loginWithSms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginWithSmsRequest"
+      responses:
+        "200":
+          description: SMS login success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeEnvelopeSmsLogin"
+        "400":
+          $ref: "#/components/responses/CodeError400"
+        "500":
+          $ref: "#/components/responses/CodeError500"
+
+  /api/v1/auth/profile/{id}:
+    get:
+      tags: [Auth]
+      summary: Get user profile by user ID
+      operationId: getProfile
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Profile fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeEnvelopeAuthUser"
+        "400":
+          $ref: "#/components/responses/CodeError400"
+        "401":
+          $ref: "#/components/responses/CodeError401"
+        "404":
+          $ref: "#/components/responses/CodeError404"
+
+  /api/v1/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      operationId: refreshToken
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeEnvelopeAuthTokenUser"
+        "401":
+          $ref: "#/components/responses/CodeError401"
+        "500":
+          $ref: "#/components/responses/CodeError500"
+
+  /api/v1/bazi/calculate:
+    post:
+      tags: [Bazi]
+      summary: Calculate and store bazi result
+      operationId: calculateBazi
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BaziCalculateRequest"
+      responses:
+        "200":
+          description: Bazi calculated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaziCalculateResponse"
+        "400":
+          $ref: "#/components/responses/MixedError400"
+        "401":
+          $ref: "#/components/responses/MixedError401"
+        "403":
+          $ref: "#/components/responses/MixedError403"
+        "404":
+          $ref: "#/components/responses/MixedError404"
+        "500":
+          $ref: "#/components/responses/MixedError500"
+
+  /api/v1/bazi/history:
+    get:
+      tags: [Bazi]
+      summary: Get current user bazi history
+      operationId: getBaziHistory
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: History fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeEnvelopeBaziList"
+        "401":
+          $ref: "#/components/responses/CodeError401"
+        "500":
+          $ref: "#/components/responses/CodeError500"
+
+  /api/v1/bazi/detail/{id}:
+    get:
+      tags: [Bazi]
+      summary: Get bazi detail by record ID
+      operationId: getBaziDetail
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Bazi detail fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaziDetailResponse"
+        "400":
+          $ref: "#/components/responses/MixedError400"
+        "401":
+          $ref: "#/components/responses/MixedError401"
+        "403":
+          $ref: "#/components/responses/MixedError403"
+        "404":
+          $ref: "#/components/responses/MixedError404"
+        "500":
+          $ref: "#/components/responses/MixedError500"
+
+  /api/v1/bazi:
+    post:
+      tags: [Bazi]
+      summary: Create bazi record
+      operationId: createBaziRecord
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BaziCalculateRequest"
+      responses:
+        "201":
+          description: Bazi record created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaziCalculateResponse"
+        "400":
+          $ref: "#/components/responses/MixedError400"
+        "401":
+          $ref: "#/components/responses/MixedError401"
+        "500":
+          $ref: "#/components/responses/MixedError500"
+
+  /api/v1/bazi/{id}:
+    put:
+      tags: [Bazi]
+      summary: Update bazi record
+      operationId: updateBaziRecord
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BaziCalculateRequest"
+      responses:
+        "200":
+          description: Bazi record updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaziCalculateResponse"
+        "400":
+          $ref: "#/components/responses/MixedError400"
+        "401":
+          $ref: "#/components/responses/MixedError401"
+        "403":
+          $ref: "#/components/responses/MixedError403"
+        "404":
+          $ref: "#/components/responses/MixedError404"
+        "500":
+          $ref: "#/components/responses/MixedError500"
+
+    delete:
+      tags: [Bazi]
+      summary: Delete bazi record
+      operationId: deleteBaziRecord
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Bazi record deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeEnvelopeNoData"
+        "400":
+          $ref: "#/components/responses/MixedError400"
+        "401":
+          $ref: "#/components/responses/MixedError401"
+        "403":
+          $ref: "#/components/responses/MixedError403"
+        "404":
+          $ref: "#/components/responses/MixedError404"
+        "500":
+          $ref: "#/components/responses/MixedError500"
+
+  /api/v1/ai/analyze:
+    post:
+      tags: [AI]
+      summary: Generate AI analysis for a bazi record
+      operationId: analyzeBazi
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AIAnalyzeRequest"
+      responses:
+        "200":
+          description: Analysis success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocalizedAnalyzeSuccessResponse"
+        "401":
+          $ref: "#/components/responses/CodeError401"
+        "403":
+          $ref: "#/components/responses/LocalizedError403"
+        "400":
+          $ref: "#/components/responses/LocalizedError400"
+        "404":
+          $ref: "#/components/responses/LocalizedError404"
+        "500":
+          $ref: "#/components/responses/LocalizedError500"
+
+  /api/v1/almanac/generate:
+    post:
+      tags: [Almanac]
+      summary: Generate and store almanac detail for a date
+      operationId: generateAlmanac
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateAlmanacRequest"
+      responses:
+        "200":
+          description: Almanac generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateAlmanacResponse"
+        "401":
+          $ref: "#/components/responses/CodeError401"
+        "400":
+          $ref: "#/components/responses/BooleanError400"
+        "500":
+          $ref: "#/components/responses/BooleanError500"
+
+  /api/v1/almanac/detail:
+    get:
+      tags: [Almanac]
+      summary: Get almanac detail by date
+      operationId: getAlmanacDetail
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: date
+          in: query
+          required: true
+          description: Date in YYYY-MM-DD
+          schema:
+            type: string
+            format: date
+        - name: bazi_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Almanac detail found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAlmanacDetailResponse"
+        "401":
+          $ref: "#/components/responses/CodeError401"
+        "400":
+          $ref: "#/components/responses/BooleanError400"
+        "404":
+          $ref: "#/components/responses/BooleanError404"
+        "500":
+          $ref: "#/components/responses/BooleanError500"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    CodeError400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CodeEnvelopeError"
+    CodeError401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CodeEnvelopeError"
+    CodeError404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CodeEnvelopeError"
+    CodeError429:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CodeEnvelopeError"
+    CodeError500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CodeEnvelopeError"
+
+    LocalizedError400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LocalizedErrorResponse"
+    LocalizedError403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LocalizedErrorResponse"
+    LocalizedError404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LocalizedErrorResponse"
+    LocalizedError500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LocalizedErrorResponse"
+
+    BooleanError400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BooleanErrorResponse"
+    BooleanError404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BooleanErrorResponse"
+    BooleanError500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BooleanErrorResponse"
+
+    MixedError400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MixedErrorResponse"
+    MixedError401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MixedErrorResponse"
+    MixedError403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MixedErrorResponse"
+    MixedError404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MixedErrorResponse"
+    MixedError500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MixedErrorResponse"
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [email, password, name]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        name:
+          type: string
+          minLength: 2
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+
+    SendSmsRequest:
+      type: object
+      required: [phone]
+      properties:
+        phone:
+          type: string
+          pattern: "^1[3-9]\\d{9}$"
+          description: Mainland China mobile number
+        purpose:
+          type: string
+          enum: [login, register, reset_password]
+          default: login
+
+    LoginWithSmsRequest:
+      type: object
+      required: [phone, code]
+      properties:
+        phone:
+          type: string
+          pattern: "^1[3-9]\\d{9}$"
+        code:
+          type: string
+          pattern: "^\\d{6}$"
+
+    BaziCalculateRequest:
+      type: object
+      required: [year, month, day, hour, minute, gender]
+      properties:
+        year:
+          type: integer
+          minimum: 1900
+          maximum: 2100
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+        day:
+          type: integer
+          minimum: 1
+          maximum: 31
+        hour:
+          type: integer
+          minimum: 0
+          maximum: 23
+        minute:
+          type: integer
+          minimum: 0
+          maximum: 59
+        gender:
+          type: string
+          enum: [male, female]
+        name:
+          type: string
+        timezone:
+          type: string
+          default: Asia/Shanghai
+
+    AIAnalyzeRequest:
+      type: object
+      required: [bazi_id]
+      properties:
+        bazi_id:
+          type: string
+          format: uuid
+        language:
+          type: string
+          enum: [zh, en]
+          default: zh
+
+    GenerateAlmanacRequest:
+      type: object
+      required: [date]
+      properties:
+        date:
+          type: string
+          format: date
+        timezone:
+          type: string
+          default: Asia/Shanghai
+        bazi_id:
+          type: string
+          format: uuid
+        language:
+          type: string
+          enum: [zh, en]
+          default: zh
+        provider_prefer:
+          type: string
+          enum: [deepseek, openai]
+          default: deepseek
+
+    SafeUser:
+      type: object
+      required: [id, email, name, role, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    AuthUserData:
+      type: object
+      required: [user]
+      properties:
+        user:
+          $ref: "#/components/schemas/SafeUser"
+
+    AuthTokenUserData:
+      type: object
+      required: [user, token]
+      properties:
+        user:
+          $ref: "#/components/schemas/SafeUser"
+        token:
+          type: string
+
+    SmsSendData:
+      type: object
+      required: [success, message, expires_in]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        expires_in:
+          type: integer
+
+    SmsLoginData:
+      type: object
+      required: [success, message, user, token, is_new]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        user:
+          $ref: "#/components/schemas/SafeUser"
+        token:
+          type: string
+        is_new:
+          type: boolean
+
+    BaziData:
+      type: object
+      description: Bazi record entity persisted in backend
+      required: [id, user_id, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        chat_id:
+          type: string
+          format: uuid
+          nullable: true
+        input_data:
+          oneOf:
+            - $ref: "#/components/schemas/BaziInput"
+            - type: string
+          nullable: true
+        result_data:
+          oneOf:
+            - $ref: "#/components/schemas/BaziResult"
+            - type: string
+          nullable: true
+        analysis:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    BaziInput:
+      type: object
+      properties:
+        year:
+          type: integer
+        month:
+          type: integer
+        day:
+          type: integer
+        hour:
+          type: integer
+        minute:
+          type: integer
+        gender:
+          type: string
+        name:
+          type: string
+        timezone:
+          type: string
+
+    BaziResult:
+      type: object
+      properties:
+        year_pillar:
+          type: string
+        month_pillar:
+          type: string
+        day_pillar:
+          type: string
+        hour_pillar:
+          type: string
+        day_master:
+          type: string
+        zodiac:
+          type: string
+        nayin:
+          type: string
+        season:
+          type: string
+        solar_terms:
+          type: array
+          items:
+            type: string
+        lunar_date:
+          type: string
+        five_elements:
+          type: object
+          additionalProperties:
+            type: integer
+        shi_shen:
+          type: object
+          additionalProperties:
+            type: string
+        yong_shen:
+          type: array
+          items:
+            type: string
+        xi_shen:
+          type: array
+          items:
+            type: string
+        ji_shen:
+          type: array
+          items:
+            type: string
+        lucky_elements:
+          type: array
+          items:
+            type: string
+        colors:
+          type: array
+          items:
+            type: string
+        numbers:
+          type: array
+          items:
+            type: integer
+        directions:
+          type: array
+          items:
+            type: string
+
+    AIAnalyzeData:
+      type: object
+      required: [analysis, language]
+      properties:
+        analysis:
+          type: string
+        language:
+          type: string
+          enum: [zh, en]
+
+    AlmanacHourItem:
+      type: object
+      required: [label, status, active]
+      properties:
+        label:
+          type: string
+        status:
+          type: string
+          description: Typically one of "ji", "xiong", "ping" or localized strings
+        active:
+          type: boolean
+      additionalProperties: true
+
+    AlmanacDTO:
+      type: object
+      required:
+        - monthTitle
+        - lunarLine
+        - yi
+        - ji
+        - wuXing
+        - chongSha
+        - zhiShen
+        - shenYiQu
+        - taiShen
+        - xiongShen
+        - baiLu
+        - currentHourTitle
+        - xiShen
+        - hourYi
+        - hourJi
+        - hours
+      properties:
+        monthTitle:
+          type: string
+        lunarLine:
+          type: string
+        yi:
+          type: array
+          items:
+            type: string
+        ji:
+          type: array
+          items:
+            type: string
+        wuXing:
+          type: string
+        chongSha:
+          type: string
+        zhiShen:
+          type: string
+        shenYiQu:
+          type: string
+        taiShen:
+          type: string
+        xiongShen:
+          type: array
+          items:
+            type: string
+        baiLu:
+          type: string
+        currentHourTitle:
+          type: string
+        xiShen:
+          type: string
+        hourYi:
+          type: array
+          items:
+            type: string
+        hourJi:
+          type: array
+          items:
+            type: string
+        hours:
+          type: array
+          items:
+            $ref: "#/components/schemas/AlmanacHourItem"
+
+    CodeEnvelopeBase:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: integer
+          example: 0
+        message:
+          type: string
+
+    CodeEnvelopeError:
+      allOf:
+        - $ref: "#/components/schemas/CodeEnvelopeBase"
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+
+    CodeEnvelopeAuthUser:
+      allOf:
+        - $ref: "#/components/schemas/CodeEnvelopeBase"
+        - type: object
+          required: [data]
+          properties:
+            data:
+              $ref: "#/components/schemas/AuthUserData"
+
+    CodeEnvelopeAuthTokenUser:
+      allOf:
+        - $ref: "#/components/schemas/CodeEnvelopeBase"
+        - type: object
+          required: [data]
+          properties:
+            data:
+              $ref: "#/components/schemas/AuthTokenUserData"
+
+    CodeEnvelopeSmsSend:
+      allOf:
+        - $ref: "#/components/schemas/CodeEnvelopeBase"
+        - type: object
+          required: [data]
+          properties:
+            data:
+              $ref: "#/components/schemas/SmsSendData"
+
+    CodeEnvelopeSmsLogin:
+      allOf:
+        - $ref: "#/components/schemas/CodeEnvelopeBase"
+        - type: object
+          required: [data]
+          properties:
+            data:
+              $ref: "#/components/schemas/SmsLoginData"
+
+    CodeEnvelopeBaziList:
+      allOf:
+        - $ref: "#/components/schemas/CodeEnvelopeBase"
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/BaziData"
+
+    CodeEnvelopeNoData:
+      $ref: "#/components/schemas/CodeEnvelopeBase"
+
+    BaziCalculateResponse:
+      type: object
+      required: [code, message, data, result]
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/BaziData"
+        result:
+          $ref: "#/components/schemas/BaziResult"
+
+    BaziDetailResponse:
+      type: object
+      required: [code, message, data, input, result]
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/BaziData"
+        input:
+          $ref: "#/components/schemas/BaziInput"
+        result:
+          $ref: "#/components/schemas/BaziResult"
+
+    LocalizedAnalyzeSuccessResponse:
+      type: object
+      required: [success, message, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/AIAnalyzeData"
+
+    LocalizedErrorResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        message:
+          type: string
+        data:
+          nullable: true
+
+    GenerateAlmanacResponse:
+      type: object
+      required: [success, message, data, vendor]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/AlmanacDTO"
+        vendor:
+          type: string
+
+    GetAlmanacDetailResponse:
+      type: object
+      required: [success, message, data, vendor, lang]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/AlmanacDTO"
+        vendor:
+          type: string
+        lang:
+          type: string
+          enum: [zh, en]
+
+    BooleanErrorResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        message:
+          type: string
+
+    MixedErrorResponse:
+      oneOf:
+        - $ref: "#/components/schemas/CodeEnvelopeError"
+        - $ref: "#/components/schemas/LocalizedErrorResponse"
+        - $ref: "#/components/schemas/BooleanErrorResponse"

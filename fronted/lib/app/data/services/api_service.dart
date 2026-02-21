@@ -1,12 +1,16 @@
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
-import '../models/user_model.dart';
-import '../models/bazi_model.dart';
-import 'token_manager.dart';
 import '../../core/config/api_config.dart';
+import '../models/almanac_model.dart';
+import '../models/bazi_model.dart';
+import '../models/user_model.dart';
+import 'token_manager.dart';
+
+class _ApiNotFoundException implements Exception {}
 
 class ApiService extends GetxService {
   static ApiService get to => Get.find();
@@ -22,30 +26,16 @@ class ApiService extends GetxService {
   @override
   void onInit() {
     super.onInit();
-    // 基础设置
     _client.timeout = const Duration(seconds: 20);
-    // 全局请求拦截：自动注入 Authorization
+
     _client.httpClient.addRequestModifier<dynamic>((request) {
-      final t = _tokenManager.token;
+      final token = _tokenManager.token;
       request.headers['Content-Type'] = 'application/json';
-      if (t != null && t.isNotEmpty) {
-        request.headers['Authorization'] = 'Bearer $t';
+      if (token != null && token.isNotEmpty) {
+        request.headers['Authorization'] = 'Bearer $token';
       }
       return request;
     });
-    // 全局响应拦截：统一透传（401 刷新与重放由 _sendWithRetry 负责）
-    _client.httpClient.addResponseModifier<dynamic>((request, response) async {
-      return response;
-    });
-  }
-
-  Map<String, String> _authHeaders() {
-    // 保持兼容局部调用（多数场景由拦截器注入）
-    final t = _tokenManager.token;
-    return {
-      'Content-Type': 'application/json',
-      if (t != null) 'Authorization': 'Bearer $t',
-    };
   }
 
   Future<Response> _dispatch(
@@ -66,7 +56,7 @@ class ApiService extends GetxService {
       case 'DELETE':
         return _client.delete(url, headers: headers);
       default:
-        return _client.request(method, url, body: body, headers: headers);
+        return _client.request(url, method, body: body, headers: headers);
     }
   }
 
@@ -75,27 +65,29 @@ class ApiService extends GetxService {
     String url, {
     dynamic body,
     Map<String, String>? headers,
+    bool retryOnUnauthorized = true,
   }) async {
-    // 第一次请求
     Response res = await _dispatch(method, url, body: body, headers: headers);
-    if (res.statusCode != 401) return res;
 
-    // 401 -> 刷新一次
-    final ok = await _refreshToken();
-    if (!ok) {
-      await _tokenManager.clear();
-      if (Get.currentRoute != '/login') Get.offAllNamed('/login');
+    if (!retryOnUnauthorized || res.statusCode != 401) {
       return res;
     }
 
-    // 刷新成功后重试一次
+    final refreshed = await _refreshToken();
+    if (!refreshed) {
+      await _tokenManager.clear();
+      if (Get.currentRoute != '/login') {
+        Get.offAllNamed('/login');
+      }
+      return res;
+    }
+
     final newHeaders = <String, String>{...?headers};
-    newHeaders.remove('Authorization'); // 让请求拦截器用新 token 注入
-    return await _dispatch(method, url, body: body, headers: newHeaders);
+    newHeaders.remove('Authorization');
+    return _dispatch(method, url, body: body, headers: newHeaders);
   }
 
   Future<bool> _refreshToken() async {
-    // 单飞刷新：如果正在刷新，等待同一个 Completer
     if (_isRefreshing) {
       if (_refreshCompleter != null) {
         try {
@@ -104,29 +96,32 @@ class ApiService extends GetxService {
           return false;
         }
       }
+      return false;
     }
 
     _isRefreshing = true;
     _refreshCompleter = Completer<bool>();
 
     try {
-      final resp = await _client.post('$_baseUrl/auth/refresh', {});
-      if (resp.statusCode == 200) {
-        final body = resp.body;
-        final wrapper = (body is Map) ? body : {};
-        final data = wrapper['data'] ?? wrapper; // 兼容老格式
-        final newToken = (data is Map) ? data['token'] as String? : null;
-        final user = (data is Map) ? data['user'] : null;
-        final uid = (user is Map) ? user['id'] as String? : null;
-        final ok = (newToken != null && uid != null);
-        if (ok) {
-          await _tokenManager.save(newToken, uid);
-          _refreshCompleter?.complete(true);
-          return true;
-        }
+      final resp = await _dispatch('POST', '$_baseUrl/api/v1/auth/refresh', body: {});
+      if (resp.statusCode != 200) {
+        _refreshCompleter?.complete(false);
+        return false;
       }
-      _refreshCompleter?.complete(false);
-      return false;
+
+      final data = _unwrapCodeData(resp.body);
+      final token = _asString(data['token']);
+      final user = _asMap(data['user']);
+      final uid = _asString(user['id']);
+
+      if (token.isEmpty || uid.isEmpty) {
+        _refreshCompleter?.complete(false);
+        return false;
+      }
+
+      await _tokenManager.save(token, uid);
+      _refreshCompleter?.complete(true);
+      return true;
     } catch (e) {
       _refreshCompleter?.completeError(e);
       return false;
@@ -136,7 +131,144 @@ class ApiService extends GetxService {
     }
   }
 
-  // 手机号注册接口
+  Map<String, dynamic> _asMap(dynamic value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) return Map<String, dynamic>.from(value);
+    return <String, dynamic>{};
+  }
+
+  List<dynamic> _asList(dynamic value) {
+    if (value is List) return value;
+    return <dynamic>[];
+  }
+
+  String _asString(dynamic value) => value?.toString() ?? '';
+
+  int _asInt(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) {
+      return int.tryParse(value) ?? fallback;
+    }
+    return fallback;
+  }
+
+  String _extractMessage(dynamic body, {String fallback = '请求失败'}) {
+    final map = _asMap(body);
+    final message = _asString(map['message']);
+    if (message.isNotEmpty) return message;
+    final error = _asString(map['error']);
+    if (error.isNotEmpty) return error;
+    return fallback;
+  }
+
+  Map<String, dynamic> _unwrapCodeData(dynamic body) {
+    final map = _asMap(body);
+    if (map.isEmpty) {
+      throw Exception('响应格式错误');
+    }
+
+    final code = _asInt(map['code'], fallback: -1);
+    if (code != 0) {
+      throw Exception(_extractMessage(map));
+    }
+
+    return _asMap(map['data']);
+  }
+
+  List<dynamic> _unwrapCodeListData(dynamic body) {
+    final map = _asMap(body);
+    if (map.isEmpty) {
+      throw Exception('响应格式错误');
+    }
+
+    final code = _asInt(map['code'], fallback: -1);
+    if (code != 0) {
+      throw Exception(_extractMessage(map));
+    }
+
+    return _asList(map['data']);
+  }
+
+  Map<String, dynamic> _unwrapSuccessEnvelope(dynamic body) {
+    final map = _asMap(body);
+    if (map.isEmpty) {
+      throw Exception('响应格式错误');
+    }
+
+    if (map.containsKey('success') && map['success'] != true) {
+      throw Exception(_extractMessage(map));
+    }
+
+    return map;
+  }
+
+  String _phoneToEmail(String phone) {
+    final normalized = phone.trim();
+    return '$normalized@mobile.local';
+  }
+
+  Map<String, dynamic> _decodeMaybeJsonMap(dynamic value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) return Map<String, dynamic>.from(value);
+
+    if (value is String && value.trim().isNotEmpty) {
+      try {
+        final decoded = jsonDecode(value);
+        if (decoded is Map) {
+          return Map<String, dynamic>.from(decoded);
+        }
+      } catch (_) {}
+    }
+
+    return <String, dynamic>{};
+  }
+
+  Map<String, dynamic> _mergeBaziPayload({
+    required Map<String, dynamic> record,
+    Map<String, dynamic>? input,
+    Map<String, dynamic>? result,
+  }) {
+    final inputMap = input ?? _decodeMaybeJsonMap(record['input_data'] ?? record['InputData']);
+    final resultMap = result ?? _decodeMaybeJsonMap(record['result_data'] ?? record['ResultData']);
+    final fiveElements = _asMap(resultMap['five_elements']);
+
+    final createdAt = _asString(record['created_at'] ?? record['CreatedAt']);
+    final updatedAt = _asString(record['updated_at'] ?? record['UpdatedAt']);
+
+    return <String, dynamic>{
+      'id': record['id'] ?? record['ID'] ?? '',
+      'user_id': record['user_id'] ?? record['UserID'] ?? '',
+      'created_at': createdAt.isNotEmpty ? createdAt : DateTime.now().toIso8601String(),
+      'updated_at': updatedAt.isNotEmpty
+          ? updatedAt
+          : (createdAt.isNotEmpty ? createdAt : DateTime.now().toIso8601String()),
+      'birth_year': inputMap['year'],
+      'birth_month': inputMap['month'],
+      'birth_day': inputMap['day'],
+      'birth_hour': inputMap['hour'],
+      'birth_minute': inputMap['minute'],
+      'gender': inputMap['gender'],
+      'name': inputMap['name'],
+      'timezone': inputMap['timezone'] ?? 'Asia/Shanghai',
+      'lunar_calendar': false,
+      'year_pillar': resultMap['year_pillar'] ?? '',
+      'month_pillar': resultMap['month_pillar'] ?? '',
+      'day_pillar': resultMap['day_pillar'] ?? '',
+      'hour_pillar': resultMap['hour_pillar'] ?? '',
+      'wood_score': _asInt(fiveElements['木']),
+      'fire_score': _asInt(fiveElements['火']),
+      'earth_score': _asInt(fiveElements['土']),
+      'metal_score': _asInt(fiveElements['金']),
+      'water_score': _asInt(fiveElements['水']),
+      'ai_analysis': _asString(record['analysis'] ?? record['Analysis']).isEmpty
+          ? null
+          : _asString(record['analysis'] ?? record['Analysis']),
+      'input': inputMap,
+      'result': resultMap,
+    };
+  }
+
   Future<UserModel> registerWithPhone({
     required String phone,
     required String username,
@@ -144,43 +276,39 @@ class ApiService extends GetxService {
   }) async {
     try {
       final requestData = {
-        'phone': phone,
-        'username': username,
+        'email': _phoneToEmail(phone),
         'password': password,
+        'name': username,
       };
 
       final response = await _sendWithRetry(
         'POST',
         '$_baseUrl/api/v1/auth/register',
         body: requestData,
+        retryOnUnauthorized: false,
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final body = response.body;
-        final userJson = body['user'];
-        final token = body['token'];
-
-        // 保存token
-        await _tokenManager.save(token, userJson['id']);
-
-        return UserModel.fromJson(userJson);
-      } else {
-        throw Exception('注册失败: ${response.body?['error'] ?? response.statusText}');
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(_extractMessage(response.body, fallback: '注册失败'));
       }
+
+      _unwrapCodeData(response.body);
+
+      // Go 注册接口不返回 token，这里串接一次登录保证主链路有鉴权态。
+      return loginWithPhone(phone: phone, password: password);
     } catch (e) {
       _logger.e('注册错误: $e');
-      throw Exception('注册失败: ${e.toString()}');
+      throw Exception('注册失败: ${e.toString().replaceFirst('Exception: ', '')}');
     }
   }
 
-  // 手机号登录接口
   Future<UserModel> loginWithPhone({
     required String phone,
     required String password,
   }) async {
     try {
       final requestData = {
-        'phone': phone,
+        'email': _phoneToEmail(phone),
         'password': password,
       };
 
@@ -188,23 +316,27 @@ class ApiService extends GetxService {
         'POST',
         '$_baseUrl/api/v1/auth/login',
         body: requestData,
+        retryOnUnauthorized: false,
       );
 
-      if (response.statusCode == 200) {
-        final body = response.body;
-        final userJson = body['user'];
-        final token = body['token'];
-
-        // 保存token
-        await _tokenManager.save(token, userJson['id']);
-
-        return UserModel.fromJson(userJson);
-      } else {
-        throw Exception('登录失败: ${response.body?['error'] ?? response.statusText}');
+      if (response.statusCode != 200) {
+        throw Exception(_extractMessage(response.body, fallback: '登录失败'));
       }
+
+      final data = _unwrapCodeData(response.body);
+      final userJson = _asMap(data['user']);
+      final token = _asString(data['token']);
+
+      final uid = _asString(userJson['id']);
+      if (uid.isEmpty || token.isEmpty) {
+        throw Exception('登录返回数据不完整');
+      }
+
+      await _tokenManager.save(token, uid);
+      return UserModel.fromJson(userJson);
     } catch (e) {
       _logger.e('登录错误: $e');
-      throw Exception('登录失败: ${e.toString()}');
+      throw Exception('登录失败: ${e.toString().replaceFirst('Exception: ', '')}');
     }
   }
 
@@ -212,10 +344,6 @@ class ApiService extends GetxService {
     await _tokenManager.clear();
   }
 
-  /// 发送短信验证码
-  /// [phone] 手机号
-  /// [purpose] 用途：login, register, reset_password
-  /// 返回验证码有效期（秒）
   Future<int> sendSmsCode({
     required String phone,
     String purpose = 'login',
@@ -230,27 +358,24 @@ class ApiService extends GetxService {
         'POST',
         '$_baseUrl/api/v1/auth/send-sms',
         body: requestData,
+        retryOnUnauthorized: false,
       );
 
-      if (response.statusCode == 200) {
-        final body = response.body;
-        return body['expires_in'] ?? 300;
-      } else if (response.statusCode == 429) {
-        // 请求过于频繁
+      if (response.statusCode == 429) {
         throw Exception('请求过于频繁，请稍后再试');
-      } else {
-        throw Exception('发送验证码失败: ${response.body?['message'] ?? response.statusText}');
       }
+      if (response.statusCode != 200) {
+        throw Exception(_extractMessage(response.body, fallback: '发送验证码失败'));
+      }
+
+      final data = _unwrapCodeData(response.body);
+      return _asInt(data['expires_in'], fallback: 300);
     } catch (e) {
       _logger.e('发送验证码错误: $e');
-      throw Exception('发送验证码失败: ${e.toString()}');
+      throw Exception('发送验证码失败: ${e.toString().replaceFirst('Exception: ', '')}');
     }
   }
 
-  /// 使用短信验证码登录/注册
-  /// [phone] 手机号
-  /// [code] 6位验证码
-  /// 返回登录结果，包含用户信息和是否新用户标识
   Future<Map<String, dynamic>> loginWithSms({
     required String phone,
     required String code,
@@ -265,60 +390,57 @@ class ApiService extends GetxService {
         'POST',
         '$_baseUrl/api/v1/auth/login-with-sms',
         body: requestData,
+        retryOnUnauthorized: false,
       );
 
-      if (response.statusCode == 200) {
-        final body = response.body;
-        final userJson = body['user'];
-        final token = body['token'];
-        final isNew = body['is_new'] ?? false;
-
-        // 保存token
-        if (token != null && userJson != null) {
-          await _tokenManager.save(token, userJson['id']);
-        }
-
-        return {
-          'user': UserModel.fromJson(userJson),
-          'token': token,
-          'is_new': isNew,
-        };
-      } else {
-        throw Exception('登录失败: ${response.body?['message'] ?? response.statusText}');
+      if (response.statusCode != 200) {
+        throw Exception(_extractMessage(response.body, fallback: '登录失败'));
       }
+
+      final data = _unwrapCodeData(response.body);
+      final userJson = _asMap(data['user']);
+      final token = _asString(data['token']);
+      final isNew = data['is_new'] == true;
+
+      if (token.isNotEmpty && _asString(userJson['id']).isNotEmpty) {
+        await _tokenManager.save(token, _asString(userJson['id']));
+      }
+
+      return {
+        'user': UserModel.fromJson(userJson),
+        'token': token,
+        'is_new': isNew,
+      };
     } catch (e) {
       _logger.e('验证码登录错误: $e');
-      throw Exception('登录失败: ${e.toString()}');
+      throw Exception('登录失败: ${e.toString().replaceFirst('Exception: ', '')}');
     }
   }
 
   Future<UserModel?> getCurrentUser() async {
     final uid = _tokenManager.userId;
-    if (uid == null) return null;
+    if (uid == null || uid.isEmpty) return null;
+
     final resp = await _sendWithRetry(
       'GET',
-      '$_baseUrl/auth/profile/$uid',
-      headers: _authHeaders(),
+      '$_baseUrl/api/v1/auth/profile/$uid',
     );
+
     if (resp.statusCode == 200) {
-      final body = resp.body;
-      final wrapper = (body is Map) ? body : {};
-      final data = wrapper['data'] ?? wrapper; // 兼容老格式
-      final userJson = (data is Map) ? (data['user'] ?? data) : null;
-      if (userJson is Map) {
-        final userMap = Map<String, dynamic>.from(userJson);
-        return UserModel.fromJson(userMap);
-      }
-      return null;
+      final data = _unwrapCodeData(resp.body);
+      final userJson = _asMap(data['user']);
+      if (userJson.isEmpty) return null;
+      return UserModel.fromJson(userJson);
     }
+
     if (resp.statusCode == 401) {
       await _tokenManager.clear();
       return null;
     }
-    return null;
+
+    throw Exception(_extractMessage(resp.body, fallback: '获取用户信息失败'));
   }
 
-  // 八字计算相关
   Future<BaziModel> calculateBazi({
     required int birthYear,
     required int birthMonth,
@@ -327,100 +449,108 @@ class ApiService extends GetxService {
     required int birthMinute,
     required String gender,
     required bool lunarCalendar,
+    String? name,
     String timezone = 'Asia/Shanghai',
   }) async {
     try {
       final requestData = {
-        'birth_year': birthYear,
-        'birth_month': birthMonth,
-        'birth_day': birthDay,
-        'birth_hour': birthHour,
-        'birth_minute': birthMinute,
+        'year': birthYear,
+        'month': birthMonth,
+        'day': birthDay,
+        'hour': birthHour,
+        'minute': birthMinute,
         'gender': gender,
-        'lunar_calendar': lunarCalendar,
+        if (name != null && name.isNotEmpty) 'name': name,
         'timezone': timezone,
       };
 
       final response = await _sendWithRetry(
         'POST',
-        '$_baseUrl/bazi/calculate',
+        '$_baseUrl/api/v1/bazi/calculate',
         body: requestData,
-        headers: _authHeaders(),
       );
 
-      if (response.statusCode == 200) {
-        return BaziModel.fromJson(response.body['data']);
-      } else {
-        throw Exception('八字计算失败: ${response.body['message']}');
+      if (response.statusCode != 200) {
+        throw Exception(_extractMessage(response.body, fallback: '八字计算失败'));
       }
+
+      final body = _asMap(response.body);
+      if (_asInt(body['code'], fallback: -1) != 0) {
+        throw Exception(_extractMessage(body, fallback: '八字计算失败'));
+      }
+
+      final record = _asMap(body['data']);
+      final result = _asMap(body['result']);
+      final merged = _mergeBaziPayload(record: record, input: requestData, result: result);
+      return BaziModel.fromJson(merged);
     } catch (e) {
       _logger.e('八字计算错误: $e');
-      throw Exception('八字计算失败: ${e.toString()}');
+      throw Exception('八字计算失败: ${e.toString().replaceFirst('Exception: ', '')}');
     }
   }
 
-  // 获取AI解读
   Future<Map<String, dynamic>> getAiAnalysis(String baziId) async {
     try {
       final response = await _sendWithRetry(
         'POST',
-        '$_baseUrl/ai/analyze',
-        body: {'bazi_id': baziId},
-        headers: _authHeaders(),
+        '$_baseUrl/api/v1/ai/analyze',
+        body: {
+          'bazi_id': baziId,
+          'language': 'zh',
+        },
       );
 
-      if (response.statusCode == 200) {
-        return response.body['data'];
-      } else {
-        throw Exception('AI解读失败: ${response.body['message']}');
+      if (response.statusCode != 200) {
+        throw Exception(_extractMessage(response.body, fallback: 'AI解读失败'));
       }
+
+      final envelope = _unwrapSuccessEnvelope(response.body);
+      return _asMap(envelope['data']);
     } catch (e) {
       _logger.e('AI解读错误: $e');
-      throw Exception('AI解读失败: ${e.toString()}');
+      throw Exception('AI解读失败: ${e.toString().replaceFirst('Exception: ', '')}');
     }
   }
 
-  // 获取八字历史记录
   Future<List<BaziModel>> getBaziHistory() async {
     try {
       final response = await _sendWithRetry(
         'GET',
-        '$_baseUrl/bazi/history',
-        headers: _authHeaders(),
+        '$_baseUrl/api/v1/bazi/history',
       );
 
-      if (response.statusCode == 200 && response.body != null) {
-        final List<dynamic> data = response.body['data'];
-        return data.map((json) => BaziModel.fromJson(json)).toList();
-      } else {
-        throw Exception(
-          '获取历史记录失败: ${response.body?['message'] ?? response.statusText}',
-        );
+      if (response.statusCode != 200) {
+        throw Exception(_extractMessage(response.body, fallback: '获取历史记录失败'));
       }
+
+      final list = _unwrapCodeListData(response.body);
+      return list
+          .whereType<Map>()
+          .map((item) => _mergeBaziPayload(record: _asMap(item)))
+          .map(BaziModel.fromJson)
+          .toList();
     } catch (e) {
       _logger.e('获取历史记录错误: $e');
-      throw Exception('获取历史记录失败: ${e.toString()}');
+      throw Exception('获取历史记录失败: ${e.toString().replaceFirst('Exception: ', '')}');
     }
   }
 
-  // 创建排盘记录（先写表，不计算）
   Future<String> createBaziRecord({
     required String name,
-    required String gender, // 'male' | 'female'
+    required String gender,
     required bool lunarCalendar,
     required int birthYear,
     required int birthMonth,
     required int birthDay,
     required int birthHour,
     required int birthMinute,
-    required String location, // 出生地区（文本）
+    required String location,
     String timezone = 'Asia/Shanghai',
   }) async {
     try {
       final requestData = {
         'name': name,
         'gender': gender,
-        'lunar_calendar': lunarCalendar,
         'year': birthYear,
         'month': birthMonth,
         'day': birthDay,
@@ -431,25 +561,31 @@ class ApiService extends GetxService {
 
       final response = await _sendWithRetry(
         'POST',
-        '$_baseUrl/bazi',
+        '$_baseUrl/api/v1/bazi',
         body: requestData,
-        headers: _authHeaders(),
       );
 
-      if (response.statusCode == 201 && response.body != null) {
-        return response.body['data']['id'];
-      } else {
-        throw Exception(
-          '创建排盘记录失败: ${response.body?['message'] ?? response.statusText}',
-        );
+      if (response.statusCode != 201 && response.statusCode != 200) {
+        throw Exception(_extractMessage(response.body, fallback: '创建排盘记录失败'));
       }
+
+      final body = _asMap(response.body);
+      if (_asInt(body['code'], fallback: -1) != 0) {
+        throw Exception(_extractMessage(body, fallback: '创建排盘记录失败'));
+      }
+
+      final data = _asMap(body['data']);
+      final id = _asString(data['id'] ?? data['ID']);
+      if (id.isEmpty) {
+        throw Exception('创建排盘记录失败：缺少记录ID');
+      }
+      return id;
     } catch (e) {
       _logger.e('创建排盘记录错误: $e');
-      throw Exception('创建排盘记录失败: ${e.toString()}');
+      throw Exception('创建排盘记录失败: ${e.toString().replaceFirst('Exception: ', '')}');
     }
   }
 
-  // 回填计算结果到 bazi_data
   Future<void> updateBaziResult(String id, BaziModel result) async {
     try {
       final requestData = {
@@ -465,93 +601,133 @@ class ApiService extends GetxService {
 
       final response = await _sendWithRetry(
         'PUT',
-        '$_baseUrl/bazi/$id',
+        '$_baseUrl/api/v1/bazi/$id',
         body: requestData,
-        headers: _authHeaders(),
       );
 
       if (response.statusCode != 200) {
-        throw Exception(
-          '更新计算结果失败: ${response.body?['message'] ?? response.statusText}',
-        );
+        throw Exception(_extractMessage(response.body, fallback: '更新计算结果失败'));
+      }
+
+      final body = _asMap(response.body);
+      if (_asInt(body['code'], fallback: -1) != 0) {
+        throw Exception(_extractMessage(body, fallback: '更新计算结果失败'));
       }
     } catch (e) {
       _logger.e('更新计算结果错误: $e');
-      throw Exception('更新计算结果失败: ${e.toString()}');
+      throw Exception('更新计算结果失败: ${e.toString().replaceFirst('Exception: ', '')}');
     }
   }
 
-  // 获取八字详情
   Future<BaziModel?> getBaziDetail(String baziId) async {
     try {
       final response = await _sendWithRetry(
         'GET',
-        '$_baseUrl/bazi/detail/$baziId',
-        headers: _authHeaders(),
+        '$_baseUrl/api/v1/bazi/detail/$baziId',
       );
 
-      if (response.statusCode == 200 && response.body != null) {
-        final Map<String, dynamic> responseBody = response.body;
-        final Map<String, dynamic> baziData = responseBody['data'];
-        final Map<String, dynamic> baziInput = responseBody['input'];
-        final Map<String, dynamic> baziResult = responseBody['result'];
-
-        Map<String, dynamic> combinedJson = {};
-
-        // Fields from baziData
-        combinedJson['id'] = baziData['id'];
-        combinedJson['user_id'] = baziData['user_id'];
-        combinedJson['created_at'] = baziData['created_at'];
-        combinedJson['updated_at'] = baziData['updated_at'];
-
-        // Fields from baziInput
-        combinedJson['birth_year'] = baziInput['year'];
-        combinedJson['birth_month'] = baziInput['month'];
-        combinedJson['birth_day'] = baziInput['day'];
-        combinedJson['birth_hour'] = baziInput['hour'];
-        combinedJson['birth_minute'] = baziInput['minute'];
-        combinedJson['gender'] = baziInput['gender'];
-        combinedJson['name'] = baziInput['name'];
-        combinedJson['timezone'] = baziInput['timezone'];
-        // lunar_calendar is not provided by Go backend, default to false
-        combinedJson['lunar_calendar'] = false;
-
-        // Fields from baziResult
-        combinedJson['year_pillar'] = baziResult['year_pillar'];
-        combinedJson['month_pillar'] = baziResult['month_pillar'];
-        combinedJson['day_pillar'] = baziResult['day_pillar'];
-        combinedJson['hour_pillar'] = baziResult['hour_pillar'];
-
-        // Extract five_elements scores
-        final Map<String, dynamic> fiveElements =
-            baziResult['five_elements'] ?? {};
-        combinedJson['wood_score'] = fiveElements['木'] ?? 0;
-        combinedJson['fire_score'] = fiveElements['火'] ?? 0;
-        combinedJson['earth_score'] = fiveElements['土'] ?? 0;
-        combinedJson['metal_score'] = fiveElements['金'] ?? 0;
-        combinedJson['water_score'] = fiveElements['水'] ?? 0;
-
-        // Parse analysis data if available
-        if (baziData['analysis'] != null && baziData['analysis'].isNotEmpty) {
-          final Map<String, dynamic> analysisMap = jsonDecode(
-            baziData['analysis'],
-          );
-          combinedJson['ai_analysis'] = analysisMap['ai_analysis'];
-          combinedJson['ai_analysis_en'] = analysisMap['ai_analysis_en'];
-          combinedJson['personality_traits'] =
-              analysisMap['personality_traits'];
-          combinedJson['career_advice'] = analysisMap['career_advice'];
-          combinedJson['health_advice'] = analysisMap['health_advice'];
-          combinedJson['relationship_advice'] =
-              analysisMap['relationship_advice'];
-        }
-
-        return BaziModel.fromJson(combinedJson);
+      if (response.statusCode != 200) {
+        throw Exception(_extractMessage(response.body, fallback: '获取八字详情失败'));
       }
-      return null;
+
+      final body = _asMap(response.body);
+      if (_asInt(body['code'], fallback: -1) != 0) {
+        throw Exception(_extractMessage(body, fallback: '获取八字详情失败'));
+      }
+
+      final record = _asMap(body['data']);
+      final input = _asMap(body['input']);
+      final result = _asMap(body['result']);
+      final merged = _mergeBaziPayload(record: record, input: input, result: result);
+      return BaziModel.fromJson(merged);
     } catch (e) {
       _logger.e('获取八字详情错误: $e');
       return null;
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    final y = date.year.toString().padLeft(4, '0');
+    final m = date.month.toString().padLeft(2, '0');
+    final d = date.day.toString().padLeft(2, '0');
+    return '$y-$m-$d';
+  }
+
+  Future<AlmanacModel> generateAlmanac({
+    required DateTime date,
+    String timezone = 'Asia/Shanghai',
+    String language = 'zh',
+    String providerPrefer = 'deepseek',
+    String? baziId,
+  }) async {
+    final payload = {
+      'date': _formatDate(date),
+      'timezone': timezone,
+      'language': language,
+      'provider_prefer': providerPrefer,
+      if (baziId != null && baziId.isNotEmpty) 'bazi_id': baziId,
+    };
+
+    final response = await _sendWithRetry(
+      'POST',
+      '$_baseUrl/api/v1/almanac/generate',
+      body: payload,
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(_extractMessage(response.body, fallback: '黄历生成失败'));
+    }
+
+    final envelope = _unwrapSuccessEnvelope(response.body);
+    return AlmanacModel.fromResponse(envelope);
+  }
+
+  Future<AlmanacModel> getAlmanacDetail({
+    required DateTime date,
+    String? baziId,
+  }) async {
+    final dateText = _formatDate(date);
+    final query = baziId != null && baziId.isNotEmpty
+        ? '?date=$dateText&bazi_id=$baziId'
+        : '?date=$dateText';
+
+    final response = await _sendWithRetry(
+      'GET',
+      '$_baseUrl/api/v1/almanac/detail$query',
+    );
+
+    if (response.statusCode == 404) {
+      throw _ApiNotFoundException();
+    }
+
+    if (response.statusCode != 200) {
+      throw Exception(_extractMessage(response.body, fallback: '获取黄历详情失败'));
+    }
+
+    final envelope = _unwrapSuccessEnvelope(response.body);
+    return AlmanacModel.fromResponse(envelope);
+  }
+
+  Future<AlmanacModel> getOrGenerateAlmanac({
+    required DateTime date,
+    String timezone = 'Asia/Shanghai',
+    String language = 'zh',
+    String providerPrefer = 'deepseek',
+    String? baziId,
+  }) async {
+    try {
+      return await getAlmanacDetail(date: date, baziId: baziId);
+    } catch (e) {
+      if (e is _ApiNotFoundException) {
+        return generateAlmanac(
+          date: date,
+          timezone: timezone,
+          language: language,
+          providerPrefer: providerPrefer,
+          baziId: baziId,
+        );
+      }
+      rethrow;
     }
   }
 }

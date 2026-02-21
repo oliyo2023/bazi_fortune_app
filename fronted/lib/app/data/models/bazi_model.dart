@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class BaziModel {
   final String id;
   final String userId;
@@ -66,36 +68,129 @@ class BaziModel {
     required this.updatedAt,
   });
 
+  static Map<String, dynamic> _toMap(dynamic value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) return Map<String, dynamic>.from(value);
+    if (value is String && value.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(value);
+        if (decoded is Map) return Map<String, dynamic>.from(decoded);
+      } catch (_) {}
+    }
+    return <String, dynamic>{};
+  }
+
+  static String _pickString(Map<String, dynamic> json, List<String> keys, {String fallback = ''}) {
+    for (final key in keys) {
+      final value = json[key];
+      if (value != null && value.toString().isNotEmpty) {
+        return value.toString();
+      }
+    }
+    return fallback;
+  }
+
+  static int _pickInt(Map<String, dynamic> json, List<String> keys, {int fallback = 0}) {
+    for (final key in keys) {
+      final value = json[key];
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      if (value is String) {
+        final parsed = int.tryParse(value);
+        if (parsed != null) return parsed;
+      }
+    }
+    return fallback;
+  }
+
   factory BaziModel.fromJson(Map<String, dynamic> json) {
+    final map = _toMap(json);
+    final input = _toMap(map['input']);
+    final result = _toMap(map['result']);
+    final dynamic inputDataRaw = map['input_data'] ?? map['InputData'];
+    final dynamic resultDataRaw = map['result_data'] ?? map['ResultData'];
+    final inputData = _toMap(inputDataRaw);
+    final resultData = _toMap(resultDataRaw);
+    final fiveElements = _toMap(
+      map['five_elements'] ??
+          result['five_elements'] ??
+          resultData['five_elements'],
+    );
+
+    final createdAtRaw = _pickString(map, ['created_at', 'CreatedAt'], fallback: DateTime.now().toIso8601String());
+    final updatedAtRaw = _pickString(
+      map,
+      ['updated_at', 'UpdatedAt'],
+      fallback: createdAtRaw,
+    );
+
+    final parsedName = _pickString(
+      map,
+      ['name'],
+      fallback: _pickString(input, ['name'], fallback: _pickString(inputData, ['name'])),
+    );
+
     return BaziModel(
-      id: json['id'],
-      userId: json['user_id'],
-      birthYear: json['birth_year'],
-      birthMonth: json['birth_month'],
-      birthDay: json['birth_day'],
-      birthHour: json['birth_hour'],
-      birthMinute: json['birth_minute'] ?? 0,
-      gender: json['gender'],
-      lunarCalendar: json['lunar_calendar'] ?? false,
-      timezone: json['timezone'] ?? 'Asia/Shanghai',
-      name: json['name'],
-      yearPillar: json['year_pillar'],
-      monthPillar: json['month_pillar'],
-      dayPillar: json['day_pillar'],
-      hourPillar: json['hour_pillar'],
-      woodScore: json['wood_score'] ?? 0,
-      fireScore: json['fire_score'] ?? 0,
-      earthScore: json['earth_score'] ?? 0,
-      metalScore: json['metal_score'] ?? 0,
-      waterScore: json['water_score'] ?? 0,
-      aiAnalysis: json['ai_analysis'],
-      aiAnalysisEn: json['ai_analysis_en'],
-      personalityTraits: json['personality_traits'],
-      careerAdvice: json['career_advice'],
-      healthAdvice: json['health_advice'],
-      relationshipAdvice: json['relationship_advice'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      id: _pickString(map, ['id', 'ID']),
+      userId: _pickString(map, ['user_id', 'UserID']),
+      birthYear: _pickInt(map, ['birth_year'], fallback: _pickInt(input, ['year'], fallback: _pickInt(inputData, ['year']))),
+      birthMonth: _pickInt(map, ['birth_month'], fallback: _pickInt(input, ['month'], fallback: _pickInt(inputData, ['month']))),
+      birthDay: _pickInt(map, ['birth_day'], fallback: _pickInt(input, ['day'], fallback: _pickInt(inputData, ['day']))),
+      birthHour: _pickInt(map, ['birth_hour'], fallback: _pickInt(input, ['hour'], fallback: _pickInt(inputData, ['hour']))),
+      birthMinute: _pickInt(
+        map,
+        ['birth_minute'],
+        fallback: _pickInt(input, ['minute'], fallback: _pickInt(inputData, ['minute'])),
+      ),
+      gender: _pickString(map, ['gender'], fallback: _pickString(input, ['gender'], fallback: _pickString(inputData, ['gender']))),
+      lunarCalendar: map['lunar_calendar'] == true,
+      timezone: _pickString(
+        map,
+        ['timezone'],
+        fallback: _pickString(input, ['timezone'], fallback: _pickString(inputData, ['timezone'], fallback: 'Asia/Shanghai')),
+      ),
+      name: parsedName.isEmpty ? null : parsedName,
+      yearPillar: _pickString(
+        map,
+        ['year_pillar'],
+        fallback: _pickString(result, ['year_pillar'], fallback: _pickString(resultData, ['year_pillar'])),
+      ),
+      monthPillar: _pickString(
+        map,
+        ['month_pillar'],
+        fallback: _pickString(result, ['month_pillar'], fallback: _pickString(resultData, ['month_pillar'])),
+      ),
+      dayPillar: _pickString(
+        map,
+        ['day_pillar'],
+        fallback: _pickString(result, ['day_pillar'], fallback: _pickString(resultData, ['day_pillar'])),
+      ),
+      hourPillar: _pickString(
+        map,
+        ['hour_pillar'],
+        fallback: _pickString(result, ['hour_pillar'], fallback: _pickString(resultData, ['hour_pillar'])),
+      ),
+      woodScore: _pickInt(map, ['wood_score'], fallback: _pickInt(fiveElements, ['木'])),
+      fireScore: _pickInt(map, ['fire_score'], fallback: _pickInt(fiveElements, ['火'])),
+      earthScore: _pickInt(map, ['earth_score'], fallback: _pickInt(fiveElements, ['土'])),
+      metalScore: _pickInt(map, ['metal_score'], fallback: _pickInt(fiveElements, ['金'])),
+      waterScore: _pickInt(map, ['water_score'], fallback: _pickInt(fiveElements, ['水'])),
+      aiAnalysis: map['ai_analysis']?.toString() ?? map['analysis']?.toString(),
+      aiAnalysisEn: map['ai_analysis_en']?.toString(),
+      personalityTraits: map['personality_traits'] is Map
+          ? Map<String, dynamic>.from(map['personality_traits'] as Map)
+          : null,
+      careerAdvice: map['career_advice'] is Map
+          ? Map<String, dynamic>.from(map['career_advice'] as Map)
+          : null,
+      healthAdvice: map['health_advice'] is Map
+          ? Map<String, dynamic>.from(map['health_advice'] as Map)
+          : null,
+      relationshipAdvice: map['relationship_advice'] is Map
+          ? Map<String, dynamic>.from(map['relationship_advice'] as Map)
+          : null,
+      createdAt: DateTime.tryParse(createdAtRaw) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(updatedAtRaw) ?? DateTime.now(),
     );
   }
 

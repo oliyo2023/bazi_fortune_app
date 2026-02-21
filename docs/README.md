@@ -2,6 +2,11 @@
 
 一款基于 Flutter 开发的八字算命应用，融合中国传统文化与现代 AI 技术，为用户提供专业的命理分析和指导。
 
+## API Governance
+
+- Primary backend decision (ADR): `adr/0001-primary-backend-go.md`
+- Frozen API contract (OpenAPI): `../backend/openapi/openapi.yaml`
+
 ## 🌟 项目特色
 
 - **八字排盘**: 根据公历出生日期自动计算八字、大运、流年

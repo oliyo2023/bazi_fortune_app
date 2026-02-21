@@ -13,8 +13,8 @@ class AuthService extends GetxService {
   final Rx<UserModel?> currentUser = Rx<UserModel?>(null);
   final RxBool isLoggedIn = false.obs;
 
-  // 测试模式：不请求网络
-  static const bool testMode = true;
+  // 生产链路默认开启真实网络请求
+  static const bool testMode = false;
 
   @override
   void onInit() {

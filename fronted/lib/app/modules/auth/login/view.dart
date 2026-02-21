@@ -239,7 +239,7 @@ class LoginPage extends GetView<LoginController> {
           Obx(
             () => OtpInputField(
               key: controller.otpFieldKey,
-              length: 4,
+              length: 6,
               boxWidth: 48.w,
               boxHeight: 56.h,
               boxSpacing: 6.w,

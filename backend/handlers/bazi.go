@@ -33,50 +33,30 @@ type CalculateRequest struct {
 	// UserID   string `json:"user_id" binding:"required"` // 从 JWT 中获取用户ID
 }
 
-// CalculateResponse 八字计算响应
-type CalculateResponse struct {
-	Success bool               `json:"success"`
-	Message string             `json:"message"`
-	Data    *models.BaziData   `json:"data,omitempty"`
-	Result  *models.BaziResult `json:"result,omitempty"`
-}
-
 // Calculate 计算八字
 func (h *BaziHandler) Calculate(c *gin.Context) {
 	var req CalculateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, CalculateResponse{
-			Success: false,
-			Message: "Invalid request format: " + err.Error(),
-		})
+		JSONError(c, 42001, "invalid_request", http.StatusBadRequest)
 		return
 	}
 
 	// 从 Gin 上下文获取用户ID（来自 JWT 中间件）
 	uid := c.GetString("user_id")
 	if uid == "" {
-		c.JSON(http.StatusUnauthorized, CalculateResponse{
-			Success: false,
-			Message: "User ID not found in context",
-		})
+		JSONError(c, 42002, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 	userID, err := uuid.Parse(uid)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, CalculateResponse{
-			Success: false,
-			Message: "Failed to parse user ID from context",
-		})
+		JSONError(c, 42003, "invalid_token", http.StatusUnauthorized)
 		return
 	}
 
 	// 验证用户是否存在 (可选，因为JWT已验证用户，但可以作为额外检查)
 	var user models.User
 	if err := h.db.First(&user, "id = ?", userID).Error; err != nil {
-		c.JSON(http.StatusNotFound, CalculateResponse{
-			Success: false,
-			Message: "User not found",
-		})
+		JSONError(c, 42004, "user_not_found", http.StatusNotFound)
 		return
 	}
 
@@ -103,27 +83,18 @@ func (h *BaziHandler) Calculate(c *gin.Context) {
 
 	// 设置输入和结果数据
 	if err := baziData.SetInputData(input); err != nil {
-		c.JSON(http.StatusInternalServerError, CalculateResponse{
-			Success: false,
-			Message: "Failed to save input data",
-		})
+		JSONError(c, 42005, "data_validation_failed", http.StatusInternalServerError)
 		return
 	}
 
 	if err := baziData.SetResultData(result); err != nil {
-		c.JSON(http.StatusInternalServerError, CalculateResponse{
-			Success: false,
-			Message: "Failed to save result data",
-		})
+		JSONError(c, 42006, "data_validation_failed", http.StatusInternalServerError)
 		return
 	}
 
 	// 保存到数据库
 	if err := h.db.Create(&baziData).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, CalculateResponse{
-			Success: false,
-			Message: "Failed to save bazi data",
-		})
+		JSONError(c, 42007, "database_error", http.StatusInternalServerError)
 		return
 	}
 
@@ -145,7 +116,7 @@ func (h *BaziHandler) GetHistory(c *gin.Context) {
 	}
 	userID, err := uuid.Parse(uid)
 	if err != nil {
-		JSONError(c, 50002, "invalid user id in context", http.StatusInternalServerError)
+		JSONError(c, 42012, "invalid_user_id_format", http.StatusUnauthorized)
 		return
 	}
 
@@ -155,7 +126,7 @@ func (h *BaziHandler) GetHistory(c *gin.Context) {
 		Where("user_id = ?", userID).
 		Order("created_at DESC").
 		Find(&baziRecords).Error; err != nil {
-		JSONError(c, 50003, "failed to fetch bazi history", http.StatusInternalServerError)
+		JSONError(c, 42013, "database_error", http.StatusInternalServerError)
 		return
 	}
 
@@ -170,53 +141,50 @@ func (h *BaziHandler) GetBaziDetail(c *gin.Context) {
 	// 从 Gin 上下文获取用户ID（来自 JWT 中间件）
 	uid := c.GetString("user_id")
 	if uid == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"message": "User ID not found in context",
-		})
+		JSONError(c, 42020, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 	requestUserID, err := uuid.Parse(uid)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "Failed to parse user ID from context",
-		})
+		JSONError(c, 42021, "invalid_token", http.StatusUnauthorized)
 		return
 	}
 
 	// 解析八字ID
 	baziID, err := uuid.Parse(baziIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "Invalid bazi ID format",
-		})
+		JSONError(c, 42022, "invalid_parameters", http.StatusBadRequest)
 		return
 	}
 
 	// 查询八字记录
 	var baziData models.BaziData
 	if err := h.db.First(&baziData, "id = ?", baziID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"success": false,
-			"message": "Bazi record not found",
-		})
+		if err == gorm.ErrRecordNotFound {
+			JSONError(c, 42023, "not_found", http.StatusNotFound)
+			return
+		}
+		JSONError(c, 42024, "database_error", http.StatusInternalServerError)
 		return
 	}
 
 	// 验证用户是否有权限访问该八字记录
 	if baziData.UserID != requestUserID {
-		c.JSON(http.StatusForbidden, gin.H{
-			"success": false,
-			"message": "You do not have permission to access this bazi record",
-		})
+		JSONError(c, 42025, "forbidden", http.StatusForbidden)
 		return
 	}
 
 	// 获取输入和结果数据
-	input, _ := baziData.GetInputData()
-	result, _ := baziData.GetResultData()
+	input, err := baziData.GetInputData()
+	if err != nil {
+		JSONError(c, 42026, "data_validation_failed", http.StatusInternalServerError)
+		return
+	}
+	result, err := baziData.GetResultData()
+	if err != nil {
+		JSONError(c, 42027, "data_validation_failed", http.StatusInternalServerError)
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"code":    0,
@@ -305,28 +273,19 @@ func getSeason(month int) string {
 func (h *BaziHandler) CreateBaziRecord(c *gin.Context) {
 	var req CalculateRequest // 复用 CalculateRequest 结构体
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, CalculateResponse{
-			Success: false,
-			Message: "Invalid request format: " + err.Error(),
-		})
+		JSONError(c, 42030, "invalid_request", http.StatusBadRequest)
 		return
 	}
 
 	// 从 Gin 上下文获取用户ID（来自 JWT 中间件）
 	uid := c.GetString("user_id")
 	if uid == "" {
-		c.JSON(http.StatusUnauthorized, CalculateResponse{
-			Success: false,
-			Message: "User ID not found in context",
-		})
+		JSONError(c, 42031, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 	userID, err := uuid.Parse(uid)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, CalculateResponse{
-			Success: false,
-			Message: "Failed to parse user ID from context",
-		})
+		JSONError(c, 42032, "invalid_token", http.StatusUnauthorized)
 		return
 	}
 
@@ -353,27 +312,18 @@ func (h *BaziHandler) CreateBaziRecord(c *gin.Context) {
 
 	// 设置输入和结果数据
 	if err := baziData.SetInputData(input); err != nil {
-		c.JSON(http.StatusInternalServerError, CalculateResponse{
-			Success: false,
-			Message: "Failed to save input data",
-		})
+		JSONError(c, 42033, "data_validation_failed", http.StatusInternalServerError)
 		return
 	}
 
 	if err := baziData.SetResultData(result); err != nil {
-		c.JSON(http.StatusInternalServerError, CalculateResponse{
-			Success: false,
-			Message: "Failed to save result data",
-		})
+		JSONError(c, 42034, "data_validation_failed", http.StatusInternalServerError)
 		return
 	}
 
 	// 保存到数据库
 	if err := h.db.Create(&baziData).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, CalculateResponse{
-			Success: false,
-			Message: "Failed to save bazi data",
-		})
+		JSONError(c, 42035, "database_error", http.StatusInternalServerError)
 		return
 	}
 
@@ -392,55 +342,41 @@ func (h *BaziHandler) UpdateBaziRecord(c *gin.Context) {
 	// 从 Gin 上下文获取用户ID（来自 JWT 中间件）
 	uid := c.GetString("user_id")
 	if uid == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"message": "User ID not found in context",
-		})
+		JSONError(c, 42040, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 	requestUserID, err := uuid.Parse(uid)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "Failed to parse user ID from context",
-		})
+		JSONError(c, 42041, "invalid_token", http.StatusUnauthorized)
 		return
 	}
 
 	// 解析八字ID
 	baziID, err := uuid.Parse(baziIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "Invalid bazi ID format",
-		})
+		JSONError(c, 42042, "invalid_parameters", http.StatusBadRequest)
 		return
 	}
 
 	var existingBaziData models.BaziData
 	if err := h.db.First(&existingBaziData, "id = ?", baziID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"success": false,
-			"message": "Bazi record not found",
-		})
+		if err == gorm.ErrRecordNotFound {
+			JSONError(c, 42043, "not_found", http.StatusNotFound)
+			return
+		}
+		JSONError(c, 42044, "database_error", http.StatusInternalServerError)
 		return
 	}
 
 	// 验证用户是否有权限更新该八字记录
 	if existingBaziData.UserID != requestUserID {
-		c.JSON(http.StatusForbidden, gin.H{
-			"success": false,
-			"message": "You do not have permission to update this bazi record",
-		})
+		JSONError(c, 42045, "forbidden", http.StatusForbidden)
 		return
 	}
 
 	var req CalculateRequest // 复用 CalculateRequest 结构体
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, CalculateResponse{
-			Success: false,
-			Message: "Invalid request format: " + err.Error(),
-		})
+		JSONError(c, 42046, "invalid_request", http.StatusBadRequest)
 		return
 	}
 
@@ -461,27 +397,18 @@ func (h *BaziHandler) UpdateBaziRecord(c *gin.Context) {
 
 	// 更新八字数据记录
 	if err := existingBaziData.SetInputData(input); err != nil {
-		c.JSON(http.StatusInternalServerError, CalculateResponse{
-			Success: false,
-			Message: "Failed to update input data",
-		})
+		JSONError(c, 42047, "data_validation_failed", http.StatusInternalServerError)
 		return
 	}
 
 	if err := existingBaziData.SetResultData(result); err != nil {
-		c.JSON(http.StatusInternalServerError, CalculateResponse{
-			Success: false,
-			Message: "Failed to update result data",
-		})
+		JSONError(c, 42048, "data_validation_failed", http.StatusInternalServerError)
 		return
 	}
 
 	// 保存到数据库
 	if err := h.db.Save(&existingBaziData).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, CalculateResponse{
-			Success: false,
-			Message: "Failed to update bazi data",
-		})
+		JSONError(c, 42049, "database_error", http.StatusInternalServerError)
 		return
 	}
 
@@ -500,55 +427,41 @@ func (h *BaziHandler) DeleteBaziRecord(c *gin.Context) {
 	// 从 Gin 上下文获取用户ID（来自 JWT 中间件）
 	uid := c.GetString("user_id")
 	if uid == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"success": false,
-			"message": "User ID not found in context",
-		})
+		JSONError(c, 42050, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 	requestUserID, err := uuid.Parse(uid)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "Failed to parse user ID from context",
-		})
+		JSONError(c, 42051, "invalid_token", http.StatusUnauthorized)
 		return
 	}
 
 	// 解析八字ID
 	baziID, err := uuid.Parse(baziIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "Invalid bazi ID format",
-		})
+		JSONError(c, 42052, "invalid_parameters", http.StatusBadRequest)
 		return
 	}
 
 	var existingBaziData models.BaziData
 	if err := h.db.First(&existingBaziData, "id = ?", baziID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"success": false,
-			"message": "Bazi record not found",
-		})
+		if err == gorm.ErrRecordNotFound {
+			JSONError(c, 42053, "not_found", http.StatusNotFound)
+			return
+		}
+		JSONError(c, 42054, "database_error", http.StatusInternalServerError)
 		return
 	}
 
 	// 验证用户是否有权限删除该八字记录
 	if existingBaziData.UserID != requestUserID {
-		c.JSON(http.StatusForbidden, gin.H{
-			"success": false,
-			"message": "You do not have permission to delete this bazi record",
-		})
+		JSONError(c, 42055, "forbidden", http.StatusForbidden)
 		return
 	}
 
 	// 从数据库中删除
 	if err := h.db.Delete(&existingBaziData).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "Failed to delete bazi record",
-		})
+		JSONError(c, 42056, "database_error", http.StatusInternalServerError)
 		return
 	}
 

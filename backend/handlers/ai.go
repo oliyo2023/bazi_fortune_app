@@ -55,6 +55,17 @@ type Choice struct {
 
 // Analyze 使用AI分析八字
 func (h *AIHandler) Analyze(c *gin.Context) {
+	uid := c.GetString("user_id")
+	if uid == "" {
+		JSONError(c, 43001, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	requestUserID, err := uuid.Parse(uid)
+	if err != nil {
+		JSONError(c, 43002, "invalid_token", http.StatusUnauthorized)
+		return
+	}
+
 	var req AnalyzeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		JSONLocalizedErrorWithData(c, "invalid_request", err.Error(), http.StatusBadRequest)
@@ -74,6 +85,10 @@ func (h *AIHandler) Analyze(c *gin.Context) {
 	var baziData models.BaziData
 	if err := models.GetDB().First(&baziData, "id = ?", baziID).Error; err != nil {
 		JSONLocalizedError(c, "no_data_found", http.StatusNotFound)
+		return
+	}
+	if baziData.UserID != requestUserID {
+		JSONLocalizedError(c, "forbidden", http.StatusForbidden)
 		return
 	}
 

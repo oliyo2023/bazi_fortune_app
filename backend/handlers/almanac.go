@@ -47,6 +47,18 @@ type GetAlmanacQuery struct {
 
 // POST /api/v1/almanac/generate
 func (h *AlmanacHandler) Generate(c *gin.Context) {
+	sub := c.GetString("user_id")
+	if sub == "" {
+		JSONError(c, 44001, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	uid, err := uuid.Parse(sub)
+	if err != nil {
+		JSONError(c, 44002, "invalid_token", http.StatusUnauthorized)
+		return
+	}
+	userID := &uid
+
 	var req GenerateAlmanacRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid request: " + err.Error()})
@@ -102,14 +114,6 @@ func (h *AlmanacHandler) Generate(c *gin.Context) {
 	// 字段兜底（防止空值导致前端异常）
 	h.fillDefaults(dto)
 
-	// upsert（user_id 从 JWT 解析，项目已有 SupabaseAuthMiddleware，但此处简单从 Header 的 claim 注入到 context）
-	var userID *uuid.UUID
-	if sub := c.GetString("user_id"); sub != "" {
-		if uid, err := uuid.Parse(sub); err == nil {
-			userID = &uid
-		}
-	}
-
 	// 幂等：同 user/date 唯一，冲突则更新
 	var record models.AlmanacDetail
 	err = h.db.Where("user_id = ? AND date = ?", userID, theDay).
@@ -158,6 +162,18 @@ func (h *AlmanacHandler) Generate(c *gin.Context) {
 
 // GET /api/v1/almanac/detail?date=YYYY-MM-DD
 func (h *AlmanacHandler) GetDetail(c *gin.Context) {
+	sub := c.GetString("user_id")
+	if sub == "" {
+		JSONError(c, 44011, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	uid, err := uuid.Parse(sub)
+	if err != nil {
+		JSONError(c, 44012, "invalid_token", http.StatusUnauthorized)
+		return
+	}
+	userID := &uid
+
 	var q GetAlmanacQuery
 	if err := c.ShouldBindQuery(&q); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid query: " + err.Error()})
@@ -167,13 +183,6 @@ func (h *AlmanacHandler) GetDetail(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid date format"})
 		return
-	}
-
-	var userID *uuid.UUID
-	if sub := c.GetString("user_id"); sub != "" {
-		if uid, err := uuid.Parse(sub); err == nil {
-			userID = &uid
-		}
 	}
 
 	var rec models.AlmanacDetail

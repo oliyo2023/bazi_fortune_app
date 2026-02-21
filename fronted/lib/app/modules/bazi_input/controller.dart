@@ -159,6 +159,7 @@ class BaziInputController extends GetxController {
         birthMinute: selectedTime.value.minute,
         gender: selectedGender.value == 0 ? 'male' : 'female',
         lunarCalendar: isLunarCalendar.value,
+        name: nameController.text.trim(),
         timezone: 'Asia/Shanghai',
       );
 

@@ -40,7 +40,7 @@ class OtpInputField extends StatefulWidget {
 
   const OtpInputField({
     super.key,
-    this.length = 4,
+    this.length = 6,
     required this.onCompleted,
     this.onChanged,
     this.boxWidth = 50,

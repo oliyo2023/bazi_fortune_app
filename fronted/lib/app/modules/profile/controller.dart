@@ -13,8 +13,8 @@ class ProfileController extends GetxController {
   final RxString yiZhu = '30'.obs;
   final RxString favorites = '0'.obs;
 
-  // 测试模式：不请求网络
-  static const bool testMode = true;
+  // 主链路默认直连后端
+  static const bool testMode = false;
 
   @override
   void onInit() {

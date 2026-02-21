@@ -2,6 +2,11 @@
 
 八字算命应用后端服务，基于 Golang + Gin + GORM + Supabase 构建。
 
+## Contract Source of Truth
+
+- Primary backend ADR: `../docs/adr/0001-primary-backend-go.md`
+- Frozen API contract (OpenAPI): `openapi/openapi.yaml`
+
 ## 功能特性
 
 - 🔐 用户认证系统（注册、登录、资料管理）
