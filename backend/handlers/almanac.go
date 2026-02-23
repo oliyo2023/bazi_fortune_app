@@ -9,6 +9,7 @@ import (
 
 	"bazi_fortune_app/backend/config"
 	"bazi_fortune_app/backend/models"
+	"bazi_fortune_app/backend/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -47,17 +48,7 @@ type GetAlmanacQuery struct {
 
 // POST /api/v1/almanac/generate
 func (h *AlmanacHandler) Generate(c *gin.Context) {
-	sub := c.GetString("user_id")
-	if sub == "" {
-		JSONError(c, 44001, "unauthorized", http.StatusUnauthorized)
-		return
-	}
-	uid, err := uuid.Parse(sub)
-	if err != nil {
-		JSONError(c, 44002, "invalid_token", http.StatusUnauthorized)
-		return
-	}
-	userID := &uid
+	userID := h.getOptionalUserID(c)
 
 	var req GenerateAlmanacRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -116,8 +107,13 @@ func (h *AlmanacHandler) Generate(c *gin.Context) {
 
 	// 幂等：同 user/date 唯一，冲突则更新
 	var record models.AlmanacDetail
-	err = h.db.Where("user_id = ? AND date = ?", userID, theDay).
-		Take(&record).Error
+	tx := h.db.Where("date = ?", theDay)
+	if userID != nil {
+		tx = tx.Where("user_id = ?", *userID)
+	} else {
+		tx = tx.Where("user_id IS NULL")
+	}
+	err = tx.Take(&record).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "DB error: " + err.Error()})
 		return
@@ -162,17 +158,7 @@ func (h *AlmanacHandler) Generate(c *gin.Context) {
 
 // GET /api/v1/almanac/detail?date=YYYY-MM-DD
 func (h *AlmanacHandler) GetDetail(c *gin.Context) {
-	sub := c.GetString("user_id")
-	if sub == "" {
-		JSONError(c, 44011, "unauthorized", http.StatusUnauthorized)
-		return
-	}
-	uid, err := uuid.Parse(sub)
-	if err != nil {
-		JSONError(c, 44012, "invalid_token", http.StatusUnauthorized)
-		return
-	}
-	userID := &uid
+	userID := h.getOptionalUserID(c)
 
 	var q GetAlmanacQuery
 	if err := c.ShouldBindQuery(&q); err != nil {
@@ -186,7 +172,13 @@ func (h *AlmanacHandler) GetDetail(c *gin.Context) {
 	}
 
 	var rec models.AlmanacDetail
-	if err := h.db.Where("user_id = ? AND date = ?", userID, theDay).Take(&rec).Error; err != nil {
+	tx := h.db.Where("date = ?", theDay)
+	if userID != nil {
+		tx = tx.Where("user_id = ?", *userID)
+	} else {
+		tx = tx.Where("user_id IS NULL")
+	}
+	if err := tx.Take(&rec).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "not found"})
 			return
@@ -207,6 +199,35 @@ func (h *AlmanacHandler) GetDetail(c *gin.Context) {
 		"vendor":  rec.Vendor,
 		"lang":    rec.Lang,
 	})
+}
+
+func (h *AlmanacHandler) getOptionalUserID(c *gin.Context) *uuid.UUID {
+	if sub := c.GetString("user_id"); sub != "" {
+		if uid, err := uuid.Parse(sub); err == nil {
+			return &uid
+		}
+	}
+
+	authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
+	if !strings.HasPrefix(strings.ToLower(authHeader), "bearer ") {
+		return nil
+	}
+
+	token := strings.TrimSpace(authHeader[len("Bearer "):])
+	if token == "" {
+		return nil
+	}
+
+	claims, err := util.ParseJWT(h.cfg, token)
+	if err != nil || claims == nil || claims.Sub == "" {
+		return nil
+	}
+
+	uid, err := uuid.Parse(claims.Sub)
+	if err != nil {
+		return nil
+	}
+	return &uid
 }
 
 // Prompt 构造

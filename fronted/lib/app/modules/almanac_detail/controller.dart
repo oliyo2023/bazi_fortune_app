@@ -3,7 +3,6 @@ import 'package:lunar/lunar.dart';
 
 import '../../data/models/almanac_model.dart';
 import '../../data/services/api_service.dart';
-import '../../data/services/auth_service.dart';
 
 class AlmanacDetailController extends GetxController {
   final Rx<DateTime> _selectedDate = DateTime.now().obs;
@@ -44,14 +43,6 @@ class AlmanacDetailController extends GetxController {
   }
 
   Future<void> updateAlmanacData(DateTime date) async {
-    if (!AuthService.to.isAuthenticated) {
-      if (Get.currentRoute != '/login') {
-        Get.toNamed('/login');
-      }
-      _applyLocalFallback(date);
-      return;
-    }
-
     isLoading.value = true;
     errorMessage.value = '';
 

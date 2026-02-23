@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"bazi_fortune_app/backend/config"
@@ -133,32 +134,65 @@ func (p *OpenAIProvider) Chat(model string, systemPrompt string, userPrompt stri
 type Orchestrator struct {
 	providers []AIProvider
 	model     string
+	preferred string
 }
 
 func NewOrchestrator(preferred string, cfg *config.Config, model string) *Orchestrator {
-	// 构造顺序：preferred 优先
+	// 构造顺序：preferred 优先，并跳过未配置 API Key 的供应商
 	order := []AIProvider{}
 	ds := &DeepSeekProvider{cfg: cfg}
 	oa := &OpenAIProvider{cfg: cfg}
+
+	hasDeepSeek := strings.TrimSpace(cfg.Deepseek.APIKey) != ""
+	hasOpenAI := strings.TrimSpace(cfg.OpenAI.APIKey) != ""
+
 	if preferred == "openai" {
-		order = []AIProvider{oa, ds}
+		if hasOpenAI {
+			order = append(order, oa)
+		}
+		if hasDeepSeek {
+			order = append(order, ds)
+		}
 	} else {
-		order = []AIProvider{ds, oa}
+		if hasDeepSeek {
+			order = append(order, ds)
+		}
+		if hasOpenAI {
+			order = append(order, oa)
+		}
 	}
+
 	return &Orchestrator{
 		providers: order,
 		model:     model,
+		preferred: preferred,
 	}
 }
 
 func (o *Orchestrator) ChatJSON(systemPrompt string, userPrompt string) (string, string, error) {
+	if len(o.providers) == 0 {
+		return "", "", fmt.Errorf("no AI provider configured: set deepseek.api_key or openai.api_key")
+	}
+
 	var lastErr error
 	for _, p := range o.providers {
-		content, err := p.Chat(o.model, systemPrompt, userPrompt)
+		model := defaultModelByProvider(p.Name())
+		if p.Name() == o.preferred && strings.TrimSpace(o.model) != "" {
+			model = o.model
+		}
+
+		content, err := p.Chat(model, systemPrompt, userPrompt)
 		if err == nil {
 			return p.Name(), content, nil
 		}
 		lastErr = err
 	}
 	return "", "", fmt.Errorf("all providers failed: %w", lastErr)
+}
+
+func defaultModelByProvider(provider string) string {
+	if provider == "openai" {
+		return "gpt-4o-mini"
+	}
+	return "deepseek-chat"
 }

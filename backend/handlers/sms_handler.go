@@ -46,7 +46,7 @@ type SendSmsResponse struct {
 // LoginWithSmsRequest 短信验证码登录请求结构
 type LoginWithSmsRequest struct {
 	Phone string `json:"phone" binding:"required"`
-	Code  string `json:"code" binding:"required,len=6"`
+	Code  string `json:"code" binding:"required,len=4"`
 }
 
 // LoginWithSmsResponse 短信验证码登录响应结构
@@ -114,7 +114,7 @@ func (h *SmsHandler) SendSmsCode(c *gin.Context) {
 		return
 	}
 
-	// 生成6位验证码
+	// 生成4位验证码
 	code := services.GenerateCode()
 
 	// 发送短信

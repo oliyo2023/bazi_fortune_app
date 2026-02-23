@@ -40,6 +40,13 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 			auth.POST("/login-with-sms", smsHandler.LoginWithSms) // 短信验证码登录
 		}
 
+		// 老黄历公开路由（游客可访问）
+		almanacPublic := v1.Group("/almanac")
+		{
+			almanacPublic.POST("/generate", almanacHandler.Generate)
+			almanacPublic.GET("/detail", almanacHandler.GetDetail)
+		}
+
 		// 需要认证的路由组
 		protected := v1.Group("/")
 		// 兼容两种 JWT：Supabase 签发或我们后端签发
@@ -66,13 +73,6 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 			aiRoutes := protected.Group("/ai")
 			{
 				aiRoutes.POST("/analyze", aiHandler.Analyze)
-			}
-
-			// 老黄历相关路由
-			almanac := protected.Group("/almanac")
-			{
-				almanac.POST("/generate", almanacHandler.Generate)
-				almanac.GET("/detail", almanacHandler.GetDetail)
 			}
 
 			// Admin 路由组

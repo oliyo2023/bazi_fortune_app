@@ -56,7 +56,7 @@ class AlmanacDetailPage extends GetView<AlmanacDetailController> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('老黄历-易百查'),
+        title: const Text('老黄历-流年观'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.of(context).pop(),

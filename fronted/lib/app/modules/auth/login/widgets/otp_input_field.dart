@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 
-/// 6位验证码输入框组件
+/// 4位验证码输入框组件
 ///
 /// 特性：
-/// - 6个独立输入框
+/// - 4个独立输入框
 /// - 自动跳转下一格
 /// - 支持粘贴完整验证码
 /// - 输入动画效果
@@ -40,7 +40,7 @@ class OtpInputField extends StatefulWidget {
 
   const OtpInputField({
     super.key,
-    this.length = 6,
+    this.length = 4,
     required this.onCompleted,
     this.onChanged,
     this.boxWidth = 50,

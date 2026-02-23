@@ -31,10 +31,10 @@ func (s *MockSmsService) SendVerificationCode(phone string, code string) error {
 	return nil
 }
 
-// GenerateCode 生成6位数字验证码
+// GenerateCode 生成4位数字验证码
 func GenerateCode() string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return fmt.Sprintf("%06d", r.Intn(1000000))
+	return fmt.Sprintf("%04d", r.Intn(10000))
 }
 
 // AliyunSmsService 阿里云短信服务（生产环境使用）

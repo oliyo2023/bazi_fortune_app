@@ -185,8 +185,8 @@ class LoginController extends GetxController {
     }
 
     // 验证验证码
-    if (code.length != 6) {
-      _showError('请输入6位验证码');
+    if (code.length != 4) {
+      _showError('请输入4位验证码');
       _shakeOtpField();
       return;
     }
