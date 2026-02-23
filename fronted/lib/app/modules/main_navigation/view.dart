@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../home/view.dart';
 import '../profile/view.dart';
@@ -9,10 +10,35 @@ import 'controller.dart';
 class MainNavigationPage extends GetView<MainNavigationController> {
   const MainNavigationPage({super.key});
 
+  void _handleBackInvoked(BuildContext context) {
+    final action = controller.handleBackPress();
+    if (action == BackPressAction.exitApp) {
+      if (GetPlatform.isAndroid) {
+        SystemNavigator.pop();
+      }
+      return;
+    }
+    if (action == BackPressAction.showExitHint) {
+      final messenger = ScaffoldMessenger.maybeOf(context);
+      messenger?.hideCurrentSnackBar();
+      messenger?.showSnackBar(
+        const SnackBar(
+          content: Text('再按一次退出应用'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: controller.onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBackInvoked(context);
+      },
       child: Scaffold(
         body: Obx(() => _getPage(controller.currentIndex.value)),
         bottomNavigationBar: Obx(

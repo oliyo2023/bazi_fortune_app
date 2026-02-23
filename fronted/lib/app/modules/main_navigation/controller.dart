@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import '../../data/services/auth_service.dart';
 
+enum BackPressAction { exitApp, switchToHomeTab, showExitHint }
+
 class MainNavigationController extends GetxController {
   final RxInt currentIndex = 0.obs;
   // 消息未读角标
@@ -38,26 +40,20 @@ class MainNavigationController extends GetxController {
     currentIndex.value = 4;
   }
 
-  Future<bool> onWillPop() async {
+  BackPressAction handleBackPress() {
     // 非首页时，返回键先回到首页而不是退出应用
     if (currentIndex.value != 0) {
       currentIndex.value = 0;
-      return false;
+      return BackPressAction.switchToHomeTab;
     }
 
     final now = DateTime.now();
     if (_lastBackPressedAt == null ||
         now.difference(_lastBackPressedAt!) > const Duration(seconds: 2)) {
       _lastBackPressedAt = now;
-      Get.snackbar(
-        '提示',
-        '再按一次退出应用',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 2),
-      );
-      return false;
+      return BackPressAction.showExitHint;
     }
 
-    return true;
+    return BackPressAction.exitApp;
   }
 }
